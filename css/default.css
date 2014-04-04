@@ -1,0 +1,28 @@
+﻿html, body {
+    height: 100%;
+}
+
+body {
+	width: 100%;
+	font: 14px/20px Arial,sans-serif;
+    margin: 0px;
+}
+
+div#main {
+	min-height: 100%; 
+	overflow: hidden; 
+	position: relative;
+	width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div#content {
+}
+
+footer#footer {
+	position: relative;
+	background: #000;
+	height: 88px;
+	margin-top: -88px;
+}
