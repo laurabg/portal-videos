@@ -1,0 +1,44 @@
+body {
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+
+/*.row {
+	margin-bottom: 20px;
+}*/
+/*
+.container.curso {
+	border: 1px solid #6e6e6e;
+	margin-bottom: 20px;
+	padding: 0px;
+}
+
+.container.curso .titulo {
+	padding-left: 15px;
+	padding-right: 15px;
+	height: 30px;
+	line-height: 30px;
+	background: #ececec;
+}
+
+.container.curso .row {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.container.curso .row .col {
+	border: 1px solid red;
+}
+
+/*
+.theme-dropdown .dropdown-menu {
+	position: static;
+	display: block;
+	margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+	margin: 5px 0;
+}
+*/

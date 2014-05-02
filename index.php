@@ -1,26 +1,26 @@
-﻿<html lang="es">
-	<head>
-		<link rel="stylesheet" type="text/css" href="css/default.css" media="screen"></link>
-		<title>Portal Vídeos</title>
-	</head>
-	<body>
-		<div id="main">
-			<header id="header">
-				<nav id="menu">
-					<ul>
-						<li><a href="admin/index.php" title="Administración">Acceso Administración</a></li>
-					</ul>
-				</nav>
-				<h1>Portal Gestión Vídeos</h1>
-			</header>
-			
-			<div id="content">
-				Contenido
-			</div>
-			
+﻿<?php include_once('config.php'); ?>
+<?php headerHTML('Portal Vídeos'); ?>
+		
+		<?php
+		if ( ($_GET["IDcurso"] != '')&&($_GET["IDvideo"] != '') ) {
+			include('mod/detalle-video.php');
+		} elseif ( ($_GET["IDcurso"] != '')&&($_GET["IDvideo"] == '') ) {
+			include('mod/detalle-curso.php');
+		} else {
+		?>
+		
+		<div class="jumbotron">
+			<div class="container">
+				<h1>Portal Vídeos</h1>
+				<p class="lead">Portal para visualización de vídeos agrupados por cursos.</p>
+			</div><!-- /.container -->
 		</div>
-		<footer id="footer">
-			Footer
-		</footer>
-	</body>
-</html>
+		<div class="container">
+			<?php listCursos(); ?>
+		</div>
+		
+		<?php
+		}
+		?>
+		
+<?php footerHTML(); ?>
