@@ -3,7 +3,23 @@ body {
 	padding-bottom: 30px;
 }
 
+span.play-video {
+	position: absolute;
+	z-index: 2;
+	left: 50%;
+	top: 20%;
+	color: #fff;
+	border: 2px solid #fff;
+	border-radius: 20px;
+	padding: 5px;
+	font-size: 20px;
+	margin-left: -10px;
+}
 
+a.ver-video:hover span.play-video {
+	color: #000;
+	border-color: #000;
+}
 /*.row {
 	margin-bottom: 20px;
 }*/
@@ -42,3 +58,4 @@ body {
 	margin: 5px 0;
 }
 */
+
