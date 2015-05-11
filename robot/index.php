@@ -25,7 +25,7 @@ function buscarCursos($dir) {
 					// Guardar el curso en la BBDD:
 				//	echo "Encontrado curso ".$filenameNEW."<br />";
 					logAction("Encontrado curso ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
-					$IDcurso = getIDcurso($filename);
+					$IDcurso = getIDcurso($filename, 1);
 
 					// Buscar temas dentro del curso:
 					buscarTemas($IDcurso, $dir.$filenameNEW);
@@ -74,7 +74,7 @@ function buscarTemas($IDcurso, $dir) {
 					// Guardar el tema
 				//	echo "&nbsp;&nbsp;&nbsp;Encontrado tema ".$filename."<br />";
 					logAction("Encontrado tema ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
-					$IDtema = getIDtema($IDcurso, $filename);
+					$IDtema = getIDtema($IDcurso, $filename, 1);
 
 					// Comprobar si existen las siguientes carpetas; sino crearlas:
 					if (!file_exists($dir."/".$filenameNEW."/img")) {
@@ -136,12 +136,12 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 						// Guardar el vídeo:
 					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$IDcurso." - ".$IDtema.") Encontrado vídeo ".$filename."<br />";
 						logAction("Encontrado vídeo ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
-						$IDvideo = getIDvideo($IDcurso, $IDtema, $filename, $ubicacion."/".$filenameNEW);
+						$IDvideo = getIDvideo($IDcurso, $IDtema, $filename, $ubicacion."/".$filenameNEW, 1);
 
 						$img = getPortada($filenameNEW, $dir);
 						
 						if ($img != '') {
-							updateVideo($IDvideo, $ubicacion."/img/".$img);
+							updateVideoIMG($IDvideo, $ubicacion."/img/".$img);
 						}
 					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$ubicacion."/".$filenameNEW."<br />";
 					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$ubicacion."/img/".$img."<br />";
@@ -231,6 +231,7 @@ $db = null;
 $dbLog = null;
 
 include_once('../config.php');
+
 include_once(_DOCUMENTROOT.'db/db.php');
 
 dbCreate(_BBDD);

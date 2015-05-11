@@ -69,10 +69,13 @@ $(window).load(function() {
 
 		$('#'+divCurso).load('ajax/admin-curso.php?IDcurso='+IDcurso, function() {});
 	}
-	// Datepickers:
-	$('.datepicker').datepicker({
-		weekStart: 1,
-		format: 'yyyy-mm-dd',
-		locale: 'es'
-	});
+
+	if ($('.datepicker').length > 0) {
+		// Datepickers:
+		$('.datepicker').datepicker({
+			weekStart: 1,
+			format: 'yyyy-mm-dd',
+			locale: 'es'
+		});
+	}
 });

@@ -13,7 +13,7 @@
  * @authorr Jerome Mouneyrac
  */
 /// SETUP - NEED TO BE CHANGED
-$token = '17b86aa656d4e44ce43f8146fb75dd05';
+$token = '418a443a4b1696cb83716eb1eb106c64';
 $domainname = 'http://localhost/moodle';
 $functionname = 'core_enrol_get_users_courses';
 
@@ -21,7 +21,7 @@ $functionname = 'core_enrol_get_users_courses';
 $restformat = 'json'; //Also possible in Moodle 2.2 and later: 'json'
                      //Setting it to 'json' will fail all calls on earlier Moodle version
 
-$params = array('userid' => 3);
+$params = array('courseid' => 2);
 
 /// REST CALL
 header('Content-Type: text/plain');
@@ -48,7 +48,7 @@ $restformat = 'json'; //Also possible in Moodle 2.2 and later: 'json'
 
 $serverurl = $domainname . '/webservice/rest/server.php'. '?wstoken=' . $token . '&wsfunction='.$functionname;
 $restformat = ($restformat == 'json')?'&moodlewsrestformat=' . $restformat:'';
-
+echo $serverurl . $restformat.'<br /><br /><br />';
 
 $resp = $curl->post($serverurl . $restformat, $params);
 

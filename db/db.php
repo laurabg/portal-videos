@@ -382,13 +382,15 @@ function getTemaData($IDtema, $IDcurso) {
 /*
  crearVideo: Crea un video con los parámetros que se facilitan
  */
-function crearVideo($IDcurso, $IDtema, $nombre, $descripcion) {
+function crearVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta) {
 	global $db;
 
 	$SQL = 'INSERT INTO videos (nombre, IDcurso, IDtema';
 	$SQL .= ($descripcion != '')?',descripcion':'';
+	$SQL .= ($ruta != '')?',ruta':'';
 	$SQL .= ') VALUES ("'.$nombre.'",'.$IDcurso.','.$IDtema;
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -423,12 +425,12 @@ function checkVideo($condicion) {
 }
 
 
-function getIDvideo($IDcurso, $IDtema, $nombre, $crearVideo) {
+function getIDvideo($IDcurso, $IDtema, $nombre, $ruta, $crearVideo) {
 	global $db;
 
 	if ($crearVideo == 1) {
 		if ($db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema) == 0) {
-			crearVideo($IDcurso, $IDtema, $nombre, '');
+			crearVideo($IDcurso, $IDtema, $nombre, '', $ruta);
 		}
 	}
 
@@ -455,6 +457,13 @@ function getVideoData($IDvideo, $IDtema, $IDcurso) {
 	}
 
 	return $video;
+}
+
+
+function updateVideoIMG($IDvideo, $img) {
+	global $db;
+
+	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
 }
 
 /*

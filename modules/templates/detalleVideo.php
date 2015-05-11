@@ -34,9 +34,11 @@ $OUT .= '<div class="container">';
 		$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND ID = '.$IDvideo);
 		while ($row = $res->fetchArray()) {
 			$OUT .= '<div class="video">';
-				$OUT .= '<video controls preload="auto" width="100%" poster="'._DIRCURSOS.$row['img'].'">';
-					$OUT .= '<source src="'._DIRCURSOS.$row['ruta'].'" type="video/mp4" />';
-				$OUT .= '</video>';
+				$OUT .= '<div class="flowplayer" data-swf="js/flowplayer-5.4.4/flowplayer.swf">';
+					$OUT .= '<video controls preload="auto" width="100%" poster="'._DIRCURSOS.$row['img'].'">';
+						$OUT .= '<source src="'._DIRCURSOS.$row['ruta'].'" type="video/mp4" />';
+					$OUT .= '</video>';
+				$OUT .= '</div>';
 				$OUT .= '<div class="thumbnail">';
 					$OUT .= '<div class="caption">';
 						$OUT .= '<h3>'.$row['nombre'].'</h3>';

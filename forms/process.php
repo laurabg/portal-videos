@@ -51,6 +51,7 @@ if ($_POST['form'] == 'cursos') {
 				// Obtener los usuarios inscritos al curso:
 				$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
 				foreach ($usuariosEnCurso as $user) {
+					echo '***'.$user->email.'<br />';
 					registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->email);
 				}
 
@@ -67,6 +68,7 @@ if ($_POST['form'] == 'cursos') {
 					// Obtener los usuarios inscritos al curso:
 					$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
 					foreach ($usuariosEnCurso as $user) {
+						echo $user->email.'<br />';
 						registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->email);
 					}
 				}
@@ -123,9 +125,9 @@ if ($_POST['form'] == 'cursos') {
 	if ($error == '') {
 		if (!$_POST['IDvideo']) {
 			// Crear el curso en la base de datos:
-			crearVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion']);
+			crearVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], '');
 
-			$IDvideo = getIDvideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], 0);
+			$IDvideo = getIDvideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], '', 0);
 			$_POST['IDvideo'] = $IDvideo;
 
 			$ok = 1;
