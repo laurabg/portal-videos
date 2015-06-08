@@ -1,6 +1,6 @@
 <?php
 
-require_once('../config.php');
+include_once(__DIR__.'/../config.php');
 
 if ( ($_POST['userName'] != '')&&($_POST['userPass'] != '') ) {
 	echo 'Comprobar datos de acceso';

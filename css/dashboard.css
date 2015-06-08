@@ -230,3 +230,13 @@ body {
 	border:1px solid #94a0b4;
 	color:#000
 */
+
+
+/* ----- CONFIG ----- */
+.listado .row {
+	margin-bottom: 15px;
+}
+
+form[name="config"] button {
+	margin-right: 10px;
+}

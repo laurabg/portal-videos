@@ -1,6 +1,6 @@
 <?php
 	
-	include_once(_DOCUMENTROOT.'config.php');
+	include_once(__DIR__.'/../config.php');
 	include_once(_DOCUMENTROOT.'modules/functions.php');
 	include_once(_DOCUMENTROOT.'db/db.php');
 	

@@ -4,7 +4,7 @@ global $db;
 $OUT = '';
 $cont = 0;
 
-$OUT .= getCabecera('Portal de vídeos','Selecciona el curso que desea ver.', 0);
+$OUT .= getCabecera('Portal de vídeos','Selecciona el curso que desea ver.', 0, '', '');
 
 $OUT .= '<div class="container">';
 	$OUT .= '<div class="panel panel-primary">';
@@ -12,7 +12,7 @@ $OUT .= '<div class="container">';
 		$OUT .= '<div class="panel-body">';
 			$OUT .= '<div class="row">';
 			
-			$res = $db->query('SELECT * FROM cursos');
+			$res = $db->query('SELECT * FROM cursos WHERE publico = 1 OR IDcursoMoodle != ""');
 			while ($row = $res->fetchArray()) {
 				if ($cont % 3 == 0) {
 					$OUT .= '</div><div class="row">';
@@ -29,6 +29,13 @@ $OUT .= '<div class="container">';
 				
 				$cont++;
 			}
+
+			if ($cont == 0) {
+				$OUT .= '<div class="col-sm-12 col-md-4">';
+					$OUT .= '<p>En estos momentos no hay cursos disponibles.</p>';
+				$OUT .= '</div>';
+			}
+
 			$OUT .= '</div>';
 		$OUT .= '</div>';
 	$OUT .= '</div>';

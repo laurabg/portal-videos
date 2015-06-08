@@ -23,6 +23,22 @@ function dbCreate($dbName) {
 	}
 }
 
+function dbConfigCreate($dbConfigName) {
+	global $dbConfig;
+
+	if (!file_exists($dbConfigName)) {
+	//	echo 'Creando bbddLog...<br />';
+		$dbConfig = new SQLite3($dbConfigName);
+		chmod($dbConfigName, 0777);
+
+	//	echo 'Creando tablasLog...<br />';
+		crearTablasConfig();
+	} else {
+	//	echo 'La base de datos ya existe<br />';
+		$dbConfig = new SQLite3($dbConfigName);
+	}
+}
+
 function dbLogCreate($dbLogName) {
 	global $dbLog;
 
@@ -61,6 +77,8 @@ function crearTablas() {
 	$db->exec('CREATE TABLE cursos (
 		ID INTEGER PRIMARY KEY, 
 		nombre TEXT, 
+		ubicacion INTEGER,
+		ruta TEXT,
 		descripcion TEXT,
 		IDcursoMoodle INTEGER,
 		fechaIni DATE,
@@ -70,6 +88,7 @@ function crearTablas() {
 	$db->exec('CREATE TABLE temas (
 		ID INTEGER PRIMARY KEY, 
 		nombre TEXT, 
+		ruta TEXT,
 		descripcion TEXT, 
 		IDcurso INTEGER);'
 	);
@@ -84,12 +103,46 @@ function crearTablas() {
 	);
 	$db->exec('CREATE TABLE usuarios (
 		ID INTEGER PRIMARY KEY, 
-		email TEXT, 
+		nombre TEXT, 
+		apellidos TEXT, 
+		email TEXT);'
+	);
+	$db->exec('CREATE TABLE cursosUsuarios (
+		ID INTEGER PRIMARY KEY, 
+		IDusuario INTEGER,
 		IDcurso INTEGER,
 		IDcursoMoodle INTEGER);'
 	);
 }
 
+
+function crearTablasConfig() {
+	global $dbConfig;
+
+	$dbConfig->exec('CREATE TABLE adminvars (
+		ID INTEGER PRIMARY KEY, 
+		nombre TEXT,
+		valor TEXT);'
+	);
+
+	crearAdminvar('showErrors',1);
+	crearAdminvar('_WSTOKEN','');
+	crearAdminvar('_MOODLEURL','');
+	
+	$dbConfig->exec('CREATE TABLE ubicaciones (
+		ID INTEGER PRIMARY KEY, 
+		ruta TEXT);'
+	);
+
+	crearUbicacion('cursos/');
+
+	$dbConfig->exec('CREATE TABLE extensionesValidas (
+		ID INTEGER PRIMARY KEY, 
+		nombre TEXT);'
+	);
+
+	crearExtension('mp4');
+}
 
 function crearTablasLog() {
 	global $dbLog;
@@ -135,21 +188,21 @@ function resetDBAnalytics() {
 /*
  crearCurso: Crea un curso con los parámetros que se facilitan
  */
-function crearCurso($nombreCurso, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function crearCurso($nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
 	global $db;
 
-	$SQL = 'INSERT INTO cursos (nombre';
+	$SQL = 'INSERT INTO cursos (nombre, ruta, ubicacion';
 	$SQL .= ($descripcion != '')?',descripcion':'';
 	$SQL .= ($IDcursoMoodle != '')?',IDcursoMoodle':'';
-	$SQL .= ($publico != '')?',publico':'';
 	$SQL .= ($fechaIni != '')?',fechaIni':'';
 	$SQL .= ($fechaFin != '')?',fechaFin':'';
-	$SQL .= ') VALUES ("'.$nombreCurso.'"';
+	$SQL .= ',publico';
+	$SQL .= ') VALUES ("'.$nombre.'", "'.$ruta.'", '.$ubicacion;
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($IDcursoMoodle != '')?','.$IDcursoMoodle:'';
-	$SQL .= ($publico != '')?',"'.$publico.'"':'';
 	$SQL .= ($fechaIni != '')?',"'.$fechaIni.'"':'';
 	$SQL .= ($fechaFin != '')?',"'.$fechaFin.'"':'';
+	$SQL .= ',"'.$publico.'"';
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -159,18 +212,18 @@ function crearCurso($nombreCurso, $descripcion, $IDcursoMoodle, $fechaIni, $fech
 /*
  updateCurso: Crea un curso con los parámetros que se facilitan
  */
-function updateCurso($IDcurso, $nombreCurso, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function updateCurso($IDcurso, $nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
 	global $db;
 
 	$SQL = 'UPDATE cursos SET ';
-	$SQL .= 'nombre = "'.$nombreCurso.'"';
+	$SQL .= 'nombre = "'.$nombre.'", ruta = "'.$ruta.'", ", ubicacion = '.$ubicacion;
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
 	$SQL .= ($IDcursoMoodle != '')?', IDcursoMoodle = '.$IDcursoMoodle:'';
-	$SQL .= ($publico != '')?', publico = "'.$publico.'"':'';
 	$SQL .= ($fechaIni != '')?', fechaIni = "'.$fechaIni.'"':'';
 	$SQL .= ($fechaFin != '')?', fechaFin = "'.$fechaFin.'"':'';
+	$SQL .= ', publico = "'.$publico.'"';
 	$SQL .= ' WHERE ID = '.$IDcurso;
-	
+
 	$db->exec($SQL);
 }
 
@@ -183,10 +236,26 @@ function checkCurso($condicion) {
 	$SQL = 'SELECT COUNT(*) FROM cursos WHERE '.$condicion;
 
 	$existe = $db->querySingle($SQL);
-	//print $SQL.' ('.$existe.')<br />';
+	
 	return $existe;
 }
 
+/*
+ getIDcurso: Devuelve el ID del curso por nombre y ruta
+ */
+function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
+	global $db;
+
+	if (checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) {
+		if ($crearCurso == 1) {
+			crearCurso($nombre, $ruta, $IDubicacion, '', '', '', '', 0);
+		}
+	}
+
+	$IDcurso = $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'"');
+
+	return $IDcurso;
+}
 
 /*
  registrarUsuarioCurso: Registra una serie de usuarios en un curso
@@ -211,21 +280,6 @@ function desregistrarUsuariosCurso($IDcurso) {
 	$db->exec($SQL);
 }
 
-
-function getIDcurso($nombreCurso, $crearCurso) {
-	global $db;
-
-	if ($crearCurso == 1) {
-		if ($db->querySingle('SELECT COUNT(*) FROM cursos WHERE nombre = "'.$nombreCurso.'"') == 0) {
-			crearCurso($nombreCurso, '', '', '', '', '');
-		}
-	}
-
-	$IDcurso = $db->querySingle('SELECT ID FROM cursos WHERE nombre = "'.$nombreCurso.'"');
-	return $IDcurso;
-}
-
-
 /*
  * getCursoData: devuelve un array con toda la información de un curso:
  */
@@ -238,6 +292,8 @@ function getCursoData($IDcurso) {
 	while ($row = $res->fetchArray()) {
 		$curso = array(
 			'nombre' => $row['nombre'],
+			'ruta' => $row['ruta'],
+			'ubicacion' => $row['ubicacion'],
 			'descripcion' => $row['descripcion'],
 			'fechaIni' => $row['fechaIni'],
 			'fechaFin' => $row['fechaFin'],
@@ -303,15 +359,15 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 /*
  crearTema: Crea un tema con los parámetros que se facilitan
  */
-function crearTema($IDcurso, $nombreTema, $descripcion) {
+function crearTema($IDcurso, $nombre, $ruta, $descripcion) {
 	global $db;
 
-	$SQL = 'INSERT INTO temas (nombre, IDcurso';
+	$SQL = 'INSERT INTO temas (nombre, ruta, IDcurso';
 	$SQL .= ($descripcion != '')?',descripcion':'';
-	$SQL .= ') VALUES ("'.$nombreTema.'",'.$IDcurso;
+	$SQL .= ') VALUES ("'.$nombre.'","'.$ruta.'",'.$IDcurso;
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ')';
-	print $SQL;
+	//print $SQL;
 	$db->exec($SQL);
 }
 
@@ -319,11 +375,10 @@ function crearTema($IDcurso, $nombreTema, $descripcion) {
 /*
  updateTema: Actualiza un tema existente
  */
-function updateTema($IDtema, $IDcurso, $nombreTema, $descripcion) {
+function updateTema($IDtema, $IDcurso, $nombre, $ruta, $descripcion) {
 	global $db;
 
-	$SQL = 'UPDATE temas SET ';
-	$SQL .= 'nombre = "'.$nombreTema.'"';
+	$SQL = 'UPDATE temas SET nombre = "'.$nombre.'", ruta = "'.$ruta.'"';
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
 	$SQL .= ' WHERE ID = '.$IDtema.' AND IDcurso = '.$IDcurso;
 	
@@ -344,16 +399,19 @@ function checkTema($condicion) {
 }
 
 
-function getIDtema($IDcurso, $nombreTema, $crearTema) {
+/*
+ getIDtema: Devuelve ID tema por ruta e IDcurso.
+ */
+function getIDtema($IDcurso, $nombre, $ruta, $crearTema) {
 	global $db;
 
-	if ($crearTema == 1) {
-		if ($db->querySingle('SELECT COUNT(*) FROM temas WHERE nombre = "'.$nombreTema.'" AND IDcurso = '.$IDcurso) == 0) {
-			crearTema($IDcurso, $nombreTema, '');
+	if (checkTema('ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso) == 0) {
+		if ($crearTema == 1) {
+			crearTema($IDcurso, $nombre, $ruta, '');
 		}
 	}
 
-	$IDtema = $db->querySingle('SELECT ID FROM temas WHERE nombre = "'.$nombreTema.'" AND IDcurso = '.$IDcurso);
+	$IDtema = $db->querySingle('SELECT ID FROM temas WHERE ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso);
 	return $IDtema;
 }
 
@@ -369,6 +427,7 @@ function getTemaData($IDtema, $IDcurso) {
 	while ($row = $res->fetchArray()) {
 		$tema = array(
 			'nombre' => $row['nombre'],
+			'ruta' => $row['ruta'],
 			'descripcion' => $row['descripcion'],
 			'IDcurso' => $row['IDcurso']
 		);
@@ -514,6 +573,142 @@ function videoPlayed($IDcurso, $IDtema, $IDvideo, $IDusuario) {
 	global $dbAn;
 
 	$dbAn->exec('INSERT INTO analytics (IDcurso, IDtema, IDvideo, IDusuario) VALUES ('.$IDcurso.','.$IDtema.','.$IDvideo.','.$IDusuario.')');
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
+
+/*
+ * getCursoData: devuelve un array con toda la información de un curso:
+ */
+function getConfigData() {
+	global $dbConfig;
+	
+	$config = array();
+	
+	$res = $dbConfig->query('SELECT * FROM adminvars');
+	while ($row = $res->fetchArray()) {
+		$config[$row['nombre']] = $row['valor'];
+	}
+	$config['listaUbicaciones'] = listaUbicaciones(1);
+	$config['listaExtensiones'] = listaExtensiones(1);
+	
+	return $config;
+}
+
+function getAdminvar($varName) {
+	global $dbConfig;
+
+	return $dbConfig->querySingle('SELECT valor FROM adminvars WHERE nombre = "'.$varName.'"');
+}
+
+function crearAdminvar($nombre, $valor) {
+	global $dbConfig;
+
+	$dbConfig->exec('INSERT INTO adminvars (nombre, valor) VALUES ("'.$nombre.'", "'.$valor.'");');
+}
+
+function updateAdminvar($nombre, $valor) {
+	global $dbConfig;
+
+	$dbConfig->exec('UPDATE adminvars SET valor = "'.$valor.'" WHERE nombre = "'.$nombre.'";');
+}
+
+function deleteAdminvar($ID) {
+	global $dbConfig;
+
+	$dbConfig->exec('DELETE FROM adminvars WHERE ID = '.$ID.';');
+}
+
+function listaUbicaciones($returnID) {
+	global $dbConfig;
+
+	$ubicaciones = array();
+
+	$res = $dbConfig->query('SELECT * FROM ubicaciones');
+	while ($row = $res->fetchArray()) {
+		if ($returnID == 1) {
+			array_push($ubicaciones, array( 'ID' => $row['ID'], 'ruta' => $row['ruta']));
+		} else {
+			array_push($ubicaciones, $row['ruta']);
+		}
+	}
+
+	return $ubicaciones;
+}
+
+function crearUbicacion($ruta) {
+	global $dbConfig;
+
+	if (checkUbicacion('ruta = "'.$ruta.'"') == 0) {
+		$dbConfig->exec('INSERT INTO ubicaciones (ruta) VALUES ("'.$ruta.'");');
+	}
+}
+
+function updateUbicacion($ID, $ruta) {
+	global $dbConfig;
+
+	$dbConfig->exec('UPDATE ubicaciones SET ruta = "'.$ruta.'" WHERE ID = '.$ID.';');
+}
+
+function deleteUbicacion($ID) {
+	global $dbConfig;
+
+	$dbConfig->exec('DELETE FROM ubicaciones WHERE ID = '.$ID.';');
+}
+
+function checkUbicacion($condicion) {
+	global $dbConfig;
+	
+	$SQL = 'SELECT COUNT(*) FROM ubicaciones WHERE '.$condicion;
+
+	$existe = $dbConfig->querySingle($SQL);
+	
+	return $existe;
+}
+
+function listaExtensiones($returnID) {
+	global $dbConfig;
+
+	$extensiones = array();
+
+	$res = $dbConfig->query('SELECT * FROM extensionesValidas');
+	while ($row = $res->fetchArray()) {
+		if ($returnID == 1) {
+			array_push($extensiones, array( 'ID' => $row['ID'], 'nombre' => $row['nombre']));
+		} else {
+			array_push($extensiones, $row['ruta']);
+		}
+	}
+
+	return $extensiones;
+}
+
+function crearExtension($nombre) {
+	global $dbConfig;
+
+	if (checkExtension('nombre = "'.$nombre.'"') == 0) {
+		$dbConfig->exec('INSERT INTO extensionesValidas (nombre) VALUES ("'.$nombre.'");');
+	}
+}
+
+function updateExtension($ID, $nombre) {
+	global $dbConfig;
+
+	$dbConfig->exec('UPDATE extensionesValidas SET nombre = "'.$nombre.'" WHERE ID = '.$ID.';');
+}
+
+function deleteExtension($ID) {
+	global $dbConfig;
+
+	$dbConfig->exec('DELETE FROM extensionesValidas WHERE ID = '.$ID.';');
+}
+
+
+function checkExtension($condicion) {
+	global $dbConfig;
+
+	return $dbConfig->querySingle('SELECT COUNT(*) FROM extensionesValidas WHERE '.$condicion);
 }
 
 ?>

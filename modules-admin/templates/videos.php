@@ -3,9 +3,9 @@
 	<div class="col-12">
 
 <?php
-include_once('../config.php');
-include_once(_DOCUMENTROOT.'forms/process.php');
-include_once(_DOCUMENTROOT.'ws/connection.php');
+include_once(__DIR__.'/../config.php');
+include_once(_DOCUMENTROOT.'forms/adminVideos.php');
+include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
 if ($_GET['IDcurso'] != '') {
 	$_POST['IDcurso'] = $_GET['IDcurso'];
@@ -15,7 +15,7 @@ if ($_GET['IDtema'] != '') {
 }
 // Si estamos viendo un curso, pero no se ha enviado el formulario, mostrar sus datos:
 if ( ($_GET['IDcurso'] != '')&&($_GET['IDtema'] != '')&&($_GET['IDvideo'] != '')&&($_POST['form'] == '') ) {
-	$videoData = getTemaData($_GET['IDvideo'], $_GET['IDtema'], $_GET['IDcurso']);
+	$videoData = getVideoData($_GET['IDvideo'], $_GET['IDtema'], $_GET['IDcurso']);
 	$_POST['IDvideo'] = $_GET['IDvideo'];
 	$_POST['nombreVideo'] = $videoData['nombre'];
 	$_POST['descripcion'] = $videoData['descripcion'];
@@ -23,12 +23,8 @@ if ( ($_GET['IDcurso'] != '')&&($_GET['IDtema'] != '')&&($_GET['IDvideo'] != '')
 
 $OUT = '';
 
-if ( ($error == '')&&($ok == 1) ) {
-	$OUT .= '<div class="alert alert-success">Datos guardados correctamente</div>';
-} else if ( ($error == '')&&($ok == 2) ) {
-	$OUT .= '<div class="alert alert-success">Datos actualizados correctamente</div>';
-} else if ($error != '') {
-	$OUT .= '<div class="alert alert-danger">'.$error.'</div>';
+if ($error != '') {
+	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
 $OUT .= '<form role="form" method="POST" action="">';

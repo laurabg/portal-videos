@@ -3,9 +3,9 @@
 	<div class="col-12">
 
 <?php
-include_once('../config.php');
-include_once(_DOCUMENTROOT.'forms/process.php');
-include_once(_DOCUMENTROOT.'ws/connection.php');
+include_once(__DIR__.'/../../config.php');
+include_once(_DOCUMENTROOT.'forms/adminTemas.php');
+include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
 if ($_GET['IDcurso'] != '') {
 	$_POST['IDcurso'] = $_GET['IDcurso'];
@@ -20,12 +20,8 @@ if ( ($_GET['IDcurso'] != '')&&($_GET['IDtema'] != '')&&($_POST['form'] == '') )
 
 $OUT = '';
 
-if ( ($error == '')&&($ok == 1) ) {
-	$OUT .= '<div class="alert alert-success">Datos guardados correctamente</div>';
-} else if ( ($error == '')&&($ok == 2) ) {
-	$OUT .= '<div class="alert alert-success">Datos actualizados correctamente</div>';
-} else if ($error != '') {
-	$OUT .= '<div class="alert alert-danger">'.$error.'</div>';
+if ($error != '') {
+	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
 $OUT .= '<form role="form" method="POST" action="">';

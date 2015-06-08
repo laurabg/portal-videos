@@ -1,6 +1,6 @@
 <?php
 
-include_once('../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'db/db.php');
 
 $OUT = '';
@@ -10,7 +10,7 @@ function listaItemsCursos() {
 	$OUT = '';
 
 	$cls = '';
-	if ( ($_GET['opt'] == $opt)&&(!$_GET['IDcurso']) ) {
+	if ( (!isset($_GET['IDcurso']))&&($_GET['opt'] == $opt) ) {
 		$cls = ' active';
 	}
 
@@ -29,9 +29,9 @@ function listaItemsCursos() {
 		$item = $listaCursos[$i];
 		$cls = '';
 
-		if ($item[0] == $_GET['IDcurso']) {
+		if ( ($item[0] == $_GET['IDcurso']) ) {
 			$cls = ' expanded';
-			if ( ($_GET['opt'] == $opt)&&(!$_GET['IDtema'])&&(!$_GET['IDvideo']) )  {
+			if ( ($_GET['opt'] == $opt)&&(!isset($_GET['IDtema']))&&(!isset($_GET['IDvideo'])) )  {
 				$cls .= ' active';
 			}
 		}
@@ -56,7 +56,7 @@ function listaItemsTemas($IDcurso) {
 	$OUT = '';
 
 	$cls = '';
-	if ( ($_GET['opt'] == $opt)&&(!$_GET['IDtema'])&&($_GET['IDcurso'] == $IDcurso) ) {
+	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&(!isset($_GET['IDtema'])) ) {
 		$cls = ' class="active"';
 	}
 
@@ -75,9 +75,9 @@ function listaItemsTemas($IDcurso) {
 		$item = $listaTemas[$i];
 		$cls = '';
 
-		if ($item[0] == $_GET['IDtema']) {
+		if ( ($item[0] == $_GET['IDtema']) ) {
 			$cls = ' class="expanded';
-			if ( ($_GET['opt'] == $opt)&&(!$_GET['IDvideo']) ) {
+			if ( ($_GET['opt'] == $opt)&&(!isset($_GET['IDvideo'])) ) {
 				$cls .= ' active';
 			}
 			$cls .= '"';
@@ -103,7 +103,7 @@ function listaItemsVideos($IDcurso, $IDtema) {
 	$OUT = '';
 
 	$cls = '';
-	if ( ($_GET['opt'] == $opt)&&(!$_GET['IDvideo'])&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == $IDtema) ) {
+	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == $IDtema)&&(!isset($_GET['IDvideo'])) ) {
 		$cls = ' class="active"';
 	}
 
@@ -157,7 +157,7 @@ for ($i = 0; $i < sizeof($menu); $i++) {
 	$item = $menu[$i];
 
 	$OUT .= '<li';
-	if ($_GET['opt'] == $item['url']) {
+	if ( ($_GET['opt'] == $item['url']) ) {
 		$OUT .=  ' class="active"';
 	}
 	$OUT .= '><a href="?opt='.$item['url'].'">'.$item['nombre'].'</a></li>';
@@ -169,43 +169,5 @@ for ($i = 0; $i < sizeof($menu); $i++) {
 $OUT .= '</ul>';
 
 echo $OUT;
-/*
-$menu[0] = '<li';
-if ($_GET['opt'] == 'config') {
-	$menu[0] .= ' class="active"';
-}
-$menu[0] .= '><a href="?opt=config">Configuración</a></li>';
 
-$menu[1] = '<li';
-if ($_GET['opt'] == 'cursos') {
-	$menu[1] .= ' class="active"';
-}
-$menu[1] .= '><a href="?opt=cursos">Cursos</a></li>';
-
-$menu[2] = '<li';
-if ($_GET['opt'] == 'temas') {
-	$menu[2] .= ' class="active"';
-}
-$menu[2] .= '><a href="?opt=temas">Temas</a></li>';
-
-$menu[3] = '<li';
-if ($_GET['opt'] == 'videos') {
-	$menu[3] .= ' class="active"';
-}
-$menu[3] .= '><a href="?opt=videos">Vídeos</a></li>';
-*/
 ?>
-<!--ul class="nav nav-sidebar">
-	<?php echo $menu[0]; ?>
-</ul>
-<ul class="nav nav-sidebar">
-	<?php echo $menu[1]; ?>
-	<?php echo $menu[2]; ?>
-	<?php echo $menu[3]; ?>
-</ul>
-<ul class="nav nav-sidebar">
-	<?php echo $menu[4]; ?>
-	<?php echo $menu[5]; ?>
-	<li><a href="?opt=analytics">Analytics</a></li>
-	<li><a href="?opt=users">Gestión de usuarios</a></li>
-</ul-->

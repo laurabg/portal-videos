@@ -1,4 +1,4 @@
-/*function loadTree() {
+function loadTree() {
     // Ocultar todos los li
     $('.tree li').hide();
     // Mostrar solo los de primer nivel:
@@ -27,49 +27,11 @@
         }
         e.stopPropagation();
     });
-}*/
+}
 
 $(window).load(function() {
-	var sPageURL = window.location.search.substring(1);
-	var sURLVariables = sPageURL.split('&');
-
-	//loadTree();
-
-	firstPlay = 1;
-	$('video').on('play', function() {
-		if (firstPlay == 1) {
-
-			$.ajax({
-				type: 'POST',
-				async: true,
-				url: 'ajax/videoPlayed.php',
-				data: sPageURL,
-				success: function(msg) {
-					alert(msg);
-				}
-			});
-			
-			firstPlay = 0;
-		}
-	});
-	/*
-	// Tabs para cursos:
-	$('#admin-cursos a').click(function() {
-		divCurso = $(this).attr('href');
-		IDcurso = divCurso.replace('#curso-','');
-
-		$(this).tab('show');
-		$(divCurso).load('ajax/admin-curso.php?IDcurso='+IDcurso, function() {});
-	});
+	loadTree();
 	
-	// Cargar el contenido de la primera pestaña:
-	divCurso = $('div.tab-content').children('.active').attr('id');
-	if (divCurso) {
-		IDcurso = divCurso.replace('curso-','');
-
-		$('#'+divCurso).load('ajax/admin-curso.php?IDcurso='+IDcurso, function() {});
-	}
-
 	if ($('.datepicker').length > 0) {
 		// Datepickers:
 		$('.datepicker').datepicker({
@@ -77,5 +39,39 @@ $(window).load(function() {
 			format: 'yyyy-mm-dd',
 			locale: 'es'
 		});
-	}*/
+	}
+
+	$('form[name="config"] .add-ub').click(function() {
+		newUb = '<div class="row"><div class="col-md-2"></div><div class="col-md-10">';
+		newUb = newUb + '<input type="text" class="form-control" name="ubicacion-new[]" id="ubicacion" value="" /></div></div>';
+		$('.listaUbicaciones').append(newUb);
+	});
+
+
+	$('form[name="config"] .add-ext').click(function() {
+		newUb = '<div class="row"><div class="col-md-2"></div><div class="col-md-10">';
+		newUb = newUb + '<input type="text" class="form-control" name="extension-new[]" id="extension" value="" /></div></div>';
+		$('.listaExtensiones').append(newUb);
+	});
+	/*
+	$('.check-delete').click(function() {
+		todosOff = true;
+		listaChecks = document.getElementsByClassName('check-delete');
+
+		for (i = 0; i < listaChecks.length; i++) {
+			if (listaChecks[i].checked == true) {
+				todosOff = false;
+			}
+		}
+
+		if (todosOff == true) {
+			$('.del-ub').addClass('disabled');
+		} else {
+			$('.del-ub').removeClass('disabled');
+		}
+	});
+	*/
+	$('.btn-cancel').click(function() {
+		window.location.reload();
+	});
 });

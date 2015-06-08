@@ -2,7 +2,7 @@
 include_once('config.php');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,11 +13,11 @@ include_once('config.php');
 		<title>Administración</title>
 
 		<!-- Bootstrap core CSS -->
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="css/datepicker.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="css/datepicker.css">
 
 		<!-- Custom styles for this template -->
-		<link href="css/dashboard.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="css/dashboard.css">
 
 		<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
 		<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -71,6 +71,6 @@ include_once('config.php');
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
 		<script type="text/javascript" src="js/flowplayer-5.4.4/flowplayer.min.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src="js/admin.js"></script>
 	</body>
 </html>

@@ -1,6 +1,6 @@
 <?php
-include_once('../config.php');
-include_once(_DOCUMENTROOT.'ws/curl.php');
+include_once(__DIR__.'/../config.php');
+include_once(_DOCUMENTROOT.'lib/curl.php');
 
 function connect($functionName, $params) {
 	$serverURL = _MOODLEURL . '/webservice/rest/server.php';

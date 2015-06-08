@@ -6,7 +6,7 @@ function getCabecera($nombre, $desc, $showButtons, $IDcurso, $IDtema) {
 	$OUT = '';
 
 	$OUT .= '<div class="jumbotron">';
-		$OUT .= '<div class="container">';
+		$OUT .= '<div class="container hidden-xs">';
 			$OUT .= '<h1>'.$nombre.'</h1>';
 			$OUT .= '<p class="lead">'.$desc.'</p>';
 			if ($showButtons == 1) {

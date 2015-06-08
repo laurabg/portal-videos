@@ -9,7 +9,7 @@ $numCol = 4;
 // Mostrar la cabecera del curso, con su nombre y descripción:
 $res = $db->query('SELECT nombre, descripcion FROM temas WHERE IDcurso = '.$IDcurso.' AND ID = '.$IDtema);
 while ($row = $res->fetchArray()) {
-	$OUT .= getCabecera($row['nombre'],$row['descripcion'], 1, $IDcurso);
+	$OUT .= getCabecera($row['nombre'],$row['descripcion'], 1, $IDcurso, '', '');
 }
 $res = null;
 	

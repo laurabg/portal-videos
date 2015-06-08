@@ -3,9 +3,9 @@
 	<div class="col-12">
 
 <?php
-include_once('../config.php');
-include_once(_DOCUMENTROOT.'forms/process.php');
-include_once(_DOCUMENTROOT.'ws/connection.php');
+include_once(__DIR__.'/../../config.php');
+include_once(_DOCUMENTROOT.'forms/adminCursos.php');
+include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
 $listaCursosMoodle = connect('core_course_get_courses', '');
 
@@ -15,27 +15,27 @@ if ( ($_GET['IDcurso'] != '')&&($_POST['form'] == '') ) {
 	$_POST['IDcurso'] = $_GET['IDcurso'];
 	$_POST['IDcursoMoodle'] = $cursoData['IDcursoMoodle'];
 	$_POST['nombreCurso'] = $cursoData['nombre'];
+	$_POST['rutaCurso'] = $cursoData['ruta'];
+	$_POST['ubicacion'] = $cursoData['ubicacion'];
 	$_POST['descripcion'] = $cursoData['descripcion'];
 	$_POST['fechaIni'] = $cursoData['fechaIni'];
 	$_POST['fechaFin'] = $cursoData['fechaFin'];
+	$_POST['publico'] = $cursoData['publico'];
 }
-
 $OUT = '';
 
-if ( ($error == '')&&($ok == 1) ) {
-	$OUT .= '<div class="alert alert-success">Datos guardados correctamente</div>';
-} else if ( ($error == '')&&($ok == 2) ) {
-	$OUT .= '<div class="alert alert-success">Datos actualizados correctamente</div>';
-} else if ( ($error == '')&&($ok == 3) ) {
-	$OUT .= '<div class="alert alert-danger">Curso eliminado</div>';
-} else if ($error != '') {
-	$OUT .= '<div class="alert alert-warning">'.$error.'</div>';
+if ($error != '') {
+	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
 $OUT .= '<form role="form" method="POST" action="">';
 	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
+		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="IDcursoMoodle">* Seleccione el curso de Moodle asociado:</label>';
-		$OUT .= '<select class="form-control" name="IDcursoMoodle" id="IDcursoMoodle" required>';
+		$OUT .= '<select class="form-control" name="IDcursoMoodle" id="IDcursoMoodle" >';
 			$OUT .= '<option value="">Seleccione un curso</option>';
 			if (sizeof($listaCursosMoodle) > 0) {
 				foreach ($listaCursosMoodle as $c) {
@@ -51,30 +51,41 @@ $OUT .= '<form role="form" method="POST" action="">';
 		$OUT .= '</select>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
-		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
+		$OUT .= '<label for="ubicacion">* Seleccione una ubicaci&oacute;n:</label>';
+		$OUT .= '<select class="form-control" name="ubicacion" id="ubicacion" >';
+			$OUT .= '<option value="">Seleccione una ubicaci&oacute;n </option>';
+			if (sizeof($listaDirs) > 0) {
+				foreach ($listaDirs as $ub) {
+					$OUT .= '<option value="'.$ub['ID'].'"';
+					if ($_POST['ubicacion'] == $ub['ID']) {
+						$OUT .= ' selected';
+					}
+					$OUT .= '>'.$ub['ruta'].'</option>';
+				}
+			}
+		$OUT .= '</select>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<div class="row">';
 			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<label for="fechaIni">* Fecha a partir de la que mostrar el curso:</label>';
+				$OUT .= '<label for="fechaIni">Fecha a partir de la que mostrar el curso:</label>';
 			$OUT .= '</div>';
 			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<label for="fechaIni">* Fecha a partir de la que dejar de mostrar el curso:</label>';
+				$OUT .= '<label for="fechaIni">Fecha a partir de la que dejar de mostrar el curso:</label>';
 			$OUT .= '</div>';
 		$OUT .= '</div>';
 		$OUT .= '<div class="row">';
 			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<input required type="text" class="form-control datepicker" value="'.$_POST['fechaIni'].'" name="fechaIni" id="fechaIni" />';
+				$OUT .= '<input type="text" class="form-control datepicker" value="'.$_POST['fechaIni'].'" name="fechaIni" id="fechaIni" />';
 			$OUT .= '</div>';
 			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<input required type="text" class="form-control datepicker" value="'.$_POST['fechaFin'].'" name="fechaFin" id="fechaFin" />';
+				$OUT .= '<input type="text" class="form-control datepicker" value="'.$_POST['fechaFin'].'" name="fechaFin" id="fechaFin" />';
 			$OUT .= '</div>';
 		$OUT .= '</div>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
 		$OUT .= '<label></label><input name="publico" type="checkbox"';
-		if ($_POST['publico']) {
+		if ($_POST['publico'] == 1) {
 			$OUT .= ' checked';
 		}
 		$OUT .= '> Curso público (visible para usuarios no conectados)</label>';
@@ -89,6 +100,9 @@ $OUT .= '<form role="form" method="POST" action="">';
 	}
 	$OUT .= '<input type="hidden" value="'.$_GET['opt'].'" name="form" />';
 	$OUT .= '<input type="hidden" value="'.$_POST['IDcurso'].'" name="IDcurso" />';
+	$OUT .= '<input type="hidden" value="'.$_POST['rutaCurso'].'" name="rutaCursoORI" />';
+	$OUT .= '<input type="hidden" value="'.$_POST['ubicacion'].'" name="ubicacionORI" />';
+	$OUT .= '<input type="hidden" value="'.$_POST['IDcursoMoodle'].'" name="IDcursoMoodleORI" />';
 $OUT .= '</form>';
 
 print($OUT);
