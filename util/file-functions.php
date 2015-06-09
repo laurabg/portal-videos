@@ -60,9 +60,30 @@ function getPortada($nombre, $ruta) {
  function createDir($rutaDir) {
 	mkdir($rutaDir);
 	chmod($rutaDir, 0777);
-
-	logAction("Creada carpeta ".$rutaDir);
 }
+
+
+/*
+ removeDir: Elimina un directorio y todos sus archivos recursivamente
+ Parámetros:
+	rutaDir				Ruta + nombre del directorio a borrar
+ */
+function removeDir($rutaDir) { 
+	if (is_dir($rutaDir)) { 
+		$objects = scandir($rutaDir); 
+		foreach ($objects as $object) { 
+			if ($object != "." && $object != "..") { 
+				if (filetype($rutaDir."/".$object) == "dir") {
+					removeDir($rutaDir."/".$object);
+				} else {
+					unlink($rutaDir."/".$object); 
+				}
+			} 
+		} 
+		reset($objects); 
+		rmdir($rutaDir); 
+	} 
+} 
 
 
 /*

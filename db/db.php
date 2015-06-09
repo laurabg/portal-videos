@@ -103,8 +103,7 @@ function crearTablas() {
 	);
 	$db->exec('CREATE TABLE usuarios (
 		ID INTEGER PRIMARY KEY, 
-		nombre TEXT, 
-		apellidos TEXT, 
+		fullname TEXT, 
 		email TEXT);'
 	);
 	$db->exec('CREATE TABLE cursosUsuarios (
@@ -185,6 +184,15 @@ function resetDBAnalytics() {
 }
 
 
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* -----------------------------------------------------    CURSOS    ----------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
 /*
  crearCurso: Crea un curso con los parámetros que se facilitan
  */
@@ -208,7 +216,6 @@ function crearCurso($nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $f
 	$db->exec($SQL);
 }
 
-
 /*
  updateCurso: Crea un curso con los parámetros que se facilitan
  */
@@ -216,7 +223,7 @@ function updateCurso($IDcurso, $nombre, $ruta, $ubicacion, $descripcion, $IDcurs
 	global $db;
 
 	$SQL = 'UPDATE cursos SET ';
-	$SQL .= 'nombre = "'.$nombre.'", ruta = "'.$ruta.'", ", ubicacion = '.$ubicacion;
+	$SQL .= 'nombre = "'.$nombre.'", ruta = "'.$ruta.'", ubicacion = '.$ubicacion;
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
 	$SQL .= ($IDcursoMoodle != '')?', IDcursoMoodle = '.$IDcursoMoodle:'';
 	$SQL .= ($fechaIni != '')?', fechaIni = "'.$fechaIni.'"':'';
@@ -233,11 +240,7 @@ function updateCurso($IDcurso, $nombre, $ruta, $ubicacion, $descripcion, $IDcurs
 function checkCurso($condicion) {
 	global $db;
 	
-	$SQL = 'SELECT COUNT(*) FROM cursos WHERE '.$condicion;
-
-	$existe = $db->querySingle($SQL);
-	
-	return $existe;
+	return $db->querySingle('SELECT COUNT(*) FROM cursos WHERE '.$condicion);
 }
 
 /*
@@ -246,38 +249,15 @@ function checkCurso($condicion) {
 function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
 	global $db;
 
-	if (checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) {
-		if ($crearCurso == 1) {
+	if ($crearCurso == 1) {
+		if (checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) {
 			crearCurso($nombre, $ruta, $IDubicacion, '', '', '', '', 0);
 		}
 	}
 
-	$IDcurso = $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'"');
+	$IDcurso = $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion);
 
 	return $IDcurso;
-}
-
-/*
- registrarUsuarioCurso: Registra una serie de usuarios en un curso
- */
-function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $email) {
-	global $db;
-
-	$SQL = 'INSERT INTO usuarios (IDcurso, IDcursoMoodle, email) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', "'.$email.'")';
-	//print $SQL.'<br />';
-	$db->exec($SQL);
-}
-
-
-/*
- desregistrarUsuariosCurso: Registra una serie de usuarios en un curso
- */
-function desregistrarUsuariosCurso($IDcurso) {
-	global $db;
-
-	$SQL = 'DELETE FROM usuarios WHERE IDcurso = '.$IDcurso;
-	//print $SQL.'<br />';
-	$db->exec($SQL);
 }
 
 /*
@@ -305,7 +285,6 @@ function getCursoData($IDcurso) {
 	return $curso;
 }
 
-
 /*
  * getListaCursos: devuelve un array con todos los cursos:
  */
@@ -321,6 +300,53 @@ function getListaCursos() {
 
 	return $listaCursos;
 }
+
+
+/*
+ registrarUsuarioCurso: Registra una serie de usuarios en un curso
+ */
+function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
+	global $db;
+
+	// Comprobar si el usuario existe en la BBDD:
+	if ($db->querySingle('SELECT COUNT(*) FROM usuarios WHERE email = "'.$email.'"') == 0) {
+		$db->exec('INSERT INTO usuarios (fullname, email) VALUES ("'.$fullname.'", "'.$email.'")');
+	}
+
+	// Obtener el ID de usuario:
+	$IDusuario = $db->querySingle('SELECT ID FROM usuarios WHERE email = "'.$email.'"');
+
+	// Añadir usuario a curso:
+	if ($db->querySingle('SELECT COUNT(*) FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario) == 0) {
+		$db->exec('INSERT INTO cursosUsuarios (IDcurso, IDcursoMoodle, IDusuario) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', '.$IDusuario.')');
+	}
+}
+
+/*
+ desregistrarUsuariosCurso: Registra una serie de usuarios en un curso
+ */
+function desregistrarUsuariosCurso($IDcurso) {
+	global $db;
+
+	$db->exec('DELETE FROM cursosUsuarios WHERE IDcurso = '.$IDcurso);
+}
+
+/*
+ deleteFullCurso: Elimina un curso completo, con sus temas y videos
+ */
+function deleteFullCurso($IDcurso) {
+	global $db;
+
+	desregistrarUsuariosCurso($IDcurso);
+	
+	$db->exec('DELETE FROM videos WHERE IDcurso = '.$IDcurso);
+	$db->exec('DELETE FROM temas WHERE IDcurso = '.$IDcurso);
+	$db->exec('DELETE FROM cursos WHERE ID = '.$IDcurso);
+}
+
+
+
+
 
 /*
  * getListaTemasByCurso: devuelve un array con todos los temas de un curso:
@@ -355,6 +381,15 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 	return $listaVideos;
 }
 
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* -----------------------------------------------------    TEMAS    ------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
 
 /*
  crearTema: Crea un tema con los parámetros que se facilitan
@@ -438,6 +473,13 @@ function getTemaData($IDtema, $IDcurso) {
 
 
 
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* -----------------------------------------------------    VIDEOS    ----------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
 /*
  crearVideo: Crea un video con los parámetros que se facilitan
  */
@@ -518,49 +560,11 @@ function getVideoData($IDvideo, $IDtema, $IDcurso) {
 	return $video;
 }
 
-
 function updateVideoIMG($IDvideo, $img) {
 	global $db;
 
 	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
 }
-
-/*
-function getIDvideo($IDcurso, $IDtema, $nombre, $ruta) {
-	global $db;
-
-	if ($db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDtema = '.$IDtema) == 0) {
-	//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Crear video ".$nombre."<br />";
-		$db->exec('INSERT INTO videos (nombre, descripcion, ruta, IDtema, IDcurso) VALUES ("'.$nombre.'", "Descripción del vídeo '.$nombre.'", "'.$ruta.'", '.$IDtema.', '.$IDcurso.')');
-	} else {
-	//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;El video ".$nombre." existe<br />";
-	}
-
-	$IDvideo = $db->querySingle('SELECT ID FROM videos WHERE nombre = "'.$nombre.'" AND IDtema = '.$IDtema.' AND IDcurso = '.$IDcurso);
-	return $IDvideo;
-}
-
-function updateVideo($IDvideo, $img) {
-	global $db;
-
-	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
-}
-
-
-function checkTema($nombre, $IDcurso) {
-	global $db;
-
-	$existe = $db->querySingle('SELECT COUNT(*) FROM temas WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso);
-	return $existe;
-}
-
-function checkVideo($nombre, $IDtema, $IDcurso) {
-	global $db;
-
-	$existe = $db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
-	return $existe;
-}*/
-
 
 function logAction($action) {
 	global $dbLog;
@@ -575,12 +579,15 @@ function videoPlayed($IDcurso, $IDtema, $IDvideo, $IDusuario) {
 	$dbAn->exec('INSERT INTO analytics (IDcurso, IDtema, IDvideo, IDusuario) VALUES ('.$IDcurso.','.$IDtema.','.$IDvideo.','.$IDusuario.')');
 }
 
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* -----------------------------------------------------    CONFIG    ----------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------------ */
 
 
-/*
- * getCursoData: devuelve un array con toda la información de un curso:
- */
 function getConfigData() {
 	global $dbConfig;
 	

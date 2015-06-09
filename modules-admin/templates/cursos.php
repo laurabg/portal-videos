@@ -9,8 +9,19 @@ include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
 $listaCursosMoodle = connect('core_course_get_courses', '');
 
+// Si se ha eliminado el curso, borrar sus datos:
+if ($error == 'danger') {
+	$_POST['IDcurso'] = '';
+	$_POST['IDcursoMoodle'] = '';
+	$_POST['nombreCurso'] = '';
+	$_POST['rutaCurso'] = '';
+	$_POST['ubicacion'] = '';
+	$_POST['descripcion'] = '';
+	$_POST['fechaIni'] = '';
+	$_POST['fechaFin'] = '';
+	$_POST['publico'] = '';
 // Si estamos viendo un curso, pero no se ha enviado el formulario, mostrar sus datos:
-if ( ($_GET['IDcurso'] != '')&&($_POST['form'] == '') ) {
+} else if ( ($_GET['IDcurso'] != '')&&($_POST['form'] == '') ) {
 	$cursoData = getCursoData($_GET['IDcurso']);
 	$_POST['IDcurso'] = $_GET['IDcurso'];
 	$_POST['IDcursoMoodle'] = $cursoData['IDcursoMoodle'];
@@ -24,7 +35,7 @@ if ( ($_GET['IDcurso'] != '')&&($_POST['form'] == '') ) {
 }
 $OUT = '';
 
-if ($error != '') {
+if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 

@@ -12,147 +12,141 @@ $renombrarCurso = 0;
 $dirORI = '';
 $dir = '';
 $msgError = '';
-$error = '';
+$error = 'success';
 
-foreach ($_POST as $key => $value)
-	print "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
+//foreach ($_POST as $key => $value)
+//	print "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
 
 if ($_POST['form'] == 'cursos') {
-
-	// Si el curso es nuevo
-	if (!$_POST['IDcurso']) {
-		$msgError = 'Datos guardados correctamente';
-		$error = 'success';
-
-	// Si se ha editado el curso:
-	} else {
-		$msgError = 'Datos actualizados correctamente';
-		$error = 'success';
-
-		$rutalimpia = clean($_POST['nombreCurso']);
-
-		if ( ($rutalimpia != $_POST['rutaCursoORI'])||($_POST['ubicacion'] != $_POST['ubicacionORI']) ) {
-			$renombrarCurso = 1;
-			
-			if (is_int(array_search($_POST['ubicacion'], array_column($listaDirs, 'ID')))) {
-				$dir = $listaDirs[array_search($_POST['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
-				$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
-			}
+	$rutalimpia = clean($_POST['nombreCurso']);
+	
+	// Eliminar el curso, todos sus temas y videos, desregistrar usuarios y eliminar todas las carpetas hijas:
+	if ($_POST['formOption'] == 'del') {
+		// Crear la carpeta del curso:
+		if (is_int(array_search($_POST['ubicacion'], array_column($listaDirs, 'ID')))) {
+			$dir = $listaDirs[array_search($_POST['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+			$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+		}
+		
+		if (file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia)) {
+			removeDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia);
 		}
 
-		if ($renombrarCurso == 1) {
-			// Renombrar la carpeta en la ubicacion original:
-			if (is_int(array_search($_POST['ubicacionORI'], array_column($listaDirs, 'ID')))) {
-				$dirORI = $listaDirs[array_search($_POST['ubicacionORI'], array_column($listaDirs, 'ID'))]['ruta'];
-				$dirORI = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dirORI);
-			}
-			if ($dir == '') {
-				$dir = $dirORI;
-			}
+		deleteFullCurso($_POST['IDcurso']);
 
-			echo "+".$dirORI." + ".$dir."+<br />";
-
-			if ( ($dirORI != '')&&($dir != '') ) {
-				echo '*****'._DOCUMENTROOT._DIRCURSOS.$dirORI.$_POST['rutaCursoORI'].' --> '._DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia.'****<br />';
-
-				// Si existe el curso original, renombrarlo:
-				if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dirORI.$_POST['rutaCursoORI'])) {
-					rename(_DOCUMENTROOT._DIRCURSOS.$dirORI.$_POST['rutaCursoORI'], _DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia);
-				}
-			}
-		}
-
-	}
-
-
-	/*if ($_POST['formOption'] == 'del') {
 		$msgError = 'Curso eliminado correctamente';
 		$error = 'danger';
+		
 	} else {
-		// Comprobar que el curso de Moodle no esté ya asociado:
-		if (!$_POST['IDcurso']) {
-			if ( ($_POST['nombreCurso'] != '')&&(checkCurso('nombre = "'.$_POST['nombreCurso'].'"') > 0) ) {
-				$msgError = 'El curso ya existe';
-				$error = 'warning';
-			}
-			if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
-				$msgError = 'Este curso de Moodle ya está asociado a otro curso';
-				$error = 'warning';
-			}
-		} else {
-			if ( ($_POST['nombreCurso'] != '')&&(checkCurso('ID != '.$_POST['IDcurso'].' AND nombre = "'.$_POST['nombreCurso'].'"') > 0) ) {
-				$msgError = 'El curso ya existe';
-				$error = 'warning';
-			}
-			if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('ID != '.$_POST['IDcurso'].' AND IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
-				$msgError = 'Este curso de Moodle ya está asociado a otro curso';
-				$error = 'warning';
-			} else if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('ID = '.$_POST['IDcurso'].' AND IDcursoMoodle != '.$_POST['IDcursoMoodle']) > 0) ) {
-				$changeCursoMoodle = 1;
-			}
-		}
-		if ($_POST['fechaIni'] > $_POST['fechaFin']) {
-		}
 		if ($_POST['publico'] == 'on') {
 			$_POST['publico'] = 1;
 		} else {
 			$_POST['publico'] = 0;
 		}
-		
-		// Si no se ha producido error, crear el curso:
-		if ($error == '') {
-			if (!$_POST['IDcurso']) {
-				// Crear el curso en la base de datos:
-				crearCurso($_POST['nombreCurso'], $_POST['rutaCurso'], $_POST['descripcion'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
 
-				$IDcurso = getIDcurso($_POST['nombreCurso'], $_POST['rutaCurso'], 0);
+		// Si el curso es nuevo
+		if (!$_POST['IDcurso']) {
+			$msgError = 'Datos guardados correctamente';
+			
+			// Comprobar que no exista el nombre, ni la ruta:
+			if ( ($_POST['nombreCurso'] != '')&&( (checkCurso('nombre = "'.$_POST['nombreCurso'].'"') > 0)||(checkCurso('ruta = "'.$rutaLimpia.'"') > 0) ) )  {
+				$msgError = 'El curso ya existe';
+				$error = 'warning';
+			}
+
+			// Comprobar que no este asociado el curso de Moodle a otro curso:
+			if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
+				$msgError = 'Este curso de Moodle ya está asociado a otro curso';
+				$error = 'warning';
+			}
+
+			if ($error == 'success') {
+				// Crear la carpeta del curso:
+				if (is_int(array_search($_POST['ubicacion'], array_column($listaDirs, 'ID')))) {
+					$dir = $listaDirs[array_search($_POST['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+					$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+				}
+				
+				if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia)) {
+					createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia);
+				}
+				
+				// Crear el curso en la base de datos:
+				crearCurso($_POST['nombreCurso'], $rutalimpia, $_POST['ubicacion'], $_POST['descripcion'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
+
+				$IDcurso = getIDcurso($_POST['nombreCurso'], $rutalimpia, $_POST['ubicacion'], 0);
 				$_POST['IDcurso'] = $IDcurso;
 
-				// Obtener los usuarios inscritos al curso:
-				$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
-				foreach ($usuariosEnCurso as $user) {
-					echo '***'.$user->email.'<br />';
-					registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->email);
+				if ($_POST['IDcursoMoodle'] != '') {
+					// Obtener los usuarios inscritos al curso:
+					$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
+					foreach ($usuariosEnCurso as $user) {
+						registrarUsuarioCurso($IDcurso, $_POST['IDcursoMoodle'], $user->fullname, $user->email);
+					}
 				}
+			}
 
-				$msgError = 'Datos guardados correctamente';
-				$error = 'success';
-			} else {
-				//checkCurso('ID = '.$_POST['IDcurso'].' AND IDcursoMoodle = '.$_POST['IDcursoMoodle']);
+		// Si se ha editado el curso:
+		} else {
+			$msgError = 'Datos actualizados correctamente';
 
-				// Si el nombre ha cambiado, renombrar la carpeta:
-				if (checkCurso('nombre != "'.$_POST['nombreCurso'].'" AND IDcurso = '.$_POST['IDcurso']) > 0) {
-					// Limpiar el nombre de la carpeta de caracteres extraños y espacios
-					$rutaNEW = clean($_POST['nombreCurso']);
-					rename($dir."/".$_POST['rutaCurso'], $dir."/".$rutaNEW);
+			// Comprobar que no exista el nombre, ni la ruta:
+			if ( ($_POST['nombreCurso'] != '')&&( (checkCurso('ID != '.$_POST['IDcurso'].' AND nombre = "'.$_POST['nombreCurso'].'"') > 0)||(checkCurso('ID != '.$_POST['IDcurso'].' AND ruta = "'.$rutaLimpia.'"') > 0) ) ) {
+				$msgError = 'El curso ya existe';
+				$error = 'warning';
+			}
+
+			// Comprobar que no este asociado el curso de Moodle a otro curso:
+			if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('ID != '.$_POST['IDcurso'].' AND IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
+				$msgError = 'Este curso de Moodle ya está asociado a otro curso';
+				$error = 'warning';
+			}
+
+			if ($error == 'success') {
+				// Si ha cambiado la ubicacion o la ruta, renombrar/mover la carpeta:
+				if ( ($rutalimpia != $_POST['rutaCursoORI'])||($_POST['ubicacion'] != $_POST['ubicacionORI']) ) {
+					$renombrarCurso = 1;
 					
+					if (is_int(array_search($_POST['ubicacion'], array_column($listaDirs, 'ID')))) {
+						$dir = $listaDirs[array_search($_POST['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+						$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+					}
 				}
 
-				// Actualizar el curso en la base de datos:
-				updateCurso($_POST['IDcurso'], $_POST['nombreCurso'], $_POST['rutaCurso'], $_POST['descripcion'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
+				if ($renombrarCurso == 1) {
+					// Renombrar/mover la carpeta en la ubicacion original:
+					if (is_int(array_search($_POST['ubicacionORI'], array_column($listaDirs, 'ID')))) {
+						$dirORI = $listaDirs[array_search($_POST['ubicacionORI'], array_column($listaDirs, 'ID'))]['ruta'];
+						$dirORI = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dirORI);
+					}
+					if ($dir == '') {
+						$dir = $dirORI;
+					}
 
-				if ( ($changeCursoMoodle == 1)||($_POST['IDcursoMoodle'] != $_POST['IDcursoMoodleORI']) ) {
+					if ( ($dirORI != '')&&($dir != '') ) {
+						// Si existe el curso original, renombrarlo:
+						if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dirORI.$_POST['rutaCursoORI'])) {
+							rename(_DOCUMENTROOT._DIRCURSOS.$dirORI.$_POST['rutaCursoORI'], _DOCUMENTROOT._DIRCURSOS.$dir.$rutalimpia);
+						}
+					}
+				}
+
+				if ( ($_POST['IDcursoMoodle'] != '')&&($_POST['IDcursoMoodle'] != $_POST['IDcursoMoodleORI']) ) {
 					desregistrarUsuariosCurso($_POST['IDcurso']);
 					
 					// Obtener los usuarios inscritos al curso:
 					$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
+					
 					foreach ($usuariosEnCurso as $user) {
-						echo $user->email.'<br />';
-						registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->email);
+						registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->fullname, $user->email);
 					}
 				}
-				
-				if ($_POST['rutaCurso'] != $_POST['rutaCursoORI']) {
-					echo 'Renombrar la carpeta de '.$_POST['rutaCursoORI'].' a '.$_POST['rutaCurso'].'<br />';
-					rename($_POST['rutaCursoORI'], $_POST['rutaCurso']);
-				}
-				
-				$msgError = 'Datos actualizados correctamente';
-				$error = 'success';
+
+				// Actualizar el curso en la base de datos:
+				updateCurso($_POST['IDcurso'], $_POST['nombreCurso'], $rutalimpia, $_POST['ubicacion'], $_POST['descripcion'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
 			}
 		}
-	}*/
+	}
 }
-
 
 ?>
