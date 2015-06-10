@@ -54,20 +54,13 @@ include_once('config.php');
 				</div>
 			</div>
 		</nav>
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-sm-4 col-md-3 sidebar">
-					<?php require_once(_DOCUMENTROOT.'modules-admin/menu.php'); ?>
-				</div>
-				<div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 main">
-					<?php require_once(_DOCUMENTROOT.'modules-admin/content.php'); ?>
-				</div>
-			</div>
-		</div>
+		<?php require_once(_DOCUMENTROOT.'modules-admin/content.php'); ?>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery.form.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
 		<script type="text/javascript" src="js/flowplayer-5.4.4/flowplayer.min.js"></script>

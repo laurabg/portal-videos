@@ -76,9 +76,11 @@ function buscarTemas($IDcurso, $dir) {
 					// Comprobar si existen las siguientes carpetas; sino crearlas:
 					if (!file_exists($dir."/".$filenameNEW."/img")) {
 						createDir($dir."/".$filenameNEW."/img");
+						logAction("Crear carpeta tema ".$dir."/".$filenameNEW."/img");
 					}
 					if (!file_exists($dir."/".$filenameNEW."/docs")) {
 						createDir($dir."/".$filenameNEW."/docs");
+						logAction("Crear carpeta tema ".$dir."/".$filenameNEW."/docs");
 					}
 
 					// Guardar el tema
@@ -128,7 +130,6 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 				// Si existe la carpeta de INBOX, leer su contenido:
 				if (is_dir($dir."/".$filename)) {
 					logAction($dir."/".$filename." no se procesará, ya que no es un archivo");
-					//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Las carpetas dentro de un tema no se procesarán <br />";
 				} else {
 					// Comprobar si el archivo tiene una extensión válida:
 					$extension = pathinfo($dir."/".$filename, PATHINFO_EXTENSION);
@@ -141,17 +142,15 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 						rename($dir."/".$filename, $dir."/".$filenameNEW);
 
 						// Guardar el vídeo:
-					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(".$IDcurso." - ".$IDtema.") Encontrado vídeo ".$filename."<br />";
 						logAction("Encontrado vídeo ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
 						$IDvideo = getIDvideo($IDcurso, $IDtema, $filename, $filenameNEW, 1);
 
 						$img = getPortada($filenameNEW, $dir);
+						logAction("Obtenida imagen ".$img." del video ".$filenameNEW);
 						
 						if ($img != '') {
-							updateVideoIMG($IDvideo, "/img/".$img);
+							updateVideoIMG($IDvideo, $img);
 						}
-					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$ubicacion."/".$filenameNEW."<br />";
-					//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$ubicacion."/img/".$img."<br />";
 					} else {
 						logAction($dir."/".$filename." no tiene una extensión válida");
 					}
@@ -161,11 +160,9 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 
 		if ($cont == 0) {
 			logAction($dir." no contiene vídeos");
-		//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No existen vídeos para ".$dir."<br />";
 		}
 	} else {
 		logAction("Error al leer ".$dir);
-	//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Error al leer de ".$dir."<br />";
 	}
 }
 

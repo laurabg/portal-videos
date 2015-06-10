@@ -4,31 +4,39 @@
 
 <?php
 include_once(__DIR__.'/../../config.php');
-include_once(_DOCUMENTROOT.'forms/adminCursos.php');
+include_once(_DOCUMENTROOT.'forms/admin-cursos.php');
 include_once(_DOCUMENTROOT.'util/ws-connection.php');
+
+if (!isset($_POST['IDcurso'])) {
+	$_POST['IDcurso'] = ( ($_GET['IDcurso'] != '') ? $_GET['IDcurso'] : '' );
+}
 
 $listaCursosMoodle = connect('core_course_get_courses', '');
 
 // Si se ha eliminado el curso, borrar sus datos:
 if ($error == 'danger') {
 	$_POST['IDcurso'] = '';
-	$_POST['IDcursoMoodle'] = '';
 	$_POST['nombreCurso'] = '';
+	$_POST['descripcion'] = '';
 	$_POST['rutaCurso'] = '';
 	$_POST['ubicacion'] = '';
-	$_POST['descripcion'] = '';
+	$_POST['orden'] = '';
+	$_POST['ocultar'] = '';
+	$_POST['IDcursoMoodle'] = '';
 	$_POST['fechaIni'] = '';
 	$_POST['fechaFin'] = '';
 	$_POST['publico'] = '';
-// Si estamos viendo un curso, pero no se ha enviado el formulario, mostrar sus datos:
-} else if ( ($_GET['IDcurso'] != '')&&($_POST['form'] == '') ) {
-	$cursoData = getCursoData($_GET['IDcurso']);
-	$_POST['IDcurso'] = $_GET['IDcurso'];
-	$_POST['IDcursoMoodle'] = $cursoData['IDcursoMoodle'];
+
+// Si estamos viendo un curso, mostrar sus datos:
+} else if ($_POST['IDcurso'] != '') {
+	$cursoData = getCursoData($_POST['IDcurso']);
 	$_POST['nombreCurso'] = $cursoData['nombre'];
+	$_POST['descripcion'] = $cursoData['descripcion'];
 	$_POST['rutaCurso'] = $cursoData['ruta'];
 	$_POST['ubicacion'] = $cursoData['ubicacion'];
-	$_POST['descripcion'] = $cursoData['descripcion'];
+	$_POST['orden'] = $cursoData['orden'];
+	$_POST['ocultar'] = $cursoData['ocultar'];
+	$_POST['IDcursoMoodle'] = $cursoData['IDcursoMoodle'];
 	$_POST['fechaIni'] = $cursoData['fechaIni'];
 	$_POST['fechaFin'] = $cursoData['fechaFin'];
 	$_POST['publico'] = $cursoData['publico'];
@@ -39,7 +47,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form role="form" method="POST" action="">';
+$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/cursos.php">';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
 		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
@@ -101,15 +109,53 @@ $OUT .= '<form role="form" method="POST" action="">';
 		}
 		$OUT .= '> Curso público (visible para usuarios no conectados)</label>';
 	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<label></label><input name="ocultar" type="checkbox"';
+		if ($_POST['ocultar'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Curso oculto, no se mostrar&aacute; a ning&uacute;n usuario</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="orden">Posici&oacute;n en la que se mostrar&aacute; el curso:</label>';
+		$OUT .= '<input type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el curso" value="'.$_POST['orden'].'" min="1" />';
+	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del curso:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
-	$OUT .= '<button type="submit" value="save" name="formOption" class="btn btn-default">Guardar</button>';
-	if ($_POST['IDcurso'] != '') {
-		$OUT .= '<button type="submit" value="del" name="formOption" class="btn btn-danger">Eliminar</button>';
+
+	if ($_POST['IDcursoMoodle'] != '') {
+		$listaUsuarios = getUsuariosByCurso($_POST['IDcurso']);
+
+		$OUT .= '<div class="form-group">';
+			$OUT .= '<label>Listado de usuarios inscritos a este curso:</label>';
+			$OUT .= '<div class="table-responsive">';
+				$OUT .= '<table class="table">';
+					$OUT .= '<thead>';
+						$OUT .= '<tr>';
+							$OUT .= '<th>Nombre completo</th>';
+							$OUT .= '<th>Email</th>';
+						$OUT .= '</tr>';
+					$OUT .= '</thead>';
+					$OUT .= '<tbody>';
+						foreach ($listaUsuarios as $usuario) {
+							$OUT .= '<tr>';
+								$OUT .= '<td>'.$usuario['fullname'].'</td>';
+								$OUT .= '<td>'.$usuario['email'].'</td>';
+							$OUT .= '</tr>';
+						}
+					$OUT .= '</tbody>';
+				$OUT .= '</table>';
+			$OUT .= '</div>';
+		$OUT .= '</div>';
 	}
-	$OUT .= '<input type="hidden" value="'.$_GET['opt'].'" name="form" />';
+
+	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if ($_POST['IDcurso'] != '') {
+		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
+	}
+	$OUT .= '<input type="hidden" value="cursos" name="form" />';
 	$OUT .= '<input type="hidden" value="'.$_POST['IDcurso'].'" name="IDcurso" />';
 	$OUT .= '<input type="hidden" value="'.$_POST['rutaCurso'].'" name="rutaCursoORI" />';
 	$OUT .= '<input type="hidden" value="'.$_POST['ubicacion'].'" name="ubicacionORI" />';

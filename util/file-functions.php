@@ -40,12 +40,7 @@ function getPortada($nombre, $ruta) {
 	
 	if (!shell_exec($cmd)) {
 		chmod($img, 0777);
-		
-		logAction("Portada para ".$nombre." obtenida");
-	//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OK!!!<br />";
 	} else {
-		logAction("No se ha podido obtener la portada para ".$nombre);
-	//	echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ooohhh....<br />";
 	}
 
 	return str_replace($ruta."/img/","",$img);
@@ -82,6 +77,19 @@ function removeDir($rutaDir) {
 		} 
 		reset($objects); 
 		rmdir($rutaDir); 
+	} 
+} 
+
+
+
+/*
+ removeFile: Elimina un fichero
+ Parámetros:
+	rutaFile			Ruta + nombre del archivo a borrar
+ */
+function removeFile($rutaFile) { 
+	if ( (!is_dir($rutaFile))&&(file_exists($rutaFile)) ) { 
+		unlink($rutaFile); 
 	} 
 } 
 

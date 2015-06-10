@@ -77,9 +77,11 @@ function crearTablas() {
 	$db->exec('CREATE TABLE cursos (
 		ID INTEGER PRIMARY KEY, 
 		nombre TEXT, 
-		ubicacion INTEGER,
-		ruta TEXT,
 		descripcion TEXT,
+		ruta TEXT,
+		ubicacion INTEGER,
+		orden INTEGER,
+		ocultar INTEGER,
 		IDcursoMoodle INTEGER,
 		fechaIni DATE,
 		fechaFin DATE,
@@ -87,19 +89,34 @@ function crearTablas() {
 	);
 	$db->exec('CREATE TABLE temas (
 		ID INTEGER PRIMARY KEY, 
+		IDcurso INTEGER,
 		nombre TEXT, 
-		ruta TEXT,
 		descripcion TEXT, 
-		IDcurso INTEGER);'
+		ruta TEXT,
+		orden INTEGER,
+		ocultar INTEGER);'
 	);
 	$db->exec('CREATE TABLE videos (
 		ID INTEGER PRIMARY KEY, 
-		nombre TEXT, 
-		ruta TEXT, 
-		descripcion TEXT, 
-		img TEXT, 
+		IDcurso INTEGER,
 		IDtema INTEGER, 
-		IDcurso INTEGER);'
+		nombre TEXT, 
+		descripcion TEXT, 
+		ruta TEXT, 
+		img TEXT, 
+		orden INTEGER,
+		ocultar INTEGER);'
+	);
+	$db->exec('CREATE TABLE videosAdjuntos (
+		ID INTEGER PRIMARY KEY, 
+		IDcurso INTEGER,
+		IDtema INTEGER, 
+		IDvideo INTEGER, 
+		nombre TEXT, 
+		descripcion TEXT, 
+		ruta TEXT, 
+		orden INTEGER,
+		ocultar INTEGER);'
 	);
 	$db->exec('CREATE TABLE usuarios (
 		ID INTEGER PRIMARY KEY, 
@@ -196,21 +213,31 @@ function resetDBAnalytics() {
 /*
  crearCurso: Crea un curso con los parámetros que se facilitan
  */
-function crearCurso($nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function crearCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
 	global $db;
 
-	$SQL = 'INSERT INTO cursos (nombre, ruta, ubicacion';
+	$SQL = 'INSERT INTO cursos (';
+	$SQL .= 'nombre';
 	$SQL .= ($descripcion != '')?',descripcion':'';
+	$SQL .= ($ruta != '')?',ruta':'';
+	$SQL .= ($ubicacion != '')?',ubicacion':'';
+	$SQL .= ($orden != '')?',orden':'';
+	$SQL .= ($ocultar != '')?',ocultar':'';
 	$SQL .= ($IDcursoMoodle != '')?',IDcursoMoodle':'';
 	$SQL .= ($fechaIni != '')?',fechaIni':'';
 	$SQL .= ($fechaFin != '')?',fechaFin':'';
-	$SQL .= ',publico';
-	$SQL .= ') VALUES ("'.$nombre.'", "'.$ruta.'", '.$ubicacion;
+	$SQL .= ($publico != '')?',publico':'';
+	$SQL .= ') VALUES (';
+	$SQL .= '"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
+	$SQL .= ($ubicacion != '')?','.$ubicacion:'';
+	$SQL .= ($orden != '')?','.$orden:'';
+	$SQL .= ($ocultar != '')?','.$ocultar:'';
 	$SQL .= ($IDcursoMoodle != '')?','.$IDcursoMoodle:'';
 	$SQL .= ($fechaIni != '')?',"'.$fechaIni.'"':'';
 	$SQL .= ($fechaFin != '')?',"'.$fechaFin.'"':'';
-	$SQL .= ',"'.$publico.'"';
+	$SQL .= ($publico != '')?','.$publico:'';
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -219,16 +246,20 @@ function crearCurso($nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $f
 /*
  updateCurso: Crea un curso con los parámetros que se facilitan
  */
-function updateCurso($IDcurso, $nombre, $ruta, $ubicacion, $descripcion, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
 	global $db;
 
 	$SQL = 'UPDATE cursos SET ';
-	$SQL .= 'nombre = "'.$nombre.'", ruta = "'.$ruta.'", ubicacion = '.$ubicacion;
+	$SQL .= 'nombre = "'.$nombre.'"';
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ($ubicacion != '')?', ubicacion = '.$ubicacion:'';
+	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
 	$SQL .= ($IDcursoMoodle != '')?', IDcursoMoodle = '.$IDcursoMoodle:'';
 	$SQL .= ($fechaIni != '')?', fechaIni = "'.$fechaIni.'"':'';
 	$SQL .= ($fechaFin != '')?', fechaFin = "'.$fechaFin.'"':'';
-	$SQL .= ', publico = "'.$publico.'"';
+	$SQL .= ($publico != '')?', publico = '.$publico:'';
 	$SQL .= ' WHERE ID = '.$IDcurso;
 
 	$db->exec($SQL);
@@ -249,15 +280,11 @@ function checkCurso($condicion) {
 function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
 	global $db;
 
-	if ($crearCurso == 1) {
-		if (checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) {
-			crearCurso($nombre, $ruta, $IDubicacion, '', '', '', '', 0);
-		}
+	if ( ($crearCurso == 1)&&(checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) ) {
+		crearCurso($nombre, $nombre, $ruta, $IDubicacion, 1, 0, '', '', '', 0);
 	}
-
-	$IDcurso = $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion);
-
-	return $IDcurso;
+	
+	return $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion);
 }
 
 /*
@@ -271,36 +298,22 @@ function getCursoData($IDcurso) {
 	$res = $db->query('SELECT * FROM cursos WHERE ID = '.$IDcurso);
 	while ($row = $res->fetchArray()) {
 		$curso = array(
+			'IDcurso' => $row['ID'],
 			'nombre' => $row['nombre'],
+			'descripcion' => $row['descripcion'],
 			'ruta' => $row['ruta'],
 			'ubicacion' => $row['ubicacion'],
-			'descripcion' => $row['descripcion'],
+			'orden' => $row['orden'],
+			'ocultar' => $row['ocultar'],
+			'IDcursoMoodle' => $row['IDcursoMoodle'],
 			'fechaIni' => $row['fechaIni'],
 			'fechaFin' => $row['fechaFin'],
-			'IDcursoMoodle' => $row['IDcursoMoodle'],
-			'publico' => $row['publico']
+			'publico' => $row['publico'],
 		);
 	}
 
 	return $curso;
 }
-
-/*
- * getListaCursos: devuelve un array con todos los cursos:
- */
-function getListaCursos() {
-	global $db;
-	
-	$listaCursos = array();
-
-	$res = $db->query('SELECT * FROM cursos');
-	while ($row = $res->fetchArray()) {
-		array_push($listaCursos, array($row['ID'], $row['nombre']));
-	}
-
-	return $listaCursos;
-}
-
 
 /*
  registrarUsuarioCurso: Registra una serie de usuarios en un curso
@@ -344,9 +357,37 @@ function deleteFullCurso($IDcurso) {
 	$db->exec('DELETE FROM cursos WHERE ID = '.$IDcurso);
 }
 
+/*
+ * getListaCursos: devuelve un array con todos los cursos ordenados:
+ */
+function getListaCursos() {
+	global $db;
+	
+	$listaCursos = array();
 
+	$res = $db->query('SELECT * FROM cursos ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaCursos, array($row['ID'], $row['nombre']));
+	}
 
+	return $listaCursos;
+}
 
+/*
+ getCursoUsuarios: Obtiene una lista de los usuarios inscritos a un curso
+ */
+function getUsuariosByCurso($IDcurso) {
+	global $db;
+	
+	$listaUsuarios = array();
+
+	$res = $db->query('SELECT * FROM usuarios WHERE ID IN (SELECT IDusuario FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.')');
+	while ($row = $res->fetchArray()) {
+		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email']));
+	}
+
+	return $listaUsuarios;
+}
 
 /*
  * getListaTemasByCurso: devuelve un array con todos los temas de un curso:
@@ -356,14 +397,13 @@ function getListaTemasByCurso($IDcurso) {
 	
 	$listaTemas = array();
 
-	$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.$IDcurso);
+	$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.$IDcurso.' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		array_push($listaTemas, array($row['ID'], $row['nombre']));
 	}
 
 	return $listaTemas;
 }
-
 
 /*
  * getListaVideosByTemaCurso: devuelve un array con todos los vídeos de un tema y un curso:
@@ -373,7 +413,7 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 	
 	$listaVideos = array();
 
-	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
+	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		array_push($listaVideos, array($row['ID'], $row['nombre']));
 	}
@@ -394,13 +434,23 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 /*
  crearTema: Crea un tema con los parámetros que se facilitan
  */
-function crearTema($IDcurso, $nombre, $ruta, $descripcion) {
+function crearTema($IDcurso, $nombre, $descripcion, $ruta, $orden, $ocultar) {
 	global $db;
 
-	$SQL = 'INSERT INTO temas (nombre, ruta, IDcurso';
+	$SQL = 'INSERT INTO temas (';
+	$SQL .= 'IDcurso';
+	$SQL .= ',nombre';
 	$SQL .= ($descripcion != '')?',descripcion':'';
-	$SQL .= ') VALUES ("'.$nombre.'","'.$ruta.'",'.$IDcurso;
+	$SQL .= ($ruta != '')?',ruta':'';
+	$SQL .= ($orden != '')?',orden':'';
+	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ') VALUES (';
+	$SQL .= $IDcurso;
+	$SQL .= ',"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
+	$SQL .= ($orden != '')?','.$orden:'';
+	$SQL .= ($ocultar != '')?','.$ocultar:'';
 	$SQL .= ')';
 	//print $SQL;
 	$db->exec($SQL);
@@ -410,12 +460,17 @@ function crearTema($IDcurso, $nombre, $ruta, $descripcion) {
 /*
  updateTema: Actualiza un tema existente
  */
-function updateTema($IDtema, $IDcurso, $nombre, $ruta, $descripcion) {
+function updateTema($IDtema, $IDcurso, $nombre, $descripcion, $ruta, $orden, $ocultar) {
 	global $db;
 
-	$SQL = 'UPDATE temas SET nombre = "'.$nombre.'", ruta = "'.$ruta.'"';
+	$SQL = 'UPDATE temas SET ';
+	$SQL .= 'IDcurso = '.$IDcurso;
+	$SQL .= ', nombre = "'.$nombre.'"';
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
-	$SQL .= ' WHERE ID = '.$IDtema.' AND IDcurso = '.$IDcurso;
+	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ' WHERE ID = '.$IDtema;
 	
 	$db->exec($SQL);
 }
@@ -426,13 +481,8 @@ function updateTema($IDtema, $IDcurso, $nombre, $ruta, $descripcion) {
 function checkTema($condicion) {
 	global $db;
 	
-	$SQL = 'SELECT COUNT(*) FROM temas WHERE '.$condicion;
-
-	$existe = $db->querySingle($SQL);
-	//print $SQL.' ('.$existe.')<br />';
-	return $existe;
+	return $db->querySingle('SELECT COUNT(*) FROM temas WHERE '.$condicion);
 }
-
 
 /*
  getIDtema: Devuelve ID tema por ruta e IDcurso.
@@ -440,31 +490,41 @@ function checkTema($condicion) {
 function getIDtema($IDcurso, $nombre, $ruta, $crearTema) {
 	global $db;
 
-	if (checkTema('ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso) == 0) {
-		if ($crearTema == 1) {
-			crearTema($IDcurso, $nombre, $ruta, '');
-		}
+	if ( ($crearTema == 1)&&(checkTema('ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso) == 0) ) {
+		crearTema($IDcurso, $nombre, $nombre, $ruta, 1, 0);
 	}
 
-	$IDtema = $db->querySingle('SELECT ID FROM temas WHERE ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso);
-	return $IDtema;
+	return $db->querySingle('SELECT ID FROM temas WHERE ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso);
+}
+
+/*
+ deleteFullTema: Elimina un tema completo, con sus videos
+ */
+function deleteFullTema($IDtema) {
+	global $db;
+
+	$db->exec('DELETE FROM videos WHERE IDtema = '.$IDtema);
+	$db->exec('DELETE FROM temas WHERE ID = '.$IDtema);
 }
 
 /*
  * getTemaData: devuelve un array con toda la información de un tema:
  */
-function getTemaData($IDtema, $IDcurso) {
+function getTemaData($IDcurso, $IDtema) {
 	global $db;
 	
 	$tema = array();
 
-	$res = $db->query('SELECT * FROM temas WHERE ID = '.$IDtema.' AND IDcurso = '.$IDcurso);
+	$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.$IDcurso.' AND ID = '.$IDtema.' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		$tema = array(
+			'IDcurso' => $row['IDcurso'],
+			'IDtema' => $row['ID'],
 			'nombre' => $row['nombre'],
-			'ruta' => $row['ruta'],
 			'descripcion' => $row['descripcion'],
-			'IDcurso' => $row['IDcurso']
+			'ruta' => $row['ruta'],
+			'orden' => $row['orden'],
+			'ocultar' => $row['ocultar']
 		);
 	}
 
@@ -483,15 +543,27 @@ function getTemaData($IDtema, $IDcurso) {
 /*
  crearVideo: Crea un video con los parámetros que se facilitan
  */
-function crearVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta) {
+function crearVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $orden, $ocultar) {
 	global $db;
 
-	$SQL = 'INSERT INTO videos (nombre, IDcurso, IDtema';
+	$SQL = 'INSERT INTO videos (';
+	$SQL .= 'IDcurso';
+	$SQL .= ',IDtema';
+	$SQL .= ',nombre';
 	$SQL .= ($descripcion != '')?',descripcion':'';
 	$SQL .= ($ruta != '')?',ruta':'';
-	$SQL .= ') VALUES ("'.$nombre.'",'.$IDcurso.','.$IDtema;
+	$SQL .= ($img != '')?',img':'';
+	$SQL .= ($orden != '')?',orden':'';
+	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ') VALUES ('; //.$nombre.'",'.$IDcurso.','.$IDtema.','.$orden;
+	$SQL .= $IDcurso;
+	$SQL .= ','.$IDtema;
+	$SQL .= ',"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
+	$SQL .= ($img != '')?',"'.$img.'"':'';
+	$SQL .= ($orden != '')?','.$orden:'';
+	$SQL .= ($ocultar != '')?','.$ocultar:'';
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -501,13 +573,19 @@ function crearVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta) {
 /*
  updateVideo: Actualiza un video existente
  */
-function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion) {
+function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $orden, $ocultar) {
 	global $db;
 
 	$SQL = 'UPDATE videos SET ';
-	$SQL .= 'nombre = "'.$nombre.'"';
+	$SQL .= 'IDcurso = '.$IDcurso;
+	$SQL .= ', IDtema = '.$IDtema;
+	$SQL .= ', nombre = "'.$nombre.'"';
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
-	$SQL .= ' WHERE ID = '.$IDvideo.' AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema;
+	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ($img != '')?', img = "'.$img.'"':'';
+	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ' WHERE ID = '.$IDvideo;
 	
 	$db->exec($SQL);
 }
@@ -518,42 +596,49 @@ function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion) {
 function checkVideo($condicion) {
 	global $db;
 	
-	$SQL = 'SELECT COUNT(*) FROM videos WHERE '.$condicion;
+	return $db->querySingle('SELECT COUNT(*) FROM videos WHERE '.$condicion);
+}
 
-	$existe = $db->querySingle($SQL);
-	//print $SQL.' ('.$existe.')<br />';
-	return $existe;
+/*
+ deleteVideo: Elimina un video
+ */
+function deleteVideo($IDvideo) {
+	global $db;
+
+	$db->exec('DELETE FROM videos WHERE ID = '.$IDvideo);
 }
 
 
 function getIDvideo($IDcurso, $IDtema, $nombre, $ruta, $crearVideo) {
 	global $db;
 
-	if ($crearVideo == 1) {
-		if ($db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema) == 0) {
-			crearVideo($IDcurso, $IDtema, $nombre, '', $ruta);
-		}
+	if ( ($crearVideo == 1)&&($db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema) == 0) ) {
+		crearVideo($IDcurso, $IDtema, $nombre, $nombre, $ruta, $img, 1, 0);
 	}
 
-	$IDvideo = $db->querySingle('SELECT ID FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
-	return $IDvideo;
+	return $db->querySingle('SELECT ID FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
 }
 
 /*
  * getVideoData: devuelve un array con toda la información de un vídeo:
  */
-function getVideoData($IDvideo, $IDtema, $IDcurso) {
+function getVideoData($IDcurso, $IDtema, $IDvideo) {
 	global $db;
 	
 	$video = array();
 
-	$res = $db->query('SELECT * FROM videos WHERE ID = '.$IDvideo.' AND IDtema = '.$IDtema.' AND IDcurso = '.$IDcurso);
+	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND ID = '.$IDvideo.' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		$video = array(
+			'IDcurso' => $row['IDcurso'],
+			'IDtema' => $row['IDtema'],
+			'IDvideo' => $row['ID'],
 			'nombre' => $row['nombre'],
 			'descripcion' => $row['descripcion'],
-			'IDcurso' => $row['IDcurso'],
-			'IDtema' => $row['IDtema']
+			'ruta' => $row['ruta'],
+			'img' => $row['img'],
+			'orden' => $row['orden'],
+			'ocultar' => $row['ocultar']
 		);
 	}
 
@@ -565,6 +650,14 @@ function updateVideoIMG($IDvideo, $img) {
 
 	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
 }
+
+
+
+
+
+
+
+
 
 function logAction($action) {
 	global $dbLog;

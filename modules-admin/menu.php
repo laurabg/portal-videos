@@ -10,7 +10,7 @@ function listaItemsCursos() {
 	$OUT = '';
 
 	$cls = '';
-	if ( (!isset($_GET['IDcurso']))&&($_GET['opt'] == $opt) ) {
+	if ( ($_GET['IDcurso'] == '')&&($_GET['opt'] == $opt) ) {
 		$cls = ' active';
 	}
 
@@ -24,14 +24,16 @@ function listaItemsCursos() {
 	$OUT .= '</li>';
 
 	$listaCursos = getListaCursos();
-
+	
 	for ($i = 0; $i < sizeof($listaCursos); $i++) {
 		$item = $listaCursos[$i];
 		$cls = '';
 
 		if ( ($item[0] == $_GET['IDcurso']) ) {
-			$cls = ' expanded';
-			if ( ($_GET['opt'] == $opt)&&(!isset($_GET['IDtema']))&&(!isset($_GET['IDvideo'])) )  {
+			if ($_GET['IDtema'] != '') {
+				$cls .= ' expanded';
+			}
+			if ( ($_GET['opt'] == $opt)&&($_GET['IDtema'] == '')&&($_GET['IDvideo'] == '') )  {
 				$cls .= ' active';
 			}
 		}
@@ -47,7 +49,7 @@ function listaItemsCursos() {
 			$OUT .= '</ul>';
 		$OUT .= '</li>';
 	}
-
+	
 	return $OUT;
 }
 
@@ -56,7 +58,7 @@ function listaItemsTemas($IDcurso) {
 	$OUT = '';
 
 	$cls = '';
-	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&(!isset($_GET['IDtema'])) ) {
+	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == '') ) {
 		$cls = ' class="active"';
 	}
 
@@ -76,8 +78,10 @@ function listaItemsTemas($IDcurso) {
 		$cls = '';
 
 		if ( ($item[0] == $_GET['IDtema']) ) {
-			$cls = ' class="expanded';
-			if ( ($_GET['opt'] == $opt)&&(!isset($_GET['IDvideo'])) ) {
+			if ($_GET['IDvideo'] != '') {
+				$cls .= ' class="expanded';
+			}
+			if ( ($_GET['opt'] == $opt)&&($_GET['IDvideo'] == '') ) {
 				$cls .= ' active';
 			}
 			$cls .= '"';
@@ -103,7 +107,7 @@ function listaItemsVideos($IDcurso, $IDtema) {
 	$OUT = '';
 
 	$cls = '';
-	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == $IDtema)&&(!isset($_GET['IDvideo'])) ) {
+	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == $IDtema)&&($_GET['IDvideo'] == '') ) {
 		$cls = ' class="active"';
 	}
 
@@ -139,31 +143,34 @@ function listaItemsVideos($IDcurso, $IDtema) {
 }
 
 $menu = array(
-	array( 'nombre' => 'Configuración', 'url' => 'config', 'cierreMenu' => 1 ),
-//	array( 'nombre' => 'Cursos', 'url' => 'cursos', 'cierreMenu' => 0 ),
-//	array( 'nombre' => 'Temas', 'url' => 'temas', 'cierreMenu' => 0 ),
-//	array( 'nombre' => 'Vídeos', 'url' => 'videos', 'cierreMenu' => 1 ),
+	array( 'nombre' => 'Configuración', 'url' => 'config', 'cierreMenu' => 0 ),
+	array( 'nombre' => 'gestionCursos', 'url' => 'gestionCursos', 'cierreMenu' => 1 ),
 	array( 'nombre' => 'Analytics', 'url' => 'analytics', 'cierreMenu' => 0 ),
 	array( 'nombre' => 'Usuarios', 'url' => 'usuarios', 'cierreMenu' => 0 )
 );
-
-$OUT .= '<div class="tree"><ul class="nav nav-sidebar">';
-	$OUT .= listaItemsCursos();
-$OUT .= '</ul></div>';
 
 $OUT .= '<ul class="nav nav-sidebar">';
 
 for ($i = 0; $i < sizeof($menu); $i++) {
 	$item = $menu[$i];
 
-	$OUT .= '<li';
-	if ( ($_GET['opt'] == $item['url']) ) {
-		$OUT .=  ' class="active"';
-	}
-	$OUT .= '><a href="?opt='.$item['url'].'">'.$item['nombre'].'</a></li>';
+	if ($item['url'] == 'gestionCursos') {
+		if ($i > 0) {
+			$OUT .= '</ul>';
+		}
+		$OUT .= '<div class="tree"><ul class="nav nav-sidebar">';
+			$OUT .= listaItemsCursos();
+		$OUT .= '</ul></div><ul class="nav nav-sidebar">';
+	} else {
+		$OUT .= '<li';
+		if ( ( ($_GET['opt'] == '')&&($item['url'] == 'config') )||( ($_GET['opt'] == $item['url']) ) ) {
+			$OUT .=  ' class="active"';
+		}
+		$OUT .= '><a href="?opt='.$item['url'].'">'.$item['nombre'].'</a></li>';
 
-	if ($item['cierreMenu']) {
-		$OUT .= '</ul><ul class="nav nav-sidebar">';
+		if ($item['cierreMenu']) {
+			$OUT .= '</ul><ul class="nav nav-sidebar">';
+		}
 	}
 }
 $OUT .= '</ul>';

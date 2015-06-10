@@ -28,7 +28,7 @@
 
 <?php
 include_once(__DIR__.'/../../config.php');
-include_once(_DOCUMENTROOT.'forms/adminConfig.php');
+include_once(_DOCUMENTROOT.'forms/admin-config.php');
 
 //$listaUbicaciones = listaUbicaciones(1);
 
@@ -42,11 +42,11 @@ $_POST['_WSTOKEN'] = $configData['_WSTOKEN'];
 
 $OUT = '';
 
-if ($error != '') {
+if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="">';
+$OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/config.php">';
 	$OUT .= '<div class="checkbox">';
 		$OUT .= '<label></label><input name="showErrors" type="checkbox"';
 		if ($_POST['showErrors'] == 1) {
@@ -94,12 +94,9 @@ $OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="">';
 		$OUT .= '</div>';
 		$OUT .= '<button type="button" class="add-ext btn btn-success">Añadir una extensi&oacute;n</button>';
 	$OUT .= '</div>';
-	$OUT .= '<button type="submit" value="save" name="formOption" class="btn btn-default">Guardar</button>';
+	$OUT .= '<button type="submit" value="save" class="btn btn-default">Guardar</button>';
 	$OUT .= '<button type="button" value="cancel" class="btn btn-default btn-cancel">Cancelar</button>';
-	if ($_POST['IDcurso'] != '') {
-		$OUT .= '<button type="submit" value="del" name="formOption" class="btn btn-danger">Eliminar</button>';
-	}
-	$OUT .= '<input type="hidden" value="'.$_GET['opt'].'" name="form" />';
+	$OUT .= '<input type="hidden" value="config" name="form" />';
 $OUT .= '</form>';
 
 print($OUT);
