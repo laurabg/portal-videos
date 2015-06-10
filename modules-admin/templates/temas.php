@@ -32,6 +32,8 @@ if ($error == 'danger') {
 	$_POST['ocultar'] = $temaData['ocultar'];
 }
 
+$_POST['orden'] = ( $_POST['orden']=='' ? getNextOrdenTema($_POST['IDcurso']) : $_POST['orden'] );
+
 $OUT = '';
 
 if ($msgError != '') {
@@ -51,8 +53,8 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '> Tema oculto, no se mostrar&aacute; a ning&uacute;n usuario</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="orden">Posici&oacute;n en la que se mostrar&aacute; el tema:</label>';
-		$OUT .= '<input type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el tema" value="'.$_POST['orden'].'" min="1" />';
+		$OUT .= '<label for="orden">* Posici&oacute;n en la que se mostrar&aacute; el tema:</label>';
+		$OUT .= '<input required type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el tema" value="'.$_POST['orden'].'" min="1" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del tema:</label>';

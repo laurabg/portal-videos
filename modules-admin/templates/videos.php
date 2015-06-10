@@ -46,7 +46,10 @@ if ($error == 'danger') {
 	$_POST['img'] = $videoData['img'];
 	$_POST['orden'] = $videoData['orden'];
 	$_POST['ocultar'] = $videoData['ocultar'];
+
 }
+
+$_POST['orden'] = ( $_POST['orden']=='' ? getNextOrdenVideo($_POST['IDcurso'], $_POST['IDtema']) : $_POST['orden'] );
 
 $OUT = '';
 
@@ -67,8 +70,8 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '> V&iacute;deo oculto, no se mostrar&aacute; a ning&uacute;n usuario</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="orden">Posici&oacute;n en la que se mostrar&aacute; el v&iacute;deo:</label>';
-		$OUT .= '<input type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el v&iacute;deo" value="'.$_POST['orden'].'" min="1" />';
+		$OUT .= '<label for="orden">* Posici&oacute;n en la que se mostrar&aacute; el v&iacute;deo:</label>';
+		$OUT .= '<input required type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el v&iacute;deo" value="'.$_POST['orden'].'" min="1" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del vídeo:</label>';

@@ -1,5 +1,5 @@
 <?php
-$opt = 'config';
+$opt = _ADMINDEF;
 if ($_GET['opt'] != '') {
 	$opt = $_GET['opt'];
 }

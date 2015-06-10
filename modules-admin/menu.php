@@ -143,10 +143,10 @@ function listaItemsVideos($IDcurso, $IDtema) {
 }
 
 $menu = array(
-	array( 'nombre' => 'Configuración', 'url' => 'config', 'cierreMenu' => 0 ),
+	array( 'nombre' => 'Estad&iacute;sticas', 'url' => 'estadisticas', 'cierreMenu' => 0 ),
 	array( 'nombre' => 'gestionCursos', 'url' => 'gestionCursos', 'cierreMenu' => 1 ),
-	array( 'nombre' => 'Analytics', 'url' => 'analytics', 'cierreMenu' => 0 ),
-	array( 'nombre' => 'Usuarios', 'url' => 'usuarios', 'cierreMenu' => 0 )
+	array( 'nombre' => 'Usuarios', 'url' => 'usuarios', 'cierreMenu' => 0 ),
+	array( 'nombre' => 'Configuración', 'url' => 'config', 'cierreMenu' => 0 )
 );
 
 $OUT .= '<ul class="nav nav-sidebar">';
@@ -163,7 +163,7 @@ for ($i = 0; $i < sizeof($menu); $i++) {
 		$OUT .= '</ul></div><ul class="nav nav-sidebar">';
 	} else {
 		$OUT .= '<li';
-		if ( ( ($_GET['opt'] == '')&&($item['url'] == 'config') )||( ($_GET['opt'] == $item['url']) ) ) {
+		if ( ( ($_GET['opt'] == '')&&($item['url'] == _ADMINDEF) )||( ($_GET['opt'] == $item['url']) ) ) {
 			$OUT .=  ' class="active"';
 		}
 		$OUT .= '><a href="?opt='.$item['url'].'">'.$item['nombre'].'</a></li>';

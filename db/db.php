@@ -121,7 +121,8 @@ function crearTablas() {
 	$db->exec('CREATE TABLE usuarios (
 		ID INTEGER PRIMARY KEY, 
 		fullname TEXT, 
-		email TEXT);'
+		email TEXT,
+		bloqueado INTEGER);'
 	);
 	$db->exec('CREATE TABLE cursosUsuarios (
 		ID INTEGER PRIMARY KEY, 
@@ -281,7 +282,9 @@ function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
 	global $db;
 
 	if ( ($crearCurso == 1)&&(checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) ) {
-		crearCurso($nombre, $nombre, $ruta, $IDubicacion, 1, 0, '', '', '', 0);
+		$orden = getNextOrdenCurso();
+
+		crearCurso($nombre, $nombre, $ruta, $IDubicacion, ( $orden=='' ? 1 : $orden ), _OCULTO, '', '', '', 0);
 	}
 	
 	return $db->querySingle('SELECT ID FROM cursos WHERE ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion);
@@ -316,32 +319,12 @@ function getCursoData($IDcurso) {
 }
 
 /*
- registrarUsuarioCurso: Registra una serie de usuarios en un curso
+ * getNextOrdenCurso: devuelve el siguiente orden en la tabla cursos
  */
-function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
+function getNextOrdenCurso() {
 	global $db;
 
-	// Comprobar si el usuario existe en la BBDD:
-	if ($db->querySingle('SELECT COUNT(*) FROM usuarios WHERE email = "'.$email.'"') == 0) {
-		$db->exec('INSERT INTO usuarios (fullname, email) VALUES ("'.$fullname.'", "'.$email.'")');
-	}
-
-	// Obtener el ID de usuario:
-	$IDusuario = $db->querySingle('SELECT ID FROM usuarios WHERE email = "'.$email.'"');
-
-	// Añadir usuario a curso:
-	if ($db->querySingle('SELECT COUNT(*) FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario) == 0) {
-		$db->exec('INSERT INTO cursosUsuarios (IDcurso, IDcursoMoodle, IDusuario) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', '.$IDusuario.')');
-	}
-}
-
-/*
- desregistrarUsuariosCurso: Registra una serie de usuarios en un curso
- */
-function desregistrarUsuariosCurso($IDcurso) {
-	global $db;
-
-	$db->exec('DELETE FROM cursosUsuarios WHERE IDcurso = '.$IDcurso);
+	return $db->querySingle('SELECT MAX(orden)+1 FROM cursos');
 }
 
 /*
@@ -491,7 +474,9 @@ function getIDtema($IDcurso, $nombre, $ruta, $crearTema) {
 	global $db;
 
 	if ( ($crearTema == 1)&&(checkTema('ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso) == 0) ) {
-		crearTema($IDcurso, $nombre, $nombre, $ruta, 1, 0);
+		$orden = getNextOrdenTema($IDcurso);
+
+		crearTema($IDcurso, $nombre, $nombre, $ruta, ( $orden=='' ? 1 : $orden ), _OCULTO);
 	}
 
 	return $db->querySingle('SELECT ID FROM temas WHERE ruta = "'.$ruta.'" AND IDcurso = '.$IDcurso);
@@ -531,6 +516,14 @@ function getTemaData($IDcurso, $IDtema) {
 	return $tema;
 }
 
+/*
+ * getNextOrdenTema: devuelve el siguiente orden en la tabla temas para un curso
+ */
+function getNextOrdenTema($IDcurso) {
+	global $db;
+
+	return $db->querySingle('SELECT MAX(orden)+1 FROM temas WHERE IDcurso = '.$IDcurso);
+}
 
 
 
@@ -569,7 +562,6 @@ function crearVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $orde
 	$db->exec($SQL);
 }
 
-
 /*
  updateVideo: Actualiza un video existente
  */
@@ -591,6 +583,15 @@ function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion, $ruta, 
 }
 
 /*
+ * updateVideoIMG: Actualiza el registro del video para asociarle una imagen
+ */
+function updateVideoIMG($IDvideo, $img) {
+	global $db;
+
+	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
+}
+
+/*
  checkVideo: Devuelve true si el video existe, y false si no.
  */
 function checkVideo($condicion) {
@@ -608,12 +609,16 @@ function deleteVideo($IDvideo) {
 	$db->exec('DELETE FROM videos WHERE ID = '.$IDvideo);
 }
 
-
+/*
+ getIDvideo: Devuelve el ID del video.
+ */
 function getIDvideo($IDcurso, $IDtema, $nombre, $ruta, $crearVideo) {
 	global $db;
 
 	if ( ($crearVideo == 1)&&($db->querySingle('SELECT COUNT(*) FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema) == 0) ) {
-		crearVideo($IDcurso, $IDtema, $nombre, $nombre, $ruta, $img, 1, 0);
+		$orden = getNextOrdenVideo($IDcurso, $IDtema);
+
+		crearVideo($IDcurso, $IDtema, $nombre, $nombre, $ruta, $img, ( $orden=='' ? 1 : $orden ), _OCULTO);
 	}
 
 	return $db->querySingle('SELECT ID FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
@@ -645,12 +650,14 @@ function getVideoData($IDcurso, $IDtema, $IDvideo) {
 	return $video;
 }
 
-function updateVideoIMG($IDvideo, $img) {
+/*
+ * getNextOrdenVideo: devuelve el siguiente orden en la tabla videos para un curso y tema
+ */
+function getNextOrdenVideo($IDcurso, $IDtema) {
 	global $db;
 
-	$db->exec('UPDATE videos SET img = "'.$img.'" WHERE ID = '.$IDvideo.';');
+	return $db->querySingle('SELECT MAX(orden)+1 FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
 }
-
 
 
 
@@ -809,6 +816,87 @@ function checkExtension($condicion) {
 	global $dbConfig;
 
 	return $dbConfig->querySingle('SELECT COUNT(*) FROM extensionesValidas WHERE '.$condicion);
+}
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ----------------------------------------------------    USUARIOS    ---------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
+/*
+ crearUsuario: Crea un usuario
+ */
+function crearUsuario($fullname, $email, $bloqueado) {
+	global $db;
+
+	$db->exec('INSERT INTO usuarios (fullname, email, bloqueado) VALUES ("'.$fullname.'", "'.$email.'", '.$bloqueado.')');
+}
+
+/*
+ bloquearUsuario: Cambia el estado de bloqueo de un usuario
+ */
+function bloquearUsuario($IDusuario, $bloqueado) {
+	global $db;
+
+	$db->exec('UPDATE usuarios SET bloqueado = '.$bloqueado.' WHERE ID = '.$IDusuario);
+}
+
+/*
+ deleteUsuario: Elimina un usuario
+ */
+function deleteUsuario($IDusuario) {
+	global $db;
+	
+	$db->exec('DELETE FROM cursosUsuarios WHERE IDusuario = '.$IDusuario);
+	$db->exec('DELETE FROM usuarios WHERE ID = '.$IDusuario);
+}
+
+/*
+ registrarUsuarioCurso: Registra una serie de usuarios en un curso
+ */
+function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
+	global $db;
+
+	// Comprobar si el usuario existe en la BBDD:
+	if ($db->querySingle('SELECT COUNT(*) FROM usuarios WHERE email = "'.$email.'"') == 0) {
+		crearUsuario($fullname, $email, 0);
+	}
+
+	// Obtener el ID de usuario:
+	$IDusuario = $db->querySingle('SELECT ID FROM usuarios WHERE email = "'.$email.'"');
+
+	// Añadir usuario a curso:
+	if ($db->querySingle('SELECT COUNT(*) FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario) == 0) {
+		$db->exec('INSERT INTO cursosUsuarios (IDcurso, IDcursoMoodle, IDusuario) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', '.$IDusuario.')');
+	}
+}
+
+/*
+ desregistrarUsuariosCurso: Registra una serie de usuarios en un curso
+ */
+function desregistrarUsuariosCurso($IDcurso) {
+	global $db;
+
+	$db->exec('DELETE FROM cursosUsuarios WHERE IDcurso = '.$IDcurso);
+}
+
+/*
+ getAllUsuarios: Obtener la lista completa de usuarios
+ */
+function getAllUsuarios() {
+	global $db;
+	
+	$listaUsuarios = array();
+
+	$res = $db->query('SELECT * FROM usuarios ORDER BY fullname');
+	while ($row = $res->fetchArray()) {
+		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email'], 'bloqueado' => $row['bloqueado']));
+	}
+
+	return $listaUsuarios;
 }
 
 ?>

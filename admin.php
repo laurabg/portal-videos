@@ -14,7 +14,7 @@ include_once('config.php');
 
 		<!-- Bootstrap core CSS -->
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="css/datepicker.css">
+		<link rel="stylesheet" type="text/css" href="js/bootstrap-datepicker-1.4.0-dist/css/bootstrap-datepicker.min.css">
 
 		<!-- Custom styles for this template -->
 		<link rel="stylesheet" type="text/css" href="css/dashboard.css">
@@ -39,9 +39,9 @@ include_once('config.php');
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="/portal-videos/">Project name</a>
+					<a class="navbar-brand" href="/portal-videos/">Portal v&iacute;deos</a>
 				</div>
-				<div id="navbar" class="navbar-collapse collapse">
+				<!--div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
 						<li><a href="#">Dashboard</a></li>
 						<li><a href="#">Settings</a></li>
@@ -51,7 +51,7 @@ include_once('config.php');
 					<form class="navbar-form navbar-right">
 						<input type="text" class="form-control" placeholder="Search...">
 					</form>
-				</div>
+				</div-->
 			</div>
 		</nav>
 		<?php require_once(_DOCUMENTROOT.'modules-admin/content.php'); ?>
@@ -62,8 +62,9 @@ include_once('config.php');
 		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="js/jquery.form.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
-		<script type="text/javascript" src="js/flowplayer-5.4.4/flowplayer.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/locales/bootstrap-datepicker.es.min.js"></script>
+		<!--script type="text/javascript" src="js/flowplayer-5.4.4/flowplayer.min.js"></script-->
 		<script type="text/javascript" src="js/admin.js"></script>
 	</body>
 </html>

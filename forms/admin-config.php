@@ -1,4 +1,5 @@
 <?php
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'db/db.php');
 include_once(_DOCUMENTROOT.'util/ws-connection.php');
 include_once(_DOCUMENTROOT.'util/file-functions.php');

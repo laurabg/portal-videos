@@ -8,6 +8,8 @@ define("_BBDDCONFIG", _DOCUMENTROOT."db/dbconfig.db");
 define("_BBDDLOG", _DOCUMENTROOT."db/dblog.db");
 define("_BBDDANALYTICS", _DOCUMENTROOT."db/analytics.db");
 define("_DIRCURSOS", "data/");
+define("_OCULTO", 0);
+define("_ADMINDEF", "estadisticas");
 
 include_once(_DOCUMENTROOT.'db/db.php');
 

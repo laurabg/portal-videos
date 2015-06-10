@@ -41,6 +41,9 @@ if ($error == 'danger') {
 	$_POST['fechaFin'] = $cursoData['fechaFin'];
 	$_POST['publico'] = $cursoData['publico'];
 }
+
+$_POST['orden'] = ( $_POST['orden']=='' ? getNextOrdenCurso() : $_POST['orden'] );
+
 $OUT = '';
 
 if ($msgError != '') {
@@ -53,7 +56,7 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="IDcursoMoodle">* Seleccione el curso de Moodle asociado:</label>';
+		$OUT .= '<label for="IDcursoMoodle">Seleccione el curso de Moodle asociado:</label>';
 		$OUT .= '<select class="form-control" name="IDcursoMoodle" id="IDcursoMoodle" >';
 			$OUT .= '<option value="">Seleccione un curso</option>';
 			if (sizeof($listaCursosMoodle) > 0) {
@@ -85,21 +88,12 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '</select>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<div class="row">';
-			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<label for="fechaIni">Fecha a partir de la que mostrar el curso:</label>';
-			$OUT .= '</div>';
-			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<label for="fechaIni">Fecha a partir de la que dejar de mostrar el curso:</label>';
-			$OUT .= '</div>';
-		$OUT .= '</div>';
-		$OUT .= '<div class="row">';
-			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<input type="text" class="form-control datepicker" value="'.$_POST['fechaIni'].'" name="fechaIni" id="fechaIni" />';
-			$OUT .= '</div>';
-			$OUT .= '<div class="col-md-6">';
-				$OUT .= '<input type="text" class="form-control datepicker" value="'.$_POST['fechaFin'].'" name="fechaFin" id="fechaFin" />';
-			$OUT .= '</div>';
+		$OUT .= '<label for="fechaIni">Fechas en las que mostrar el curso:</label>';
+		$OUT .= '<div class="input-daterange input-group" id="datepicker">';
+			$OUT .= '<span class="input-group-addon">desde</span>';
+			$OUT .= '<input type="text" class="input-sm form-control" name="fechaIni" value="'.$_POST['fechaIni'].'" />';
+			$OUT .= '<span class="input-group-addon">hasta</span>';
+			$OUT .= '<input type="text" class="input-sm form-control" name="fechaFin" value="'.$_POST['fechaFin'].'" />';
 		$OUT .= '</div>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
@@ -117,8 +111,8 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '> Curso oculto, no se mostrar&aacute; a ning&uacute;n usuario</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="orden">Posici&oacute;n en la que se mostrar&aacute; el curso:</label>';
-		$OUT .= '<input type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el curso" value="'.$_POST['orden'].'" min="1" />';
+		$OUT .= '<label for="orden">* Posici&oacute;n en la que se mostrar&aacute; el curso:</label>';
+		$OUT .= '<input required type="number" name="orden" class="form-control" id="orden" placeholder="Posici&oacute;n en la que se mostrar&aacute; el curso" value="'.$_POST['orden'].'" min="1" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del curso:</label>';

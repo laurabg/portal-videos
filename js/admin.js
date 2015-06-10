@@ -1,18 +1,4 @@
 function loadMenu() {
-	/*$('ul.menu-sortable').sortable({
-		containment: 'parent',
-		items: 'li:not(.ui-state-disabled)',
-		start: function(event, ui) {
-			if ($(ui.item[0]).children('.item').children('span').hasClass('glyphicon-folder-open')) {
-				$(ui.item[0]).children('.item').trigger('click');
-			}
-		},
-		stop: function(event, ui) {
-			var sorted = $('ul.menu-sortable').sortable( "toArray", { attribute: "IDcurso" } );;
-			console.log(sorted);
-		}
-	});*/
-	
 	$('.nav-sidebar a').click(function() {
 		$('.nav-sidebar li').removeClass('active');
 		$(this).closest('li').addClass('active');
@@ -86,14 +72,11 @@ function getUrlParameter(sParam, fullURL) {
 }       
 
 function loadAjaxForm() {
-	/*if ($('.datepicker').length > 0) {
-		// Datepickers:
-		$('.datepicker').datepicker({
-			weekStart: 1,
-			format: 'yyyy-mm-dd',
-			locale: 'es'
-		});
-	}*/
+	$('.input-group.input-daterange').datepicker({
+		weekStart: 1,
+		format: 'yyyy-mm-dd',
+		language: 'es'
+	});
 
 	$('form[name="config"] .add-ub').click(function() {
 		newUb = '<div class="row"><div class="col-md-2"></div><div class="col-md-10">';
@@ -127,8 +110,21 @@ function beforeSubmit(formData, jqForm, options) {
 	// Si se ha pulsado "eliminar", pedir confirmacion:
 	if (queryString.indexOf('formDel') != -1) {
 		if (confirm('¿Desea eliminar este elemento?')) {
-			return true
+			return true;
 		}
+
+	// Si se ha pulsado "desautorizar acceso usuario", pedir confirmacion:
+	} else if (queryString.indexOf('block-access-user') != -1) {
+		if (confirm('¿Desea bloquear el acceso de este usuario a sus cursos?')) {
+			return true;
+		}
+
+	// Si se ha pulsado "desautorizar acceso usuario", pedir confirmacion:
+	} else if (queryString.indexOf('del-user') != -1) {
+		if (confirm('¿Desea eliminar este usuario?')) {
+			return true;
+		}
+
 	} else {
 		return true;
 	}
