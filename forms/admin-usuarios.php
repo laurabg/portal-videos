@@ -54,7 +54,7 @@ if ($_POST['form'] == 'usuarios') {
 				$error = 'warning';
 
 			} else {
-				crearUsuario($_POST['fullname'], $_POST['email'], 0);
+				crearUsuario($_POST['fullname'], $_POST['email'], 0, '', 0);
 
 				// Crear el usuario:
 				$msgError = 'Datos guardados correctamente'; 

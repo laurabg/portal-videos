@@ -122,8 +122,13 @@ function crearTablas() {
 		ID INTEGER PRIMARY KEY, 
 		fullname TEXT, 
 		email TEXT,
-		bloqueado INTEGER);'
+		bloqueado INTEGER,
+		username TEXT,
+		esAdmin INTEGER);'
 	);
+	
+	crearUsuario('Administrador', 'admin@localhost.com', 0, 'admin', 1);
+
 	$db->exec('CREATE TABLE cursosUsuarios (
 		ID INTEGER PRIMARY KEY, 
 		IDusuario INTEGER,
@@ -838,10 +843,19 @@ function checkExtension($condicion) {
 /*
  crearUsuario: Crea un usuario
  */
-function crearUsuario($fullname, $email, $bloqueado) {
+function crearUsuario($fullname, $email, $bloqueado, $username, $esAdmin) {
 	global $db;
 
-	$db->exec('INSERT INTO usuarios (fullname, email, bloqueado) VALUES ("'.$fullname.'", "'.$email.'", '.$bloqueado.')');
+	$db->exec('INSERT INTO usuarios (fullname, email, bloqueado, username, esAdmin) VALUES ("'.$fullname.'", "'.$email.'", '.$bloqueado.', "'.$username.'", '.$esAdmin.')');
+}
+
+/*
+ checkUsuario: Devuelve true si el usuario existe, y false si no.
+ */
+function checkUsuario($condicion) {
+	global $db;
+	
+	return $db->querySingle('SELECT COUNT(*) FROM usuarios WHERE '.$condicion);
 }
 
 /*
@@ -864,6 +878,35 @@ function deleteUsuario($IDusuario) {
 }
 
 /*
+ asociarUsernameEmail: Asocia un correo a un username
+ */
+function asociarUsernameEmail($email, $username) {
+	global $db;
+	
+	if (checkUsuario('email = "'.$email.'"') > 0) {
+		$db->exec('UPDATE usuarios SET username = "'.$username.'" WHERE email = "'.$email.'"');
+	}
+}
+
+/*
+ getUserFullname: Obtiene el fullname de un usuario
+ */
+function getUserFullname($username) {
+	global $db;
+	
+	return $db->querySingle('SELECT fullname FROM usuarios WHERE username = "'.$username.'"');
+}
+
+/*
+ getUserID: Obtiene el ID de un usuario
+ */
+function getUserID($username) {
+	global $db;
+	
+	return $db->querySingle('SELECT ID FROM usuarios WHERE username = "'.$username.'"');
+}
+
+/*
  registrarUsuarioCurso: Registra una serie de usuarios en un curso
  */
 function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
@@ -871,7 +914,7 @@ function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
 
 	// Comprobar si el usuario existe en la BBDD:
 	if ($db->querySingle('SELECT COUNT(*) FROM usuarios WHERE email = "'.$email.'"') == 0) {
-		crearUsuario($fullname, $email, 0);
+		crearUsuario($fullname, $email, 0, '', 0);
 	}
 
 	// Obtener el ID de usuario:
@@ -911,6 +954,31 @@ function getAllUsuarios() {
 	}
 
 	return $listaUsuarios;
+}
+
+/*
+ * getUserData: devuelve un array con toda la información de un curso:
+ */
+function getUserData($IDusuario, $username, $email) {
+	global $db;
+	
+	$usuario = array();
+
+	$SQL = 'SELECT * FROM usuarios WHERE ';
+	( ($IDusuario != '') ? $SQL .= 'ID = '.$IDcurso : ( ($username != '') ? $SQL .= 'username = "'.$username.'"' : ( ($email != '') ? $SQL .= 'email = "'.$email.'"' : '' ) ) );
+	
+	$res = $db->query($SQL);
+	while ($row = $res->fetchArray()) {
+		$usuario = array(
+			'IDusuario' => $row['ID'],
+			'fullname' => $row['fullname'],
+			'email' => $row['email'],
+			'bloqueado' => $row['bloqueado'],
+			'esAdmin' => $row['esAdmin']
+		);
+	}
+
+	return $usuario;
 }
 
 /*

@@ -3,6 +3,20 @@ body {
 	padding-bottom: 30px;
 }
 
+header form .form-error {
+	display: none;
+	float: left;
+	margin-right: 10px;
+}
+
+header form .form-error-show {
+	display: block;
+}
+
+header form .form-group span {
+	color: #999;
+	padding: 5px;
+}
 span.play-video {
 	position: absolute;
 	z-index: 2;

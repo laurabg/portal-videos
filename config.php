@@ -10,6 +10,7 @@ define("_BBDDANALYTICS", _DOCUMENTROOT."db/analytics.db");
 define("_DIRCURSOS", "data/");
 define("_OCULTO", 0);
 define("_ADMINDEF", "estadisticas");
+define("_ADMINPASS", "#Admin1");
 
 include_once(_DOCUMENTROOT.'db/db.php');
 

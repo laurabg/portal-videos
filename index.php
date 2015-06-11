@@ -14,8 +14,8 @@ require_once('config.php');
 		<!-- Bootstrap core CSS -->
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
-		<link rel="stylesheet" type="text/css" href="css/style.css" />
 		<link rel="stylesheet" type="text/css" href="js/flowplayer-5.4.4/skin/minimalist.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
 		
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
@@ -37,17 +37,34 @@ require_once('config.php');
 						<a class="navbar-brand" href="index.php">Portal Vídeos</a>
 					</div>
 					<div class="navbar-collapse collapse">
+						<?php if ( (isset($_COOKIE['MoodleUserAdmin']))&&($_COOKIE['MoodleUserAdmin'] == 1) ) { ?>
 						<ul class="nav navbar-nav">
 							<li><a href="admin.php">Admin</a></li>
 						</ul>
-						<form class="navbar-form navbar-right" role="form" method="POST" action="forms/login.php">
+						<?php } ?>
+						<form name="userSession" class="navbar-form navbar-right" role="form" method="POST" action="forms/login.php">
+						<?php if(!isset($_COOKIE['MoodleUserSession'])) { ?>
+							<div class="form-error btn btn-danger"></div>
 							<div class="form-group">
-								<input name="userName" type="text" placeholder="Email" class="form-control">
+								<input name="userName" type="text" placeholder="Usuario" class="form-control" />
 							</div>
 							<div class="form-group">
-								<input name="userPass" type="password" placeholder="Password" class="form-control">
+								<input name="userPass" type="password" placeholder="Contraseña" class="form-control" />
 							</div>
-							<button type="submit" class="btn btn-success">Sign in</button>
+							<button type="submit" name="login" class="btn btn-success">Acceder</button>
+						<?php } else if(isset($_COOKIE['MoodleUserFaltaCorreo'])) { ?>
+							<div class="form-error form-error-show btn btn-warning">Debe facilitar el correo electr&oacute;nico con el que accede a Moodle</div>
+							<div class="form-group">
+								<input name="email" type="text" placeholder="Correo electr&oacute;nico" class="form-control" />
+							</div>
+							<button type="submit" name="asociar-correo" class="btn btn-success">Acceder</button>
+							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
+						<?php } else { ?>
+							<div class="form-group">
+								<span>Bienvenido, <?php echo unserialize($_COOKIE['MoodleUserSession'])['fullname']; ?></span>
+							</div>
+							<button type="submit" value="aa" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
+						<?php } ?>
 						</form>
 					</div><!--/.navbar-collapse -->
 				</div>
@@ -60,6 +77,7 @@ require_once('config.php');
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="js/jquery.form.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/flowplayer-5.4.4/flowplayer.min.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>

@@ -7,6 +7,20 @@ body {
 	padding-top: 50px;
 }
 
+header form .form-error {
+	display: none;
+	float: left;
+	margin-right: 10px;
+}
+
+header form .form-error-show {
+	display: block;
+}
+
+header form .form-group span {
+	color: #999;
+	padding: 5px;
+}
 
 /*
  * Global add-ons
