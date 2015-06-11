@@ -8,6 +8,9 @@ global $db;
 $msgError = '';
 $error = 'success';
 
+//foreach ($_POST as $key => $value)
+//	print "Field ".htmlspecialchars($key)." is ".($value)."<br>";
+
 if ($_POST['form'] == 'usuarios') {
 	if (isset($_POST['block-access-user'])) {
 		$msgError = 'Usuario bloqueado';
@@ -27,6 +30,22 @@ if ($_POST['form'] == 'usuarios') {
 
 		deleteUsuario($_POST['del-user']);
 		
+	} else if (isset($_POST['save-cursos-user'])) {
+		$msgError = 'Datos actualizados correctamente'; 
+		$error = 'success'; 
+
+		if ( (isset($_POST['check-curso-user']))&&(sizeof($_POST['check-curso-user']) > 0) ) {
+			foreach ($_POST['check-curso-user'] as $IDcursoMoodle => $valor) {
+				$IDcurso = getIDcursoByIDcursoMoodle($IDcursoMoodle);
+
+				if ($valor == 'on') {
+					crearCursoUsuario($IDcurso, $IDcursoMoodle, $_POST['save-cursos-user']);
+				} else {
+					deleteCursoUsuario($IDcurso, $IDcursoMoodle, $_POST['save-cursos-user']);
+				}
+			}
+		}
+
 	} else if (isset($_POST['add-user'])) {
 		if ( ($_POST['fullname'] != '')&&($_POST['email'] != '') ) {
 			// Comprobar que el email es valido:

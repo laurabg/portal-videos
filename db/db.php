@@ -291,6 +291,15 @@ function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
 }
 
 /*
+ getIDcursoByIDcursoMoodle: Devuelve el ID del curso asociado al ID de moodle
+ */
+function getIDcursoByIDcursoMoodle($IDcursoMoodle) {
+	global $db;
+
+	return $db->querySingle('SELECT ID FROM cursos WHERE IDcursoMoodle = '.$IDcursoMoodle);
+}
+
+/*
  * getCursoData: devuelve un array con toda la información de un curso:
  */
 function getCursoData($IDcurso) {
@@ -869,9 +878,7 @@ function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
 	$IDusuario = $db->querySingle('SELECT ID FROM usuarios WHERE email = "'.$email.'"');
 
 	// Añadir usuario a curso:
-	if ($db->querySingle('SELECT COUNT(*) FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario) == 0) {
-		$db->exec('INSERT INTO cursosUsuarios (IDcurso, IDcursoMoodle, IDusuario) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', '.$IDusuario.')');
-	}
+	crearCursoUsuario($IDcurso, $IDcursoMoodle, $IDusuario);
 }
 
 /*
@@ -893,10 +900,37 @@ function getAllUsuarios() {
 
 	$res = $db->query('SELECT * FROM usuarios ORDER BY fullname');
 	while ($row = $res->fetchArray()) {
-		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email'], 'bloqueado' => $row['bloqueado']));
+		$cursos = array();
+
+		$resCursos = $db->query('SELECT * FROM cursosUsuarios WHERE IDusuario = '.$row['ID']);
+		while ($rowCursos = $resCursos->fetchArray()) {
+			array_push($cursos, $rowCursos['IDcursoMoodle']);
+		}
+		
+		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email'], 'bloqueado' => $row['bloqueado'], 'cursos' => $cursos ));
 	}
 
 	return $listaUsuarios;
+}
+
+/*
+ crearCursoUsuario: Crea un registro en la tabla cursosUsuarios
+ */
+function crearCursoUsuario($IDcurso, $IDcursoMoodle, $IDusuario) {
+	global $db;
+	
+	if ($db->querySingle('SELECT COUNT(*) FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario) == 0) {
+		$db->exec('INSERT INTO cursosUsuarios (IDcurso, IDcursoMoodle, IDusuario) VALUES ('.$IDcurso.', '.$IDcursoMoodle.', '.$IDusuario.')');
+	}
+}
+
+/*
+ deleteCursoUsuario: Elimina un registro de cursosUsuarios
+ */
+function deleteCursoUsuario($IDcurso, $IDcursoMoodle, $IDusuario) {
+	global $db;
+
+	$db->exec('DELETE FROM cursosUsuarios WHERE IDcurso = '.$IDcurso.' AND IDcursoMoodle = '.$IDcursoMoodle.' AND IDusuario = '.$IDusuario);
 }
 
 ?>

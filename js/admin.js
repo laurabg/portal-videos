@@ -90,6 +90,27 @@ function loadAjaxForm() {
 		$('.listaExtensiones').append(newUb);
 	});
 
+	$('form[name="usuarios"] button[name="list-user"]').click(function() {
+		IDusuario = $(this).attr('value');
+
+		if ($('tr.list-user-'+IDusuario).is(':visible')) {
+			$('tr.list-user-'+IDusuario).hide();
+		} else {
+			$('tr.no-mostrar').hide();
+			$('tr.list-user-'+IDusuario).show();
+		}
+	});
+
+	$('form[name="usuarios"] button[name="save-cursos-user"]').click(function() {
+		IDusuario = $(this).attr('value');
+
+		$('tr.no-mostrar').each(function() {
+			if ($(this).is(':visible') == false) {
+				$(this).detach();
+			}
+		});
+	});
+	
 	$('.btn-cancel').click(function() {
 		window.location.reload();
 	});
@@ -110,6 +131,12 @@ function beforeSubmit(formData, jqForm, options) {
 	// Si se ha pulsado "eliminar", pedir confirmacion:
 	if (queryString.indexOf('formDel') != -1) {
 		if (confirm('¿Desea eliminar este elemento?')) {
+			return true;
+		}
+
+	// Si se ha pulsado "autorizar acceso usuario", pedir confirmacion:
+	} else if (queryString.indexOf('unblock-access-user') != -1) {
+		if (confirm('¿Desea desbloquear el acceso de este usuario a sus cursos?')) {
 			return true;
 		}
 

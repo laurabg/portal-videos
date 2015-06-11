@@ -5,6 +5,9 @@
 <?php
 include_once(__DIR__.'/../../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-usuarios.php');
+include_once(_DOCUMENTROOT.'util/ws-connection.php');
+
+$listaCursosMoodle = connect('core_course_get_courses', '');
 
 $OUT = '';
 
@@ -12,7 +15,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/usuarios.php">';
+$OUT .= '<form name="usuarios" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/usuarios.php">';
 	$listaUsuarios = getAllUsuarios();
 
 	$OUT .= '<div class="form-group">';
@@ -22,6 +25,7 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 					$OUT .= '<tr>';
 						$OUT .= '<th>Nombre completo</th>';
 						$OUT .= '<th>Email</th>';
+						$OUT .= '<th></th>';
 						$OUT .= '<th></th>';
 						$OUT .= '<th></th>';
 					$OUT .= '</tr>';
@@ -37,6 +41,39 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 								$OUT .= '<td><button title="Desbloquear acceso a cursos" type="submit" value="'.$usuario['ID'].'" name="unblock-access-user" class="btn btn-xs btn-success"><span class="glyphicon glyphicon-lock"></span></button></td>';
 							}
 							$OUT .= '<td><button title="Eliminar usuarios" type="submit" value="'.$usuario['ID'].'" name="del-user" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-minus"></span></button></td>';
+							$OUT .= '<td><button title="Listado de cursos en los que est&aacute; inscrito" type="button" value="'.$usuario['ID'].'" name="list-user" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-th-list"></span></button></td>';
+						$OUT .= '</tr>';
+						$OUT .= '<tr class="no-mostrar list-user-'.$usuario['ID'].'">';
+							$OUT .= '<td colspan="5">';
+								$OUT .= '<div class="table-responsive">';
+									$OUT .= '<table class="table">';
+										$OUT .= '<thead>';
+											$OUT .= '<tr>';
+												$OUT .= '<th>Cursos de Moodle en los que est&aacute; inscrito</th>';
+											$OUT .= '</tr>';
+										$OUT .= '</thead>';
+										$OUT .= '<tbody>';
+										if (sizeof($listaCursosMoodle) > 0) {
+											foreach ($listaCursosMoodle as $c) {
+												if ($c->categoryid > 0) {
+													$OUT .= '<tr><td><input name="check-curso-user['.$c->id.']" type="checkbox"';
+													if (in_array($c->id, $usuario['cursos'])) {
+														$OUT .= ' checked';
+													}
+													$OUT .= ' /> '.$c->fullname.'</td></tr>';
+												}
+											}
+											$OUT .= '<tr><td><button type="submit" name="save-cursos-user" value="'.$usuario['ID'].'" class="btn btn-success">Guardar</button></td></tr>';
+										} else {
+											$OUT .= '<tr><td>No hay cursos de Moodle</td></tr>';
+										}
+										/*foreach ($usuario['cursos'] as $curso) {
+											$OUT .= '<tr><td><input type="checkbox" name="'.$curso.'" /> '.$curso.'</td></tr>';
+										}*/
+										$OUT .= '</tbody>';
+									$OUT .= '</table>';
+								$OUT .= '</div>';
+							$OUT .= '</td>';
 						$OUT .= '</tr>';
 					}
 					$OUT .= '<tr>';
