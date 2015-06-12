@@ -20,6 +20,22 @@ if ($_POST['form'] == 'config') {
 	} else {
 		updateAdminvar('showErrors', 0);
 	}
+
+	if ($_POST['_OCULTO'] == 'on') {
+		updateAdminvar('_OCULTO', 1);
+	} else {
+		updateAdminvar('_OCULTO', 0);
+	}
+
+	if ($_POST['_MOODLEALLUSERS'] == 'on') {
+		updateAdminvar('_MOODLEALLUSERS', 1);
+	} else {
+		updateAdminvar('_MOODLEALLUSERS', 0);
+	}
+
+	updateAdminvar('_DIRCURSOS', $_POST['_DIRCURSOS']);
+	updateAdminvar('_ADMINDEF', $_POST['_ADMINDEF']);
+	updateAdminvar('_ADMINPASS', $_POST['_ADMINPASS']);
 	updateAdminvar('_MOODLEURL', $_POST['_MOODLEURL']);
 	updateAdminvar('_WSTOKEN', $_POST['_WSTOKEN']);
 
@@ -60,7 +76,6 @@ if ($_POST['form'] == 'config') {
 			}
 		}
 	}
-
 
 	if (sizeof($_POST['extension']) > 0) {
 		foreach ($_POST['extension'] as $ID => $nombre) {

@@ -1,27 +1,3 @@
-<!--h1 class="page-header">Configuración</h1>
-<div class="row placeholders">
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-	<div class="col-xs-6 col-sm-3 placeholder">
-		<img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-		<h4>Label</h4>
-		<span class="text-muted">Something else</span>
-	</div>
-</div-->
-
 <h1 class="page-header">Configuración</h1>
 <div class="row">
 	<div class="col-12">
@@ -30,13 +6,16 @@
 include_once(__DIR__.'/../../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-config.php');
 
-//$listaUbicaciones = listaUbicaciones(1);
-
 $configData = getConfigData();
 
 $_POST['listaUbicaciones'] = $configData['listaUbicaciones'];
 $_POST['listaExtensiones'] = $configData['listaExtensiones'];
 $_POST['showErrors'] = $configData['showErrors'];
+$_POST['_OCULTO'] = $configData['_OCULTO'];
+$_POST['_MOODLEALLUSERS'] = $configData['_MOODLEALLUSERS'];
+$_POST['_DIRCURSOS'] = $configData['_DIRCURSOS'];
+$_POST['_ADMINDEF'] = $configData['_ADMINDEF'];
+$_POST['_ADMINPASS'] = $configData['_ADMINPASS'];
 $_POST['_MOODLEURL'] = $configData['_MOODLEURL'];
 $_POST['_WSTOKEN'] = $configData['_WSTOKEN'];
 
@@ -48,11 +27,37 @@ if ($msgError != '') {
 
 $OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/config.php">';
 	$OUT .= '<div class="checkbox">';
-		$OUT .= '<label></label><input name="showErrors" type="checkbox"';
+		$OUT .= '<input name="showErrors" type="checkbox"';
 		if ($_POST['showErrors'] == 1) {
 			$OUT .= ' checked';
 		}
 		$OUT .= '> Mostrar errores de PHP</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_OCULTO" type="checkbox"';
+		if ($_POST['_OCULTO'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Al crear un curso, mostrarlo oculto</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_MOODLEALLUSERS" type="checkbox"';
+		if ($_POST['_MOODLEALLUSERS'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Importar todos los usuarios de Moodle (por defecto, solo alumnos)</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_DIRCURSOS">Directorio donde se almacenar&aacute;n y linkar&aacute;n los cursos:</label>';
+		$OUT .= '<input type="text" name="_DIRCURSOS" class="form-control" id="_DIRCURSOS" placeholder="Directorio donde se almacenar&aacute;n y linkar&aacute;n los cursos" value="'.$_POST['_DIRCURSOS'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_ADMINDEF">P&aacute;gina por defecto para mostrar en la Administraci&oacute;n:</label>';
+		$OUT .= '<input type="text" name="_ADMINDEF" class="form-control" id="_ADMINDEF" placeholder="P&aacute;gina por defecto para mostrar en la Administraci&oacute;n" value="'.$_POST['_ADMINDEF'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_ADMINPASS">Contraseña usuario administrador:</label>';
+		$OUT .= '<input type="text" name="_ADMINPASS" class="form-control" id="_ADMINPASS" placeholder="Contraseña usuario administrador" value="'.$_POST['_ADMINPASS'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="_MOODLEURL">URL de Moodle:</label>';

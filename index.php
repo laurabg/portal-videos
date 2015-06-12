@@ -43,8 +43,8 @@ require_once('config.php');
 						</ul>
 						<?php } ?>
 						<form name="userSession" class="navbar-form navbar-right" role="form" method="POST" action="forms/login.php">
-						<?php if(!isset($_COOKIE['MoodleUserSession'])) { ?>
 							<div class="form-error btn btn-danger"></div>
+						<?php if(!isset($_COOKIE['MoodleUserSession'])) { ?>
 							<div class="form-group">
 								<input name="userName" type="text" placeholder="Usuario" class="form-control" />
 							</div>
@@ -52,17 +52,17 @@ require_once('config.php');
 								<input name="userPass" type="password" placeholder="Contraseña" class="form-control" />
 							</div>
 							<button type="submit" name="login" class="btn btn-success">Acceder</button>
-						<?php } else if(isset($_COOKIE['MoodleUserFaltaCorreo'])) { ?>
-							<div class="form-error form-error-show btn btn-warning">Debe facilitar el correo electr&oacute;nico con el que accede a Moodle</div>
+						<?php //} else if(isset($_COOKIE['MoodleUserFaltaCorreo'])) { ?>
+							<!--div class="form-error form-error-show btn btn-warning">Debe facilitar el correo electr&oacute;nico con el que accede a Moodle</div>
 							<div class="form-group">
 								<input name="email" type="text" placeholder="Correo electr&oacute;nico" class="form-control" />
 							</div>
 							<button type="submit" name="asociar-correo" class="btn btn-success">Acceder</button>
-							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
+							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button-->
 						<?php } else { ?>
-							<div class="form-group">
-								<span>Bienvenido, <?php echo unserialize($_COOKIE['MoodleUserSession'])['fullname']; ?></span>
-							</div>
+							<!--div class="form-group"-->
+								<span class="saludo">Bienvenido, <?php echo unserialize($_COOKIE['MoodleUserSession'])['fullname']; ?></span>
+							<!--/div-->
 							<button type="submit" value="aa" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } ?>
 						</form>
@@ -70,9 +70,16 @@ require_once('config.php');
 				</div>
 			</div>
 		</header>
+		<div id="main">
 		<?php
+			require_once(_DOCUMENTROOT.'modules/migas-pan.php');
 			require_once(_DOCUMENTROOT.'modules/content.php');
+
+			if (isset($_COOKIE['MoodleUserFaltaCorreo'])) {
+				include_once(_DOCUMENTROOT.'modules/pedirEmail.php');
+			}
 		?>
+		</div>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->

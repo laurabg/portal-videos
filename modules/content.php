@@ -1,7 +1,6 @@
 <?php
 	
 	include_once(__DIR__.'/../config.php');
-	include_once(_DOCUMENTROOT.'modules/functions.php');
 	include_once(_DOCUMENTROOT.'db/db.php');
 	
 	if ( (isset($_GET['username']))&&(isset($_GET['email'])) ) {
@@ -19,21 +18,15 @@
 		die();
 	}
 
-	// Listado cursos |-----------------------------------------------
+	// Listado principal |-----------------------------------------------
 	if (!isset($_GET['IDcurso'])) {
-		include_once(_DOCUMENTROOT.'modules/templates/listadoCursos.php');
+		//include_once(_DOCUMENTROOT.'modules/templates/listadoCursos.php');
+		include_once(_DOCUMENTROOT.'modules/templates/mainList.php');
 
-	// Listado temas |------------------------------------------------
-	} elseif ( (isset($_GET['IDcurso']))&&(!isset($_GET['IDtema']))&&(!isset($_GET['IDvideo'])) ) {
+	// Listado contenido cursos |------------------------------------------------
+	} elseif ( (isset($_GET['IDcurso']))&&(!isset($_GET['IDvideo'])) ) {
 		$IDcurso = $_GET['IDcurso'];
-		include_once(_DOCUMENTROOT.'modules/templates/listadoTemas.php');
-
-	// Listado vídeos |-----------------------------------------------
-	} elseif ( (isset($_GET['IDcurso']))&&(isset($_GET['IDtema']))&&(!isset($_GET['IDvideo'])) ) {
-		$IDcurso = $_GET['IDcurso'];
-		$IDtema = $_GET['IDtema'];
-		
-		include_once(_DOCUMENTROOT.'modules/templates/listadoVideos.php');
+		include_once(_DOCUMENTROOT.'modules/templates/detalleCurso.php');
 
 	// Detalle vídeo |------------------------------------------------
 	} elseif ( (isset($_GET['IDcurso']))&&(isset($_GET['IDtema']))&&(isset($_GET['IDvideo'])) ) {

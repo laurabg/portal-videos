@@ -63,7 +63,7 @@ include_once('config.php');
 							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } else { ?>
 							<div class="form-group">
-								<span>Bienvenido, <?php echo $_COOKIE['MoodleUserSession']; ?></span>
+								<span>Bienvenido, <?php echo unserialize($_COOKIE['MoodleUserSession'])['fullname']; ?></span>
 							</div>
 							<button type="submit" value="aa" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } ?>
@@ -82,6 +82,8 @@ include_once('config.php');
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/js/bootstrap-datepicker.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/locales/bootstrap-datepicker.es.min.js"></script>
+		<script type="text/javascript" src="js/highcharts-4.1.6/highcharts.js"></script>
+		<!--script type="text/javascript" src="js/highcharts-4.1.6/modules/exporting.js"></script-->
 		<script type="text/javascript" src="js/admin.js"></script>
 	</body>
 </html>

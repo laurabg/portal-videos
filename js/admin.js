@@ -189,4 +189,94 @@ function submitDone(responseText, statusText, xhr, $form)  {
 $(window).load(function() {
 	loadMenu();
 	loadAjaxForm();
+
+	// Build the chart
+	$.ajax({
+		type: 'POST',
+		url: 'modules-admin/charts.php',
+		data: 'chartName=totalVisualizaciones',
+		success: function(infoChart) {
+			infoChart = window.JSON.parse(infoChart);
+			
+			$('#totalVisualizaciones').highcharts({
+				chart: {
+					plotBackgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false
+				},
+				title: {
+					text: ''
+				},
+				tooltip: {
+					pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+				},
+				plotOptions: {
+					pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+							enabled: true,
+							format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+							style: {
+								color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+							},
+							connectorColor: 'silver'
+						},
+						showInLegend: true
+					}
+				},
+				series: [{
+					type: 'pie',
+					name: 'Total reproducciones',
+					data: infoChart
+				}]
+			});
+		}
+	});
+	// Build the chart
+	$.ajax({
+		type: 'POST',
+		url: 'modules-admin/charts.php',
+		data: 'chartName=videosMasVistos',
+		success: function(infoChart) {
+			infoChart = window.JSON.parse(infoChart);
+
+			console.log(infoChart.categories);
+			$('#videosMasVistos').highcharts({
+				chart: {
+					type: 'bar'
+				},
+				title: {
+					text: ''
+				},
+				xAxis: {
+					categories: infoChart.categories,
+					title: {
+						text: null
+					}
+				},
+				yAxis: {
+					min: 0,
+					title: {
+						text: '',
+						align: 'high'
+					},
+					labels: {
+						overflow: 'justify'
+					}
+				},
+				tooltip: {
+					valueSuffix: ' veces'
+				},
+				plotOptions: {
+					bar: {
+						dataLabels: {
+							enabled: true
+						}
+					}
+				},
+				series: infoChart.info
+			});
+		}
+	});
 });
