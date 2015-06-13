@@ -1,4 +1,23 @@
 /*
+ * Loading animation
+ */
+ .glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+
+/*
  * Base structure
  */
 
@@ -258,6 +277,10 @@ form button {
 	margin-right: 10px;
 }
 
+form .input-group-btn button {
+	margin-right: inherit;
+}
+
 form table td button.btn-xs.center {
 	margin-top: 5px;
 }
@@ -284,4 +307,12 @@ table tr.no-mostrar div.table-responsive {
 table tr.no-mostrar div.table-responsive table {
 	background: none;
 	margin-bottom: 0px;
+}
+
+form span.obtenerCaptura {
+	display: none;
+}
+
+.file-preview .close.fileinput-remove {
+	display: none;
 }

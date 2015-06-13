@@ -15,10 +15,13 @@ function loadMenu() {
 		if ($(this).attr('href').indexOf('IDvideo') != -1) {
 			url = url + '&IDvideo='+getUrlParameter('IDvideo', $(this).attr('href'));
 		}
+		if ($(this).attr('href').indexOf('IDadjunto') != -1) {
+			url = url + '&IDadjunto='+getUrlParameter('IDadjunto', $(this).attr('href'));
+		}
 
-		$('.main').html('').load(url, function () {
-			loadAjaxForm();
-		});
+		$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+		setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
+		
 		return false;
 	});
 
@@ -72,6 +75,8 @@ function getUrlParameter(sParam, fullURL) {
 }       
 
 function loadAjaxForm() {
+	$('#loading-content').detach();
+
 	$('.input-group.input-daterange').datepicker({
 		weekStart: 1,
 		format: 'yyyy-mm-dd',
@@ -110,6 +115,66 @@ function loadAjaxForm() {
 			}
 		});
 	});
+	
+	if ($('#img').length > 0) {
+		rutaImg = $('#img').attr('value');
+		previewImg = '';
+		if (rutaImg.split('/')[rutaImg.split('/').length-1] != '') {
+			previewImg = '<img src="'+rutaImg+'" class="file-preview-image" />';
+		}
+
+		$('#img').fileinput({
+			initialPreview: previewImg,
+			previewFileType: 'image',
+			browseLabel: 'Buscar imagen',
+			browseIcon: '<i class="glyphicon glyphicon-picture"></i> ',
+			showUpload: false,
+			showRemove: false
+		});
+	}
+
+	if ($('#rutaVideo').length > 0) {
+		rutaVideo = $('#rutaVideo').attr('value');
+		previewVideo = '';
+
+		if (rutaVideo.split('/')[rutaVideo.split('/').length-1] != '') {
+			previewVideo = '<video width="213px" height="160px" controls=""><source src="'+rutaVideo+'" type="video/mp4" /><div class="file-preview-other"><i class="glyphicon glyphicon-file"></i></div></video>';
+			previewVideo = previewVideo + '<div class="file-thumbnail-footer"><div class="file-caption-name">'+rutaVideo.split('/')[rutaVideo.split('/').length-1]+'</div></div>';
+		}
+
+		$('#rutaVideo').fileinput({
+			initialPreview: previewVideo,
+			previewFileType: 'video',
+			browseLabel: 'Buscar v&iacute;deo',
+			browseIcon: '<i class="glyphicon glyphicon-facetime-video"></i>  ',
+			showUpload: false,
+			showRemove: false
+		});
+
+		$('#rutaVideo').on('fileloaded', function(event, file, previewId, index, reader) {
+			if ( (document.getElementsByName('IDvideo').length > 0)&&(document.getElementsByName('IDvideo')[0] != '') ) {
+				$('span.obtenerCaptura').show();
+			}
+		});
+	}
+
+	if ($('#rutaAdjunto').length > 0) {
+		rutaAdjunto = $('#rutaAdjunto').attr('value');
+		previewAdjunto = '';
+
+		if (rutaAdjunto.split('/')[rutaAdjunto.split('/').length-1] != '') {
+			previewAdjunto = '<div class="file-preview-other"><a href="'+rutaAdjunto+'" target="_blank"><i class="glyphicon glyphicon-file"></i> '+rutaAdjunto.split('/')[rutaAdjunto.split('/').length-1]+'</a></div>';
+		//	previewAdjunto = '<div class="file-preview-text"><h2><i class="glyphicon glyphicon-file"></i></h2>'+rutaAdjunto.split('/')[rutaAdjunto.split('/').length-1]+'</div>';
+		}
+
+		$('#rutaAdjunto').fileinput({
+			initialPreview: previewAdjunto,
+			browseLabel: 'Buscar archivo',
+			browseIcon: '<i class="glyphicon glyphicon-file"></i> ',
+			showUpload: false,
+			showRemove: false
+		});
+	}
 	
 	$('.btn-cancel').click(function() {
 		window.location.reload();
@@ -153,6 +218,9 @@ function beforeSubmit(formData, jqForm, options) {
 		}
 
 	} else {
+		$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+		$('.main').find('form').hide();
+
 		return true;
 	}
 
@@ -162,6 +230,9 @@ function beforeSubmit(formData, jqForm, options) {
 function submitDone(responseText, statusText, xhr, $form)  { 
 	console.log('done!!!');
 
+	$('#loading-content').detach();
+	$('.main').find('form').show();
+	
 	opt = document.getElementsByName('form')[0].value;
 	IDcurso = '';
 	if (document.getElementsByName('IDcurso').length > 0) {
@@ -175,10 +246,15 @@ function submitDone(responseText, statusText, xhr, $form)  {
 	if (document.getElementsByName('IDvideo').length > 0) {
 		IDvideo = document.getElementsByName('IDvideo')[0].value;
 	}
+	IDadjunto = '';
+	if (document.getElementsByName('IDadjunto').length > 0) {
+		IDadjunto = document.getElementsByName('IDadjunto')[0].value;
+	}
 	
 	// Si ha ido todo bien, recargar el menu:
 	if ( (responseText.indexOf('alert-success') != -1)||(responseText.indexOf('alert-danger') != -1) ) {
-		$('.sidebar').html('').load('modules-admin/menu.php?opt='+opt+'&IDcurso='+IDcurso+'&IDtema='+IDtema+'&IDvideo='+IDvideo, function() {
+		console.log('modules-admin/menu.php?opt='+opt+'&IDcurso='+IDcurso+'&IDtema='+IDtema+'&IDvideo='+IDvideo+'&IDadjunto='+IDadjunto);
+		$('.sidebar').html('').load('modules-admin/menu.php?opt='+opt+'&IDcurso='+IDcurso+'&IDtema='+IDtema+'&IDvideo='+IDvideo+'&IDadjunto='+IDadjunto, function() {
 			loadMenu();
 		});
 	}

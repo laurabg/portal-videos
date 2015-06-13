@@ -57,7 +57,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/videos.php" enctype="multipart/form-data">';
+$OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/videos.php" enctype="multipart/form-data">';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreVideo">* Título del vídeo:</label>';
 		$OUT .= '<input required type="text" name="nombreVideo" class="form-control" id="nombreVideo" placeholder="Título del vídeo" value="'.$_POST['nombreVideo'].'" />';
@@ -78,15 +78,25 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="rutaVideo">* Nombre del archivo de v&iacute;deo:</label>'.( ($_POST['IDvideo'] != '') ? ' <input type="checkbox" name="renombrarVideo" /> Marcar para renombrar' : '' );
-		$OUT .= '<input required type="text" name="rutaVideo" class="form-control" id="ruta" placeholder="Nombre del archivo de v&iacute;deo" value="'.$_POST['rutaVideo'].'" />';
+		if (_ALLOWVIDEOUPLOAD == 1) {
+			$OUT .= '<label for="rutaVideo" class="control-label">* Archivo de v&iacute;deo:</label> <span class="obtenerCaptura"><input type="checkbox" name="obtenerCaptura" /> Obtener portada del v&iacute;deo autom&aacute;ticamente</span>';
+			$OUT .= '<input id="rutaVideo" name="rutaVideo" type="file" accept="video/*" placeholder="Nombre del archivo de v&iacute;deo" data-preview-file-type="text" class="file-loadinga" value="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$_POST['rutaVideo'].'" />';
+		} else {
+			$OUT .= '<label for="rutaVideo">* Nombre del archivo de v&iacute;deo:</label>'.( ($_POST['IDvideo'] != '') ? ' <input type="checkbox" name="renombrarVideo" /> Marcar para renombrar' : '' );
+			$OUT .= '<input required type="text" name="rutaVideo" class="form-control" id="ruta" placeholder="Nombre del archivo de v&iacute;deo" value="'.$_POST['rutaVideo'].'" />';
+		}
 	$OUT .= '</div>';
 	if ($_POST['IDvideo'] != '') {
 		$OUT .= '<div class="form-group">';
-			$OUT .= '<label for="img">* Imagen de portada del v&iacute;deo:</label>'.( ($_POST['IDvideo'] != '') ? ' <input type="checkbox" name="renombrarImg" /> Marcar para renombrar' : '' );
-			$OUT .= '<div class="clearfix"></div>';
-			$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$_POST['img'].'" alt="" class="img-thumbnail img-responsive" />';
-			$OUT .= '<input required type="text" name="img" class="form-control" id="img" placeholder="Nombre del archivo de imagen" value="'.$_POST['img'].'" />';
+			if (_ALLOWIMGUPLOAD == 1) {
+				$OUT .= '<label for="img" class="control-label">* Imagen de portada del v&iacute;deo:</label>';
+				$OUT .= '<input id="img" name="img" type="file" accept="*" placeholder="Imagen de portada del v&iacute;deo" data-preview-file-type="text" class="file-loadinga" value="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$_POST['img'].'" />';
+			} else {
+				$OUT .= '<label for="img">* Imagen de portada del v&iacute;deo:</label>'.( ($_POST['IDvideo'] != '') ? ' <input type="checkbox" name="renombrarImg" /> Marcar para renombrar' : '' );
+				$OUT .= '<div class="clearfix"></div>';
+				$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$_POST['img'].'" alt="" class="img-thumbnail img-responsive" />';
+				$OUT .= '<input required type="text" name="img" class="form-control" id="img" placeholder="Nombre del archivo de imagen" value="'.$_POST['img'].'" />';
+			}
 		$OUT .= '</div>';
 	}
 	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';

@@ -16,6 +16,7 @@ include_once('config.php');
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
 		<link rel="stylesheet" type="text/css" href="js/bootstrap-datepicker-1.4.0-dist/css/bootstrap-datepicker.min.css">
+		<link rel="stylesheet" type="text/css" href="js/fileinput/fileinput.css" />
 
 		<!-- Custom styles for this template -->
 		<link rel="stylesheet" type="text/css" href="css/dashboard.css">
@@ -83,6 +84,7 @@ include_once('config.php');
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/js/bootstrap-datepicker.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/locales/bootstrap-datepicker.es.min.js"></script>
 		<script type="text/javascript" src="js/highcharts-4.1.6/highcharts.js"></script>
+		<script type="text/javascript" src="js/fileinput/fileinput.min.js"></script>
 		<!--script type="text/javascript" src="js/highcharts-4.1.6/modules/exporting.js"></script-->
 		<script type="text/javascript" src="js/admin.js"></script>
 	</body>

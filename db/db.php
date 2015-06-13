@@ -424,6 +424,22 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 	return $listaVideos;
 }
 
+/*
+ * getListaAdjuntosByVideoTemaCurso: devuelve un array con todos los adjuntos de un tema, video y un curso:
+ */
+function getListaAdjuntosByVideoTemaCurso($IDcurso, $IDtema, $IDvideo) {
+	global $db;
+	
+	$listaAdjuntos = array();
+
+	$res = $db->query('SELECT * FROM videosAdjuntos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo.' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaAdjuntos, array($row['ID'], $row['nombre']));
+	}
+
+	return $listaAdjuntos;
+}
+
 
 
 
@@ -678,6 +694,138 @@ function getNextOrdenVideo($IDcurso, $IDtema) {
 
 	return $db->querySingle('SELECT MAX(orden)+1 FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema);
 }
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ----------------------------------------------------    ADJUNTOS    ---------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
+/*
+ crearAdjunto: Crea un adjunto a un video con los parámetros que se facilitan
+ */
+function crearAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $orden, $ocultar) {
+	global $db;
+
+	$SQL = 'INSERT INTO videosAdjuntos (';
+	$SQL .= 'IDcurso';
+	$SQL .= ',IDtema';
+	$SQL .= ',IDvideo';
+	$SQL .= ',nombre';
+	$SQL .= ($descripcion != '')?',descripcion':'';
+	$SQL .= ($ruta != '')?',ruta':'';
+	$SQL .= ($orden != '')?',orden':'';
+	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ') VALUES (';
+	$SQL .= $IDcurso;
+	$SQL .= ','.$IDtema;
+	$SQL .= ','.$IDvideo;
+	$SQL .= ',"'.$nombre.'"';
+	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
+	$SQL .= ($orden != '')?','.$orden:'';
+	$SQL .= ($ocultar != '')?','.$ocultar:'';
+	$SQL .= ')';
+	
+	$db->exec($SQL);
+}
+
+/*
+ updateAdjunto: Actualiza un adjunto existente
+ */
+function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $orden, $ocultar) {
+	global $db;
+
+	$SQL = 'UPDATE videosAdjuntos SET ';
+	$SQL .= 'IDcurso = '.$IDcurso;
+	$SQL .= ', IDtema = '.$IDtema;
+	$SQL .= ', IDvideo = '.$IDvideo;
+	$SQL .= ', nombre = "'.$nombre.'"';
+	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
+	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ' WHERE ID = '.$IDadjunto;
+	
+	$db->exec($SQL);
+}
+
+/*
+ checkAdjunto: Devuelve true si el adjunto existe, y false si no.
+ */
+function checkAdjunto($condicion) {
+	global $db;
+	
+	return $db->querySingle('SELECT COUNT(*) FROM videosAdjuntos WHERE '.$condicion);
+}
+
+/*
+ deleteAdjunto: Elimina un adjunto
+ */
+function deleteAdjunto($IDadjunto) {
+	global $db;
+
+	$db->exec('DELETE FROM videosAdjuntos WHERE ID = '.$IDadjunto);
+}
+
+/*
+ getIDadjunto: Devuelve el ID del adjunto.
+ */
+function getIDadjunto($IDcurso, $IDtema, $IDvideo, $nombre, $ruta, $crearAdjunto) {
+	global $db;
+
+	if ( ($crearAdjunto == 1)&&($db->querySingle('SELECT COUNT(*) FROM videosAdjuntos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo) == 0) ) {
+		$orden = getNextOrdenAdjunto($IDcurso, $IDtema, $IDvideo);
+
+		crearAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $nombre, $ruta, $orden, _OCULTO);
+	}
+
+	return $db->querySingle('SELECT ID FROM videosAdjuntos WHERE nombre = "'.$nombre.'" AND IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo);
+}
+
+/*
+ * getAdjuntoData: devuelve un array con toda la información de un adjunto:
+ */
+function getAdjuntoData($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
+	global $db;
+	
+	$adjunto = array();
+
+	$res = $db->query('SELECT * FROM videosAdjuntos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo.' AND ID = '.$IDadjunto.' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		$adjunto = array(
+			'IDcurso' => $row['IDcurso'],
+			'IDtema' => $row['IDtema'],
+			'IDvideo' => $row['IDvideo'],
+			'IDadjunto' => $row['ID'],
+			'nombre' => $row['nombre'],
+			'descripcion' => $row['descripcion'],
+			'ruta' => $row['ruta'],
+			'orden' => $row['orden'],
+			'ocultar' => $row['ocultar']
+		);
+	}
+
+	return $adjunto;
+}
+
+/*
+ * getNextOrdenAdjunto: devuelve el siguiente orden en la tabla videosAdjuntos para un curso, tema y video
+ */
+function getNextOrdenAdjunto($IDcurso, $IDtema, $IDvideo) {
+	global $db;
+
+	$orden = $db->querySingle('SELECT MAX(orden)+1 FROM videosAdjuntos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo);
+	if (!$orden) {
+		$orden = 1;
+	}
+	return $orden;
+}
+
+
+
 
 
 
