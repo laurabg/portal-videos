@@ -3,7 +3,7 @@
 	<div class="col-12">
 
 <?php
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-config.php');
 
 $configData = getConfigData();
@@ -25,7 +25,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/config.php">';
+$OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORTALROOT.'modules-admin/config.php">';
 	$OUT .= '<div class="checkbox">';
 		$OUT .= '<input name="showErrors" type="checkbox"';
 		if ($_POST['showErrors'] == 1) {

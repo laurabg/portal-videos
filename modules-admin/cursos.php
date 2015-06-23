@@ -3,7 +3,7 @@
 	<div class="col-12">
 
 <?php
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-cursos.php');
 include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
@@ -50,7 +50,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/cursos.php">';
+$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cursos.php">';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
 		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';

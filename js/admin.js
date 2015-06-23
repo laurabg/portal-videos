@@ -4,7 +4,7 @@ function loadMenu() {
 		$(this).closest('li').addClass('active');
 		template = getUrlParameter('opt', $(this).attr('href'));
 
-		url = 'modules-admin/templates/'+template+'.php?opt='+template;
+		url = 'modules-admin/'+template+'.php?opt='+template;
 
 		if ($(this).attr('href').indexOf('IDcurso') != -1) {
 			url = url + '&IDcurso='+getUrlParameter('IDcurso', $(this).attr('href'));

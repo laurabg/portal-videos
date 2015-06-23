@@ -3,7 +3,7 @@
 	<div class="col-12">
 
 <?php
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-adjuntos.php');
 include_once(_DOCUMENTROOT.'util/file-functions.php');
 
@@ -59,7 +59,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/adjuntos.php" enctype="multipart/form-data">';
+$OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'modules-admin/adjuntos.php" enctype="multipart/form-data">';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreAdjunto">* Título del archivo adjunto:</label>';
 		$OUT .= '<input required type="text" name="nombreAdjunto" class="form-control" id="nombreAdjunto" placeholder="Título del archivo adjunto" value="'.$_POST['nombreAdjunto'].'" />';

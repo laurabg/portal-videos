@@ -3,7 +3,7 @@
 	<div class="col-12">
 
 <?php
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'forms/admin-temas.php');
 
 if (!isset($_POST['IDcurso'])) {
@@ -40,7 +40,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/templates/temas.php">';
+$OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/temas.php">';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreTema">* Nombre del tema:</label>';
 		$OUT .= '<input required type="text" name="nombreTema" class="form-control" id="nombreTema" placeholder="Nombre del tema" value="'.$_POST['nombreTema'].'" />';

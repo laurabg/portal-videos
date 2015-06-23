@@ -668,6 +668,8 @@ function getVideoData($IDcurso, $IDtema, $IDvideo) {
 	
 	$video = array();
 
+	$adjuntos = getAllAdjuntos($IDcurso, $IDtema, $IDvideo);
+
 	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND ID = '.$IDvideo.' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		$video = array(
@@ -679,7 +681,8 @@ function getVideoData($IDcurso, $IDtema, $IDvideo) {
 			'ruta' => $row['ruta'],
 			'img' => $row['img'],
 			'orden' => $row['orden'],
-			'ocultar' => $row['ocultar']
+			'ocultar' => $row['ocultar'],
+			'adjuntos' => $adjuntos
 		);
 	}
 
@@ -809,6 +812,34 @@ function getAdjuntoData($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
 	}
 
 	return $adjunto;
+}
+
+
+/*
+ * getAllAdjuntos: devuelve un array con todos los adjuntos de un video:
+ */
+function getAllAdjuntos($IDcurso, $IDtema, $IDvideo) {
+	global $db;
+	
+	$listaAdjuntos = array();
+
+	$res = $db->query('SELECT * FROM videosAdjuntos WHERE IDcurso = '.$IDcurso.' AND IDtema = '.$IDtema.' AND IDvideo = '.$IDvideo.' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaAdjuntos, array(
+				'IDcurso' => $row['IDcurso'],
+				'IDtema' => $row['IDtema'],
+				'IDvideo' => $row['IDvideo'],
+				'IDadjunto' => $row['ID'],
+				'nombre' => $row['nombre'],
+				'descripcion' => $row['descripcion'],
+				'ruta' => $row['ruta'],
+				'orden' => $row['orden'],
+				'ocultar' => $row['ocultar']
+			)
+		);
+	}
+
+	return $listaAdjuntos;
 }
 
 /*

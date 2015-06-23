@@ -1,6 +1,6 @@
 <?php
 
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'db/db.php');
 include_once(_DOCUMENTROOT.'util/file-functions.php');
 
@@ -38,7 +38,7 @@ $OUT .= '<div class="container">';
 
 			$OUT .= '<div class="col-md-12">';
 				$OUT .= '<div class="panel panel-primary">';
-					$OUT .= '<div class="panel-heading">&Uacute;ltimos v&iacute;deos de '.$row['nombre'].'</div>';
+					$OUT .= '<div class="panel-heading">Novedades en: <a href="?IDcurso='.$row['ID'].'"><b>'.$row['nombre'].'</b></a></div>';
 					$OUT .= '<div class="panel-body">';
 						$OUT .= '<div class="row">';
 							// Listar videos del tema:

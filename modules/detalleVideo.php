@@ -1,6 +1,6 @@
 <?php
 
-include_once(__DIR__.'/../../config.php');
+include_once(__DIR__.'/../config.php');
 include_once(_DOCUMENTROOT.'db/db.php');
 include_once(_DOCUMENTROOT.'util/file-functions.php');
 
@@ -28,12 +28,12 @@ $OUT .= '<div class="container">';
 		$OUT .= '<div class="col-md-3 hidden-xs">';
 			$OUT .= '<div class="botones-visualizacion margin-bottom">';
 				$OUT .= '<a href="?opt=1&IDcurso='.$cursoData['IDcurso'].'&IDtema='.$temaData['IDtema'].'&IDvideo='.$videoData['IDvideo'].'"><button class="btn btn-default';
-				if ( ( (isset($_GET['opt']))&&($_GET['opt'] == 1) )||(!isset($_GET['opt'])) ) {
+				if ( ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 1) )||(!isset($_COOKIE['listMode'])) ) {
 					$OUT .= ' active';
 				}
 				$OUT .= '" type="button"><span class="glyphicon glyphicon-th"></span></button></a>';
 				$OUT .= '<a href="?opt=2&IDcurso='.$cursoData['IDcurso'].'&IDtema='.$temaData['IDtema'].'&IDvideo='.$videoData['IDvideo'].'"><button class="btn btn-default';
-				if ( (isset($_GET['opt']))&&($_GET['opt'] == 2) ) {
+				if ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 2) ) {
 					$OUT .= ' active';
 				}
 				$OUT .= '" type="button"><span class="glyphicon glyphicon-th-list"></span></button></a>';
@@ -43,9 +43,9 @@ $OUT .= '<div class="container">';
 				$OUT .= '<div class="panel-heading">'.$temaData['nombre'].'</div>';
 				$OUT .= '<div class="panel-body">';
 				// Listado del resto de vídeos del tema:
-				$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$cursoData['IDcurso'].' AND IDtema = '.$temaData['IDtema'].' AND ID != '.$videoData['IDvideo'].' ORDER BY orden DESC, nombre');
+				$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.$cursoData['IDcurso'].' AND IDtema = '.$temaData['IDtema'].' AND ID != '.$videoData['IDvideo'].' ORDER BY orden DESC, nombre LIMIT 5');
 				while ($row = $res->fetchArray()) {
-					if ( ( (isset($_GET['opt']))&&($_GET['opt'] == 1) )||(!isset($_GET['opt'])) ) {
+					if ( ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 1) )||(!isset($_COOKIE['listMode'])) ) {
 						$OUT .= '<div class="item">';
 							$OUT .= '<a class="ver-video" href="?IDcurso='.$cursoData['IDcurso'].'&IDtema='.$temaData['IDtema'].'&IDvideo='.$row['ID'].'">';
 								$OUT .= '<img src="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$row['img'].'" />';
@@ -54,7 +54,7 @@ $OUT .= '<div class="container">';
 								$OUT .= '<a href="?IDcurso='.$cursoData['IDcurso'].'&IDtema='.$temaData['IDtema'].'&IDvideo='.$row['ID'].'">'.$row['nombre'].'</a>';
 							$OUT .= '</div>';
 						$OUT .= '</div>';
-					} else if ( (isset($_GET['opt']))&&($_GET['opt'] == 2) ) {
+					} else if ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 2) ) {
 						$OUT .= '<div class="row"><div class="col-md-5">';
 							$OUT .= '<a class="ver-video" href="?IDcurso='.$cursoData['IDcurso'].'&IDtema='.$temaData['IDtema'].'&IDvideo='.$row['ID'].'">';
 								$OUT .= '<img src="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$row['img'].'" />';
@@ -65,6 +65,9 @@ $OUT .= '<div class="container">';
 						$OUT .= '</div></div>';
 					}
 				}
+
+				$OUT .= '<a href="?IDcurso='.$_GET['IDcurso'].'"><button class="btn btn-default pull-right"><span class="glyphicon glyphicon-chevron-left"></span> Ver m&aacute;s v&iacute;deos</button></a>';
+
 				$OUT .= '</div>';
 			$OUT .= '</div>';
 		$OUT .= '</div>';
@@ -80,20 +83,12 @@ $OUT .= '<div class="container">';
 				$OUT .= '</div>';
 				$OUT .= '<p>'.$videoData['descripcion'].'</p>';
 				$OUT .= '<p>Descargas</p>';
-				$OUT .= '<div class="thumbnail">';
-					$OUT .= '<div class="caption">';
-						$OUT .= '<div class="btn-toolbar" role="toolbar">';
-							$OUT .= '<div class="btn-group" role="group">';
-								$OUT .= '<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-book"></span> V&iacute;deo en diapositivas</button>';
-								$OUT .= '<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-file"></span> Apuntes</button>';
-								$OUT .= '<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> Ejercicios</button>';
-							$OUT .= '</div>';
-							$OUT .= '<div class="btn-group pull-right hidden-xs" role="group">';
-								$OUT .= '<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-save"></span> Descargar video</button>';
-							$OUT .= '</div>';
-						$OUT .= '</div>';
-					$OUT .= '</div>';
-				$OUT .= '</div>';
+				$OUT .= '<ul class="list-group">';
+					foreach ($videoData['adjuntos'] as $adjunto) {
+						$OUT .= '<li class="list-group-item"><span class="glyphicon glyphicon-download-alt"></span><span class="badge">0</span> <a href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'].'" target="_blank">'.$adjunto['nombre'].'</a></li>';
+					}
+					$OUT .= '<li class="list-group-item"><span class="glyphicon glyphicon-download-alt"></span><span class="badge">0</span> <a download href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" target="_blank">Descargar v&iacute;deo</a></li>';
+				$OUT .= '</ul>';
 			$OUT .= '</div>';
 		$OUT .= '</div>';
 
