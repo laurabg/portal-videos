@@ -1,5 +1,7 @@
 <?php
+
 $opt = _ADMINDEF;
+
 if ($_GET['opt'] != '') {
 	$opt = $_GET['opt'];
 }

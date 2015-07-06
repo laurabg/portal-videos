@@ -50,25 +50,7 @@ $(window).load(function() {
 			backdrop: 'static'
 		});
 	}
-
-	/*$(".paginas").paginate({
-		count 		: 4,
-		start 		: 1,
-		border					: false,
-		border_color			: 'transparent',
-		text_color  			: 'transparent',
-		background_color    	: 'transparent',	
-		border_hover_color		: 'transparent',
-		text_hover_color  		: 'transparent',
-		background_hover_color	: 'transparent', 
-		images					: false,
-		mouse					: 'press',
-		onChange     			: function(page){
-			$('._current').removeClass('_current').hide();
-			$('#p'+page).addClass('_current').show();
-		}
-	});*/
-
+	
 	var sPageURL = window.location.search.substring(1);
 	var sURLVariables = sPageURL.split('&');
 

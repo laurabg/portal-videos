@@ -56,7 +56,7 @@ if ($_POST['form'] == 'adjuntos') {
 			// Si el adjunto es nuevo:
 			if (!$_POST['IDadjunto']) {
 				// Comprobar que no exista el nombre, ni la ruta en el mismo tema y curso:
-				if ( ($_POST['nombreAdjunto'] != '')&&( (checkAdjunto('nombre = "'.$_POST['nombreAdjunto'].'" AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND IDvideo = '.$_POST['IDvideo']) > 0)||(checkAdjunto('ruta = "'.$_POST['rutaAdjunto'].'" AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND IDvideo = '.$_POST['IDvideo']) > 0) ) )  {
+				if ( ($_POST['nombreAdjunto'] != '')&&( (checkAdjunto('nombre = "'.$_POST['nombreAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0)||(checkAdjunto('ruta = "'.$_POST['rutaAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0) ) )  {
 					$msgError = 'El adjunto ya existe';
 					$error = 'warning';
 				}
@@ -83,7 +83,7 @@ if ($_POST['form'] == 'adjuntos') {
 					$msgError = 'Datos guardados correctamente';
 
 					// Crear el adjunto en la base de datos:
-					crearAdjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['orden'], $_POST['ocultar']);
+					createAdjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['orden'], $_POST['ocultar']);
 					
 					$_POST['IDadjunto'] = getIDadjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['rutaAdjunto'], 0);
 				}
@@ -129,7 +129,7 @@ if ($_POST['form'] == 'adjuntos') {
 				}
 				
 				// Comprobar que no exista el nombre, ni la ruta en el mismo tema y curso:
-				if ( ($_POST['nombreAdjunto'] != '')&&( (checkAdjunto('ID != '.$_POST['IDadjunto'].' AND nombre = "'.$_POST['nombreAdjunto'].'" AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND IDvideo = '.$_POST['IDvideo']) > 0)||(checkAdjunto('ID != '.$_POST['IDadjunto'].' AND ruta = "'.$_POST['rutaAdjunto'].'" AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND IDvideo = '.$_POST['IDvideo']) > 0) ) ) {
+				if ( ($_POST['nombreAdjunto'] != '')&&( (checkAdjunto('ID != '.$_POST['IDadjunto'].' AND nombre = "'.$_POST['nombreAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0)||(checkAdjunto('ID != '.$_POST['IDadjunto'].' AND ruta = "'.$_POST['rutaAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0) ) ) {
 					$msgError = 'El adjunto ya existe';
 					$error = 'warning';
 				}

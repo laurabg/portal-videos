@@ -50,7 +50,7 @@ if ($_POST['form'] == 'temas') {
 			// Si el curso es nuevo
 			if (!$_POST['IDtema']) {
 				// Comprobar que no exista el nombre, ni la ruta:
-				if ( ($_POST['nombreTema'] != '')&&( (checkTema('nombre = "'.$_POST['nombreTema'].'" AND IDcurso = '.$_POST['IDcurso']) > 0)||(checkTema('ruta = "'.$rutalimpia.'" AND IDcurso = '.$_POST['IDcurso']) > 0) ) )  {
+				if ( ($_POST['nombreTema'] != '')&&( (checkTema('nombre = "'.$_POST['nombreTema'].'" AND IDcurso = '.decrypt($_POST['IDcurso'])) > 0)||(checkTema('ruta = "'.$rutalimpia.'" AND IDcurso = '.decrypt($_POST['IDcurso'])) > 0) ) )  {
 					$msgError = 'El tema ya existe';
 					$error = 'warning';
 				}
@@ -78,7 +78,7 @@ if ($_POST['form'] == 'temas') {
 					}
 					
 					// Crear el tema en la base de datos:
-					crearTema($_POST['IDcurso'], $_POST['nombreTema'], $_POST['descripcion'], $rutalimpia, $_POST['orden'], $_POST['ocultar']);
+					createTema($_POST['IDcurso'], $_POST['nombreTema'], $_POST['descripcion'], $rutalimpia, $_POST['orden'], $_POST['ocultar']);
 					
 					$_POST['IDtema'] = getIDtema($_POST['IDcurso'], $_POST['nombreTema'], $rutalimpia, 0);
 				}
@@ -86,7 +86,7 @@ if ($_POST['form'] == 'temas') {
 			// Si se ha editado el tema:
 			} else {
 				// Comprobar que no exista el nombre, ni la ruta:
-				if ( ($_POST['nombreTema'] != '')&&( (checkTema('ID != '.$_POST['IDtema'].' AND IDcurso = '.$_POST['IDcurso'].' AND nombre = "'.$_POST['nombreTema'].'"') > 0)||(checkTema('ID != '.$_POST['IDtema'].' AND IDcurso = '.$_POST['IDcurso'].' AND ruta = "'.$rutalimpia.'"') > 0) ) ) {
+				if ( ($_POST['nombreTema'] != '')&&( (checkTema('ID != '.decrypt($_POST['IDtema']).' AND IDcurso = '.decrypt($_POST['IDcurso']).' AND nombre = "'.$_POST['nombreTema'].'"') > 0)||(checkTema('ID != '.decrypt($_POST['IDtema']).' AND IDcurso = '.decrypt($_POST['IDcurso']).' AND ruta = "'.$rutalimpia.'"') > 0) ) ) {
 					$msgError = 'El tema ya existe';
 					$error = 'warning';
 				}

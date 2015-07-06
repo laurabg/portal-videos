@@ -21,7 +21,7 @@ function loadMenu() {
 
 		$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
 		setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
-		
+
 		return false;
 	});
 
@@ -75,6 +75,8 @@ function getUrlParameter(sParam, fullURL) {
 }       
 
 function loadAjaxForm() {
+	loadCharts();
+
 	$('#loading-content').detach();
 
 	$('.input-group.input-daterange').datepicker({
@@ -181,7 +183,7 @@ function loadAjaxForm() {
 	});
 
 	// Cargar funcionalidad ajax para todos los formularios:
-	$('form').unbind().ajaxForm({
+	$('form:not(.userSession)').unbind().ajaxForm({
 		target: 		'.main',
 		beforeSubmit: 	beforeSubmit,
 		success: 		submitDone
@@ -253,8 +255,8 @@ function submitDone(responseText, statusText, xhr, $form)  {
 	
 	// Si ha ido todo bien, recargar el menu:
 	if ( (responseText.indexOf('alert-success') != -1)||(responseText.indexOf('alert-danger') != -1) ) {
-		console.log('modules-admin/menu.php?opt='+opt+'&IDcurso='+IDcurso+'&IDtema='+IDtema+'&IDvideo='+IDvideo+'&IDadjunto='+IDadjunto);
-		$('.sidebar').html('').load('modules-admin/menu.php?opt='+opt+'&IDcurso='+IDcurso+'&IDtema='+IDtema+'&IDvideo='+IDvideo+'&IDadjunto='+IDadjunto, function() {
+		console.log('modules-admin/menu.php?opt='+opt+'&IDcurso='+encodeURIComponent(IDcurso)+'&IDtema='+encodeURIComponent(IDtema)+'&IDvideo='+encodeURIComponent(IDvideo)+'&IDadjunto='+IDadjunto);
+		$('.sidebar').html('').load('modules-admin/menu.php?opt='+opt+'&IDcurso='+encodeURIComponent(IDcurso)+'&IDtema='+encodeURIComponent(IDtema)+'&IDvideo='+encodeURIComponent(IDvideo)+'&IDadjunto='+IDadjunto, function() {
 			loadMenu();
 		});
 	}
@@ -262,97 +264,139 @@ function submitDone(responseText, statusText, xhr, $form)  {
 	loadAjaxForm();
 } 
 
-$(window).load(function() {
-	loadMenu();
-	loadAjaxForm();
-
-	// Build the chart
-	$.ajax({
-		type: 'POST',
-		url: 'modules-admin/charts.php',
-		data: 'chartName=totalVisualizaciones',
-		success: function(infoChart) {
-			infoChart = window.JSON.parse(infoChart);
-			
-			$('#totalVisualizaciones').highcharts({
-				chart: {
-					plotBackgroundColor: null,
-					plotBorderWidth: null,
-					plotShadow: false
-				},
-				title: {
-					text: ''
-				},
-				tooltip: {
-					pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-				},
-				plotOptions: {
-					pie: {
-						allowPointSelect: true,
-						cursor: 'pointer',
-						dataLabels: {
-							enabled: true,
-							format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-							style: {
-								color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-							},
-							connectorColor: 'silver'
-						},
-						showInLegend: true
-					}
-				},
-				series: [{
-					type: 'pie',
-					name: 'Total reproducciones',
-					data: infoChart
-				}]
-			});
-		}
-	});
-	// Build the chart
-	$.ajax({
-		type: 'POST',
-		url: 'modules-admin/charts.php',
-		data: 'chartName=videosMasVistos',
-		success: function(infoChart) {
-			infoChart = window.JSON.parse(infoChart);
-
-			console.log(infoChart.categories);
-			$('#videosMasVistos').highcharts({
-				chart: {
-					type: 'bar'
-				},
-				title: {
-					text: ''
-				},
-				xAxis: {
-					categories: infoChart.categories,
-					title: {
-						text: null
-					}
-				},
-				yAxis: {
-					min: 0,
-					title: {
-						text: '',
-						align: 'high'
+function loadCharts() {
+	if ($('#totalVisualizaciones').length > 0) {
+		// Build the chart
+		$.ajax({
+			type: 'POST',
+			url: 'modules-admin/charts.php',
+			data: 'chartName=totalVisualizaciones',
+			success: function(infoChart) {
+				infoChart = window.JSON.parse(infoChart);
+				
+				$('#totalVisualizaciones').highcharts({
+					chart: {
+						plotBackgroundColor: null,
+						plotBorderWidth: null,
+						plotShadow: false
 					},
-					labels: {
-						overflow: 'justify'
-					}
-				},
-				tooltip: {
-					valueSuffix: ' veces'
-				},
-				plotOptions: {
-					bar: {
-						dataLabels: {
-							enabled: true
+					title: {
+						text: ''
+					},
+					tooltip: {
+						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+					},
+					plotOptions: {
+						pie: {
+							allowPointSelect: true,
+							cursor: 'pointer',
+							dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+								style: {
+									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+								},
+								connectorColor: 'silver'
+							},
+							showInLegend: true
 						}
-					}
-				},
-				series: infoChart.info
-			});
-		}
+					},
+					series: [{
+						type: 'pie',
+						name: 'Total reproducciones',
+						data: infoChart
+					}]
+				});
+			}
+		});
+	}
+
+	if ($('#videosMasVistos').length > 0) {
+		// Build the chart
+		$.ajax({
+			type: 'POST',
+			url: 'modules-admin/charts.php',
+			data: 'chartName=videosMasVistos',
+			success: function(infoChart) {
+				infoChart = window.JSON.parse(infoChart);
+
+				console.log(infoChart.categories);
+				$('#videosMasVistos').highcharts({
+					chart: {
+						type: 'bar'
+					},
+					title: {
+						text: ''
+					},
+					xAxis: {
+						categories: infoChart.categories,
+						title: {
+							text: null
+						}
+					},
+					yAxis: {
+						min: 0,
+						title: {
+							text: '',
+							align: 'high'
+						},
+						labels: {
+							overflow: 'justify'
+						}
+					},
+					tooltip: {
+						valueSuffix: ' veces'
+					},
+					plotOptions: {
+						bar: {
+							dataLabels: {
+								enabled: true
+							}
+						}
+					},
+					series: infoChart.info
+				});
+			}
+		});
+	}
+}
+
+function beforeLoginSubmit(formData, jqForm, options) { 
+	var queryString = $.param(formData); 
+
+	console.log('enviando... ('+queryString+')');
+
+	if (queryString.indexOf('logout') != -1) {
+		location.reload();
+	}
+
+	return true;
+} 
+ 
+function submitLoginDone(responseText, statusText, xhr, $form)  { 
+	console.log('done!!!');
+	
+	if (responseText != '') {
+		$('.form-error').show();
+		loadAjaxForm();
+	} else {
+		location.reload();
+	}
+} 
+
+function loadLoginForm() {
+	$('form[name="userSession"]').ajaxForm({
+		target: 		'.form-error',
+		beforeSubmit: 	beforeLoginSubmit,
+		success: 		submitLoginDone
 	});
+}
+
+
+$(window).load(function() {
+	if ($('.nav-sidebar').length > 0) {
+		loadMenu();
+	}
+	loadAjaxForm();
+	loadLoginForm();
 });

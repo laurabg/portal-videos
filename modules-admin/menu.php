@@ -28,9 +28,9 @@ function listaItemsCursos() {
 	for ($i = 0; $i < sizeof($listaCursos); $i++) {
 		$item = $listaCursos[$i];
 		$cls = '';
-
+		
 		if ( ($item[0] == $_GET['IDcurso']) ) {
-			if ($_GET['IDtema'] != '') {
+			if ( ($_GET['IDtema'] != '')||( ($_GET['IDtema'] == '')&&($_GET['opt'] == 'temas') ) ) {
 				$cls .= ' expanded';
 			}
 			if ( ($_GET['opt'] == $opt)&&($_GET['IDtema'] == '')&&($_GET['IDvideo'] == '')&&($_GET['IDadjunto'] == '') )  {
@@ -42,7 +42,7 @@ function listaItemsCursos() {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsTemas($item[0]);
@@ -58,6 +58,7 @@ function listaItemsTemas($IDcurso) {
 	$OUT = '';
 
 	$cls = '';
+
 	if ( ($_GET['opt'] == $opt)&&($_GET['IDcurso'] == $IDcurso)&&($_GET['IDtema'] == '') ) {
 		$cls = ' class="active"';
 	}
@@ -65,7 +66,7 @@ function listaItemsTemas($IDcurso) {
 	$OUT .= '<li'.$cls.'>';
 		$OUT .= '<div class="item">';
 			$OUT .= '<span class="glyphicon glyphicon-plus"></span>';
-			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.$IDcurso.'">';
+			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'">';
 				$OUT .= '<span class="txt" title="Añadir nuevo tema">Añadir nuevo tema</span>';
 			$OUT .= '</a>';
 		$OUT .= '</div>';
@@ -78,7 +79,7 @@ function listaItemsTemas($IDcurso) {
 		$cls = '';
 
 		if ( ($item[0] == $_GET['IDtema']) ) {
-			if ($_GET['IDvideo'] != '') {
+			if ( ($_GET['IDvideo'] != '')||( ($_GET['IDvideo'] == '')&&($_GET['opt'] == 'videos') ) ) {
 				$cls .= ' expanded';
 			}
 			if ( ($_GET['opt'] == $opt)&&($_GET['IDvideo'] == '')&&($_GET['IDadjunto'] == '') ) {
@@ -90,7 +91,7 @@ function listaItemsTemas($IDcurso) {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.$IDcurso.'&IDtema='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsVideos($IDcurso, $item[0]);
@@ -113,7 +114,7 @@ function listaItemsVideos($IDcurso, $IDtema) {
 	$OUT .= '<li'.$cls.'>';
 		$OUT .= '<div class="item">';
 			$OUT .= '<span class="glyphicon glyphicon-plus"></span>';
-			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.$IDcurso.'&IDtema='.$IDtema.'">';
+			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'">';
 				$OUT .= '<span class="txt" title="Añadir nuevo vídeo">Añadir nuevo vídeo</span>';
 			$OUT .= '</a>';
 		$OUT .= '</div>';
@@ -126,7 +127,7 @@ function listaItemsVideos($IDcurso, $IDtema) {
 		$cls = '';
 
 		if ( ($item[0] == $_GET['IDvideo']) ) {
-			if ($_GET['IDadjunto'] != '') {
+			if ( ($_GET['IDadjunto'] != '')||( ($_GET['IDadjunto'] == '')&&($_GET['opt'] == 'adjuntos') ) ) {
 				$cls .= ' expanded';
 			}
 			if ( ($_GET['opt'] == $opt)&&($_GET['IDadjunto'] == '') ) {
@@ -139,7 +140,7 @@ function listaItemsVideos($IDcurso, $IDtema) {
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 			//	$OUT .= '<span class="glyphicon glyphicon-facetime-video"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.$IDcurso.'&IDtema='.$IDtema.'&IDvideo='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsAdjuntos($IDcurso, $IDtema, $item[0]);
@@ -163,7 +164,7 @@ function listaItemsAdjuntos($IDcurso, $IDtema, $IDvideo) {
 	$OUT .= '<li'.$cls.'>';
 		$OUT .= '<div class="item">';
 			$OUT .= '<span class="glyphicon glyphicon-plus"></span>';
-			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.$IDcurso.'&IDtema='.$IDtema.'&IDvideo='.$IDvideo.'">';
+			$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'">';
 				$OUT .= '<span class="txt" title="Añadir nuevo adjunto">Añadir nuevo adjunto</span>';
 			$OUT .= '</a>';
 		$OUT .= '</div>';
@@ -183,7 +184,7 @@ function listaItemsAdjuntos($IDcurso, $IDtema, $IDvideo) {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-file"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.$IDcurso.'&IDtema='.$IDtema.'&IDvideo='.$IDvideo.'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}

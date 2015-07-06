@@ -98,7 +98,7 @@ if ($_POST['form'] == 'cursos') {
 					}
 					
 					// Crear el curso en la base de datos:
-					crearCurso($_POST['nombreCurso'], $_POST['descripcion'], $rutalimpia, $_POST['ubicacion'], $_POST['orden'], $_POST['ocultar'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
+					createCurso($_POST['nombreCurso'], $_POST['descripcion'], $rutalimpia, $_POST['ubicacion'], $_POST['orden'], $_POST['ocultar'], $_POST['IDcursoMoodle'], $_POST['fechaIni'], $_POST['fechaFin'], $_POST['publico']);
 
 					$_POST['IDcurso'] = getIDcurso($_POST['nombreCurso'], $rutalimpia, $_POST['ubicacion'], 0);
 
@@ -127,13 +127,13 @@ if ($_POST['form'] == 'cursos') {
 			// Si se ha editado el curso:
 			} else {
 				// Comprobar que no exista el nombre, ni la ruta:
-				if ( ($_POST['nombreCurso'] != '')&&( (checkCurso('ID != '.$_POST['IDcurso'].' AND nombre = "'.$_POST['nombreCurso'].'"') > 0)||(checkCurso('ID != '.$_POST['IDcurso'].' AND ruta = "'.$rutalimpia.'"') > 0) ) ) {
+				if ( ($_POST['nombreCurso'] != '')&&( (checkCurso('ID != '.decrypt($_POST['IDcurso']).' AND nombre = "'.$_POST['nombreCurso'].'"') > 0)||(checkCurso('ID != '.decrypt($_POST['IDcurso']).' AND ruta = "'.$rutalimpia.'"') > 0) ) ) {
 					$msgError = 'El curso ya existe';
 					$error = 'warning';
 				}
 
 				// Comprobar que no este asociado el curso de Moodle a otro curso:
-				if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('ID != '.$_POST['IDcurso'].' AND IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
+				if ( ($_POST['IDcursoMoodle'] != '')&&(checkCurso('ID != '.decrypt($_POST['IDcurso']).' AND IDcursoMoodle = '.$_POST['IDcursoMoodle']) > 0) ) {
 					$msgError = 'Este curso de Moodle ya está asociado a otro curso';
 					$error = 'warning';
 				}

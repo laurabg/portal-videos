@@ -8,6 +8,7 @@ define('_BBDDCONFIG', _DOCUMENTROOT.'db/dbconfig.db');
 define('_BBDDLOG', _DOCUMENTROOT.'db/dblog.db');
 define('_BBDDANALYTICS', _DOCUMENTROOT.'db/dbanalytics.db');
 
+include_once(_DOCUMENTROOT.'util/encrypt-decrypt.php');
 include_once(_DOCUMENTROOT.'db/db.php');
 
 $dbConfig = null;
@@ -33,6 +34,10 @@ define('_MOODLEALLUSERS', getAdminvar('_MOODLEALLUSERS'));
 define('_ALLOWFILEUPLOAD', 1);
 define('_ALLOWIMGUPLOAD', 1);
 define('_ALLOWVIDEOUPLOAD', 1);
+define('_ENCRIPTAR', 0);
+define('_EKEY', '4243bcdce4ffdb41b613');
+define('_AKEY', 'ef515dff755448e12100');
+
 
 //define('_WSTOKEN', '418a443a4b1696cb83716eb1eb106c64');
 //define('_MOODLEURL', 'http://localhost/moodle');

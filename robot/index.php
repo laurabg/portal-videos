@@ -26,7 +26,7 @@ function buscarCursos($IDdir, $dir) {
 					// Guardar el curso en la BBDD:
 					logAction("Encontrado curso ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
 					$IDcurso = getIDcurso($filename, $filenameNEW, $IDdir, 1);
-
+					
 					if ($IDcurso != '') {
 						// Buscar temas dentro del curso:
 						buscarTemas($IDcurso, $dir.$filenameNEW);
@@ -86,8 +86,8 @@ function buscarTemas($IDcurso, $dir) {
 					// Guardar el tema
 					logAction("Encontrado tema ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
 					$IDtema = getIDtema($IDcurso, $filename, $filenameNEW, 1);
-
-					if ($IDcurso != '') {
+					
+					if ($IDtema != '') {
 						buscarVideos($IDcurso, $IDtema, $dir."/".$filenameNEW);
 					} else {
 						logAction($dir."/".$filename." no se encuentra en la base de datos");

@@ -15,7 +15,7 @@ if (isset($_GET['IDcurso'])) {
 			} else {
 				$temaData = getTemaData($_GET['IDcurso'], $_GET['IDtema']);
 				$videoData = getVideoData($_GET['IDcurso'], $_GET['IDtema'], $_GET['IDvideo']);
-				$OUT .= '<li><a href="'._PORTALROOT.'?IDcurso='.$cursoData['IDcurso'].'">'.$cursoData['nombre'].'</a></li>';
+				$OUT .= '<li><a href="'._PORTALROOT.'?IDcurso='.urlencode($cursoData['IDcurso']).'">'.$cursoData['nombre'].'</a></li>';
 				$OUT .= '<li class="active">'.$temaData['nombre'].'</li>';
 				$OUT .= '<li class="active">'.$videoData['nombre'].'</li>';
 			}

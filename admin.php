@@ -45,7 +45,7 @@ include_once('config.php');
 						<a class="navbar-brand" href="/portal-videos/">Portal v&iacute;deos</a>
 					</div>
 					<div class="navbar-collapse collapse">
-						<form name="userSession" class="navbar-form navbar-right" role="form" method="POST" action="forms/login.php">
+						<form name="userSession" class="navbar-form navbar-right userSession" role="form" method="POST" action="forms/login.php">
 						<?php if(!isset($_COOKIE['MoodleUserSession'])) { ?>
 							<div class="form-error btn btn-danger"></div>
 							<div class="form-group">
@@ -64,7 +64,7 @@ include_once('config.php');
 							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } else { ?>
 							<div class="form-group">
-								<span>Bienvenido, <?php echo unserialize($_COOKIE['MoodleUserSession'])['fullname']; ?></span>
+								<span class="saludo">Bienvenido, <?php echo decrypt($_COOKIE['MoodleUserSession'],1)['fullname']; ?></span>
 							</div>
 							<button type="submit" value="aa" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } ?>
@@ -73,7 +73,21 @@ include_once('config.php');
 				</div>
 			</nav>
 		</header>
-		<?php require_once(_DOCUMENTROOT.'modules-admin/content.php'); ?>
+		<?php
+			if ( (!isset($_COOKIE['MoodleUserSession'])) || ( (isset($_COOKIE['MoodleUserSession']))&&(decrypt($_COOKIE['MoodleUserSession'],1)['esAdmin'] == 0) ) ) {
+				$OUT = '<div class="container">';
+					$OUT .= '<div class="row">';
+						$OUT .= '<div class="col-md-12 margin-bottom">';
+							$OUT .= '<h1>Acceso restringido</h1>';
+							$OUT .= '<p>Esta intentando acceder a una pagina protegida. Debe ser usuario administrador para poder acceder.</p>';
+						$OUT .= '</div>';
+					$OUT .= '</div>';
+				$OUT .= '</div>';
+				echo $OUT;
+			} else {
+				require_once(_DOCUMENTROOT.'modules-admin/content.php');
+			}
+		?>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->

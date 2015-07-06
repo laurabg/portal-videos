@@ -81,11 +81,11 @@ if ($_POST['form'] == 'videos') {
 						
 						// Comprobar que la imagen no exista, para no crearla dos veces:
 						if (!file_exists($dir.$_POST['rutaVideo'])) {
-							echo "crear el video<br />";
+						//	echo "crear el video<br />";
 							move_uploaded_file($_FILES['rutaVideo']['tmp_name'], $dir.$_POST['rutaVideo']);
 							
 						} else {
-							echo "el video ya existe, solo asociarlo<br />";
+						//	echo "el video ya existe, solo asociarlo<br />";
 						}
 						if ($_POST['obtenerCaptura'] == 'on') {
 							$_POST['img'] = getPortada($_POST['rutaVideo'], $dir);
@@ -100,7 +100,7 @@ if ($_POST['form'] == 'videos') {
 				}
 				
 				// Comprobar que no exista el nombre, ni la ruta en el mismo tema y curso:
-				if ( ($_POST['nombreVideo'] != '')&&( (checkVideo('nombre = "'.$_POST['nombreVideo'].'" AND IDtema = '.$_POST['IDtema'].' AND IDcurso = '.$_POST['IDcurso']) > 0)||(checkVideo('ruta = "'.$_POST['rutaVideo'].'" AND IDtema = '.$_POST['IDtema'].' AND IDcurso = '.$_POST['IDcurso']) > 0) ) )  {
+				if ( ($_POST['nombreVideo'] != '')&&( (checkVideo('nombre = "'.$_POST['nombreVideo'].'" AND IDtema = '.decrypt($_POST['IDtema']).' AND IDcurso = '.decrypt($_POST['IDcurso'])) > 0)||(checkVideo('ruta = "'.$_POST['rutaVideo'].'" AND IDtema = '.decrypt($_POST['IDtema']).' AND IDcurso = '.decrypt($_POST['IDcurso'])) > 0) ) )  {
 					$msgError = 'El v&iacute;deo ya existe';
 					$error = 'warning';
 				}
@@ -112,7 +112,7 @@ if ($_POST['form'] == 'videos') {
 					$_POST['img'] = getPortada($_POST['rutaVideo'], $dir);
 					
 					// Crear el video en la base de datos:
-					crearVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['orden'], $_POST['ocultar']);
+					createVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['orden'], $_POST['ocultar']);
 					
 					$_POST['IDvideo'] = getIDvideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['rutaVideo'], 0);
 				}
@@ -161,7 +161,7 @@ if ($_POST['form'] == 'videos') {
 				}
 				
 				// Comprobar que no exista el nombre, ni la ruta en el mismo tema y curso:
-				if ( ($_POST['nombreVideo'] != '')&&( (checkVideo('ID != '.$_POST['IDvideo'].' AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND nombre = "'.$_POST['nombreVideo'].'"') > 0)||(checkVideo('ID != '.$_POST['IDvideo'].' AND IDcurso = '.$_POST['IDcurso'].' AND IDtema = '.$_POST['IDtema'].' AND ruta = "'.$_POST['rutaVideo'].'"') > 0) ) ) {
+				if ( ($_POST['nombreVideo'] != '')&&( (checkVideo('ID != '.decrypt($_POST['IDvideo']).' AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND nombre = "'.$_POST['nombreVideo'].'"') > 0)||(checkVideo('ID != '.decrypt($_POST['IDvideo']).' AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND ruta = "'.$_POST['rutaVideo'].'"') > 0) ) ) {
 					$msgError = 'El v&iacute;deo ya existe';
 					$error = 'warning';
 				}
