@@ -6,7 +6,7 @@
  Parámetros:
 	dir				Ruta a rastrear
  *********************************************************************/
-function buscarCursos($IDdir, $dir) {
+function buscarCursos($IDdir, $dir, &$listaCursosExistentes) {
 	logAction("Buscando cursos en ".$dir);
 	
 	$IDcurso = 0;
@@ -28,6 +28,8 @@ function buscarCursos($IDdir, $dir) {
 					$IDcurso = getIDcurso($filename, $filenameNEW, $IDdir, 1);
 					
 					if ($IDcurso != '') {
+						array_push($listaCursosExistentes, $IDcurso);
+						
 						// Buscar temas dentro del curso:
 						buscarTemas($IDcurso, $dir.$filenameNEW);
 					} else {
@@ -42,6 +44,7 @@ function buscarCursos($IDdir, $dir) {
 		if ($cont == 0) {
 			logAction($dir." no contiene cursos");
 		}
+		
 	} else {
 		logAction("Error al leer ".$dir);
 	}
@@ -188,6 +191,8 @@ if ( (isset($_GET['rehacer']))&&($_GET['rehacer'] == 1) ) {
 	resetDBLog();
 }
 
+$listaCursosExistentes = array();
+
 logAction("Inicio Robot");
 
 foreach ($listaDirs as $dir) {
@@ -206,9 +211,20 @@ foreach ($listaDirs as $dir) {
 			symlink($dir['ruta'], _DOCUMENTROOT._DIRCURSOS.$link);
 		}
 
-		buscarCursos($dir['ID'], _DOCUMENTROOT._DIRCURSOS.$link."/");
+		buscarCursos($dir['ID'], _DOCUMENTROOT._DIRCURSOS.$link."/", $listaCursosExistentes);
 	} else {
-		buscarCursos($dir['ID'], _DOCUMENTROOT._DIRCURSOS.$dir['ruta']);
+		buscarCursos($dir['ID'], _DOCUMENTROOT._DIRCURSOS.$dir['ruta'], $listaCursosExistentes);
+	}
+}
+
+logAction("Eliminando los cursos que ya no existen...");
+
+$listaCursosORI = getListaCursos();
+
+foreach ($listaCursosORI as $curso) {
+	if (!is_int(array_search(decrypt($curso[0]), $listaCursosExistentes))) {
+		deleteFullCurso($curso[0]);
+		logAction('Eliminar curso '.$curso[1].'...');
 	}
 }
 

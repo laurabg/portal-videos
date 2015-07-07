@@ -43,6 +43,7 @@ function getConfigData() {
 	
 	$config['listaUbicaciones'] = listaUbicaciones(1);
 	$config['listaExtensiones'] = listaExtensiones(1);
+	$config['listaMoodleRoles'] = listaMoodleRoles();
 	
 	return $config;
 }
@@ -190,5 +191,78 @@ function listaExtensiones($returnID) {
 
 	return $extensiones;
 }
+
+
+
+
+
+
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* --------------------------------------------------    MOODLE ROLES    -------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------ */
+
+/*
+ createMoodleRol: Crea un nuevo rol
+ */
+function createMoodleRol($nombre, $esAdmin, $importar) {
+	global $dbConfig;
+
+	if (checkMoodleRol('nombre = "'.$nombre.'"') == 0) {
+		$dbConfig->exec('INSERT INTO moodleRoles (nombre, esAdmin, importar) VALUES ("'.$nombre.'", '.$esAdmin.', '.$importar.');');
+	}
+}
+
+/*
+ updateMoodleRol: Actualiza un rol
+ */
+function updateMoodleRol($ID, $esAdmin, $importar) {
+	global $dbConfig;
+
+	$dbConfig->exec('UPDATE moodleRoles SET esAdmin = '.$esAdmin.', importar = '.$importar.' WHERE ID = '.$ID.';');
+}
+
+
+/*
+ deleteMoodleRol: Elimina un rol
+ */
+function deleteMoodleRol($ID) {
+	global $dbConfig;
+
+	$dbConfig->exec('DELETE FROM moodleRoles WHERE ID = '.$ID.';');
+}
+
+/*
+ checkMoodleRol: Devuelve true si el rol existe, y false si no
+ */
+function checkMoodleRol($condicion) {
+	global $dbConfig;
+	
+	return ($dbConfig->querySingle('SELECT COUNT(*) FROM moodleRoles WHERE '.$condicion) > 0);
+}
+
+/*
+ listaMoodleRoles: Obtiene un array con los roles existentes
+ */
+ function listaMoodleRoles() {
+	global $dbConfig;
+
+	$moodleRoles = array();
+
+	$res = $dbConfig->query('SELECT * FROM moodleRoles');
+	
+	while ($row = $res->fetchArray()) {
+		array_push($moodleRoles, array(
+			'ID' => $row['ID'],
+			'nombre' => $row['nombre'],
+			'esAdmin' => $row['esAdmin'],
+			'importar' => $row['importar']
+		));
+	}
+
+	return $moodleRoles;
+}
+
 
 ?>

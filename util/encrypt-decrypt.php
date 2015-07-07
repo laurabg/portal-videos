@@ -1,4 +1,5 @@
 <?php
+
 if (!function_exists('hash_equals')) {
 	function hash_equals($str1, $str2) {
 		if (strlen($str1) != strlen($str2)) {
@@ -14,8 +15,8 @@ if (!function_exists('hash_equals')) {
 	}
 }
 
-function encrypt($data, $encCookie = 0) {
-	if ( (_ENCRIPTAR == 1)||($encCookie == 1) ) {
+function encrypt($data, $encriptarForzado = 0) {
+	if ( (_ENCRIPTAR == 1)||($encriptarForzado == 1) ) {
 		$iv = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
 		$ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, _EKEY, json_encode($data), MCRYPT_MODE_CBC, $iv);
 		
@@ -28,8 +29,8 @@ function encrypt($data, $encCookie = 0) {
 	}
 }
 
-function decrypt($data, $encCookie = 0) {
-	if ( (_ENCRIPTAR == 1)||($encCookie == 1) ) {
+function decrypt($data, $encriptarForzado = 0) {
+	if ( (_ENCRIPTAR == 1)||($encriptarForzado == 1) ) {
 		$decoded = base64_decode($data);
 		$hmac = mb_substr($decoded, 0, 32, '8bit');
 		$iv = mb_substr($decoded, 32, 16, '8bit');

@@ -166,8 +166,13 @@ function crearTablasConfig() {
 	createAdminvar('_OCULTO',0);
 	createAdminvar('_ADMINDEF','estadisticas');
 	createAdminvar('_ADMINPASS','#Admin1');
-	createAdminvar('_MOODLEALLUSERS',0);
-	
+	createAdminvar('_ALLOWFILEUPLOAD', 1);
+	createAdminvar('_ALLOWIMGUPLOAD', 1);
+	createAdminvar('_ALLOWVIDEOUPLOAD', 1);
+	createAdminvar('_ENCRIPTAR', 0);
+	createAdminvar('_EKEY', '4243bcdce4ffdb41b613');
+	createAdminvar('_AKEY', 'ef515dff755448e12100');
+
 	$dbConfig->exec('CREATE TABLE ubicaciones (
 		ID INTEGER PRIMARY KEY, 
 		ruta TEXT);'
@@ -181,6 +186,19 @@ function crearTablasConfig() {
 	);
 
 	createExtension('mp4');
+
+
+	$dbConfig->exec('CREATE TABLE moodleRoles (
+		ID INTEGER PRIMARY KEY, 
+		nombre TEXT,
+		esAdmin INTEGER,
+		importar INTEGER);'
+	);
+
+	createMoodleRol('student',0,1);
+	createMoodleRol('teacher',0,0);
+	createMoodleRol('editingteacher',1,0);
+	createMoodleRol('manager',1,0);
 }
 
 function crearTablasLog() {
@@ -201,6 +219,16 @@ function crearTablasAnalytics() {
 		IDcurso INTEGER,
 		IDtema INTEGER,
 		IDvideo INTEGER,
+		IDusuario INTEGER,
+		"timestamp" DATETIME DEFAULT CURRENT_TIMESTAMP);'
+	);
+
+	$dbAn->exec('CREATE TABLE descargas (
+		ID INTEGER PRIMARY KEY, 
+		IDcurso INTEGER,
+		IDtema INTEGER,
+		IDvideo INTEGER,
+		IDadjunto INTEGER,
 		IDusuario INTEGER,
 		"timestamp" DATETIME DEFAULT CURRENT_TIMESTAMP);'
 	);
@@ -256,4 +284,34 @@ function videoPlayed($IDcurso, $IDtema, $IDvideo, $IDusuario) {
 	$dbAn->exec('INSERT INTO analytics (IDcurso, IDtema, IDvideo, IDusuario) VALUES ('.decrypt($IDcurso).','.decrypt($IDtema).','.decrypt($IDvideo).','.$IDusuario.')');
 }
 
+
+function descargarArchivo($IDcurso, $IDtema, $IDvideo, $IDadjunto, $IDusuario) {
+	global $dbAn;
+	echo 'INSERT INTO descargas (IDcurso, IDtema, IDvideo, IDadjunto, IDusuario) VALUES ('.decrypt($IDcurso).','.decrypt($IDtema).','.decrypt($IDvideo).','.$IDadjunto.','.$IDusuario.')';
+	$dbAn->exec('INSERT INTO descargas (IDcurso, IDtema, IDvideo, IDadjunto, IDusuario) VALUES ('.decrypt($IDcurso).','.decrypt($IDtema).','.decrypt($IDvideo).','.$IDadjunto.','.$IDusuario.')');
+}
+
+function getTotalDescargas($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
+	global $dbAn;
+	
+	return $dbAn->querySingle('SELECT COUNT(*) FROM descargas WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo).' AND IDadjunto = '.$IDadjunto);
+}
+
+function deleteCursoPlayed($IDcurso) {
+	global $dbAn;
+
+	$dbAn->exec('DELETE FROM analytics WHERE IDcurso = '.decrypt($IDcurso));
+}
+
+function deleteTemaPlayed($IDcurso) {
+	global $dbAn;
+
+	$dbAn->exec('DELETE FROM analytics WHERE IDtema = '.decrypt($IDtema));
+}
+
+function deleteVideoPlayed($IDcurso) {
+	global $dbAn;
+
+	$dbAn->exec('DELETE FROM analytics WHERE IDvideo = '.decrypt($IDvideo));
+}
 ?>

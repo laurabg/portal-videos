@@ -130,7 +130,7 @@ header form .form-group span {
 	margin-left: 10px;
 }
 
-.nav-sidebar > li > a, .nav-sidebar div.item > span.glyphicon:last-child {
+.nav-sidebar > li > a, .nav-sidebar div.item > span.glyphicon:last-child, .nav-sidebar div.item > .edit span.glyphicon, .nav-sidebar div.item > .dup span.glyphicon {
 	margin: 0px;
 }
 
@@ -144,16 +144,20 @@ header form .form-group span {
 	background-color: #428bca;
 }
 
-.nav-sidebar li div.item > a.edit {
+.nav-sidebar li div.item > a.edit, .nav-sidebar li div.item > a.dup {
 	float: right;
 	margin-right: 0px;
+}
+
+.nav-sidebar li div.item > a.dup {
+	margin-right: 10px;
 }
 
 .nav-sidebar li div.item > span.txt {
 	float:left;
     text-overflow: ellipsis; 
     white-space: nowrap; 
-    width: 77%; 
+    width: 70%; 
     overflow: hidden;
 }
 
@@ -266,11 +270,28 @@ header form .form-group span {
 
 
 /* ----- FORMULARIOS ----- */
+div.checkbox {
+	margin-left: 20px;
+}
+
+input.checkbox-con-margen {
+	margin-left: 15px;
+}
+
 .datepicker {
 	margin: 0px;
 }
 .listado .row {
 	margin-bottom: 15px;
+}
+
+.txt-as-label {
+	border: 0px;
+	background: transparent;
+}
+
+.txt-as-label.pull-right {
+	text-align: right;
 }
 
 form button {
@@ -286,6 +307,10 @@ form table td button.btn-xs.center {
 }
 
 table tr.blocked-user {
+	background: #f0ad4e;
+}
+
+table tr.user-nologin {
 	background: #f5f5f5;
 }
 

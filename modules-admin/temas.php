@@ -46,7 +46,7 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '<input required type="text" name="nombreTema" class="form-control" id="nombreTema" placeholder="Nombre del tema" value="'.$_POST['nombreTema'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
-		$OUT .= '<label></label><input name="ocultar" type="checkbox"';
+		$OUT .= '<input name="ocultar" type="checkbox"';
 		if ($_POST['ocultar'] == 1) {
 			$OUT .= ' checked';
 		}

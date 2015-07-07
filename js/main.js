@@ -67,4 +67,23 @@ $(window).load(function() {
 			firstPlay = 0;
 		}
 	});
+
+	$('.descargarArchivo').click(function() {
+		urlData = sPageURL;
+		if ($(this).attr('rel')) {
+			urlData = urlData + '&IDadjunto='+$(this).attr('rel');
+		} else {
+			urlData = urlData + '&IDadjunto=0';
+		}
+
+		$.ajax({
+			type: 'POST',
+			async: true,
+			url: 'modules/descargarArchivo.php',
+			data: urlData,
+			success: function(msg) {
+				window.location.reload();
+			}
+		});
+	});
 });

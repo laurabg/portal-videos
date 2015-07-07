@@ -139,5 +139,35 @@ function getVideoData($IDcurso, $IDtema, $IDvideo) {
 	return $video;
 }
 
+/*
+ * getListaVideosByTemaCurso: devuelve un array con todos los vídeos de un tema y un curso:
+ */
+function getListaVideosByTemaCurso($IDcurso, $IDtema) {
+	global $db;
+	
+	$listaVideos = array();
 
+	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaVideos, array($row['IDencriptado'], $row['nombre']));
+	}
+
+	return $listaVideos;
+}
+
+/*
+ * encriptarVideos: Encripta todos los IDs de los videos:
+ */
+function encriptarVideos($encriptarForzado = 0) {
+	global $db;
+	
+	$res = $db->query('SELECT ID FROM videos');
+	while ($row = $res->fetchArray()) {
+		if ($encriptarForzado == 0) {
+			$db->exec('UPDATE videos SET IDencriptado = "'.$row['ID'].'" WHERE ID = '.$row['ID']);
+		} else {
+			$db->exec('UPDATE videos SET IDencriptado = "'.encrypt($row['ID'], $encriptarForzado).'" WHERE ID = '.$row['ID']);
+		}
+	}
+}
 ?>

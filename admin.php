@@ -55,13 +55,6 @@ include_once('config.php');
 								<input name="userPass" type="password" placeholder="Contraseña" class="form-control" />
 							</div>
 							<button type="submit" name="login" class="btn btn-success">Acceder</button>
-						<?php } else if(isset($_COOKIE['MoodleUserFaltaCorreo'])) { ?>
-							<div class="form-error form-error-show btn btn-warning">Debe facilitar el correo electr&oacute;nico con el que accede a Moodle</div>
-							<div class="form-group">
-								<input name="email" type="text" placeholder="Correo electr&oacute;nico" class="form-control" />
-							</div>
-							<button type="submit" name="asociar-correo" class="btn btn-success">Acceder</button>
-							<button type="submit" name="logout" class="btn btn-danger">Cerrar sesi&oacute;n</button>
 						<?php } else { ?>
 							<div class="form-group">
 								<span class="saludo">Bienvenido, <?php echo decrypt($_COOKIE['MoodleUserSession'],1)['fullname']; ?></span>
@@ -87,6 +80,10 @@ include_once('config.php');
 			} else {
 				require_once(_DOCUMENTROOT.'modules-admin/content.php');
 			}
+			
+			if (isset($_COOKIE['MoodleUserFaltaCorreo'])) {
+				include_once(_DOCUMENTROOT.'modules/pedirEmail.php');
+			}
 		?>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
@@ -98,8 +95,10 @@ include_once('config.php');
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/js/bootstrap-datepicker.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-datepicker-1.4.0-dist/locales/bootstrap-datepicker.es.min.js"></script>
 		<script type="text/javascript" src="js/highcharts-4.1.6/highcharts.js"></script>
+		<script type="text/javascript" src="js/highcharts-4.1.6/modules/drilldown.js"></script>
 		<script type="text/javascript" src="js/fileinput/fileinput.min.js"></script>
 		<!--script type="text/javascript" src="js/highcharts-4.1.6/modules/exporting.js"></script-->
+		<script type="text/javascript" src="js/charts.js"></script>
 		<script type="text/javascript" src="js/admin.js"></script>
 	</body>
 </html>

@@ -52,6 +52,9 @@ if ($msgError != '') {
 
 $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cursos.php">';
 	$OUT .= '<div class="form-group">';
+		$OUT .= '<label>URL del curso:</label> http://'.$_SERVER['SERVER_NAME']._PORTALROOT.'?IDcurso='.$cursoData['IDcurso'];
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
 		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
 	$OUT .= '</div>';
@@ -97,14 +100,14 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cu
 		$OUT .= '</div>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
-		$OUT .= '<label></label><input name="publico" type="checkbox"';
+		$OUT .= '<input name="publico" type="checkbox"';
 		if ($_POST['publico'] == 1) {
 			$OUT .= ' checked';
 		}
 		$OUT .= '> Curso público (visible para usuarios no conectados)</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
-		$OUT .= '<label></label><input name="ocultar" type="checkbox"';
+		$OUT .= '<input name="ocultar" type="checkbox"';
 		if ($_POST['ocultar'] == 1) {
 			$OUT .= ' checked';
 		}
@@ -135,7 +138,7 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cu
 					$OUT .= '<tbody>';
 						foreach ($listaUsuarios as $usuario) {
 							$OUT .= '<tr>';
-								$OUT .= '<td>'.$usuario['fullname'].'</td>';
+								$OUT .= '<td'.( $usuario['esAdmin']==1 ? ' title="Usuario Administrador"' : ' title="Estudiante"' ).'><span class="glyphicon glyphicon-'.( $usuario['esAdmin']==1 ? 'user' : 'education' ).'"></span> '.$usuario['fullname'].'</td>';
 								$OUT .= '<td>'.$usuario['email'].'</td>';
 							$OUT .= '</tr>';
 						}

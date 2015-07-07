@@ -65,7 +65,7 @@ $OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'
 		$OUT .= '<input required type="text" name="nombreAdjunto" class="form-control" id="nombreAdjunto" placeholder="Título del archivo adjunto" value="'.$_POST['nombreAdjunto'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="checkbox">';
-		$OUT .= '<label></label><input name="ocultar" type="checkbox"';
+		$OUT .= '<input name="ocultar" type="checkbox"';
 		if ($_POST['ocultar'] == 1) {
 			$OUT .= ' checked';
 		}
@@ -84,8 +84,8 @@ $OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'
 			$OUT .= '<label for="rutaAdjunto" class="control-label">* Archivo:</label>';
 			$OUT .= '<input id="rutaAdjunto" name="rutaAdjunto" type="file" accept="*" placeholder="Nombre del archivo de v&iacute;deo" data-preview-file-type="other" class="file-loading" value="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$_POST['rutaAdjunto'].'" />';
 		} else {
-			$OUT .= '<label for="rutaAdjunto">* Nombre del archivo:</label>'.( ($_POST['IDadjunto'] != '') ? ' <input type="checkbox" name="renombrarAdjunto" /> Marcar para renombrar' : '' );
-			$OUT .= '<input required type="text" name="rutaAdjunto" class="form-control" id="ruta" placeholder="Nombre del archivo" value="'.$_POST['rutaAdjunto'].'" />';
+			$OUT .= '<label for="rutaAdjunto">* Nombre del archivo:</label>'.( ($_POST['IDadjunto'] != '') ? ' <input class="checkbox-con-margen" type="checkbox" name="renombrarAdjunto" /> Marcar para renombrar' : '' );
+			$OUT .= '<input required type="text" name="rutaAdjunto" class="form-control" id="rutaAdjunto-noUpload" placeholder="Nombre del archivo" value="'.$_POST['rutaAdjunto'].'" />';
 		}
 	$OUT .= '</div>';
 	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';

@@ -60,7 +60,11 @@ $OUT .= '<div class="container">';
 
 		if ($found == 0) {
 			$OUT .= '<div class="col-md-12">';
-				$OUT .= '<p>En estos momentos no hay cursos publicados.</p>';
+				if ( (isset($_COOKIE['MoodleUserSession']))&&(decrypt($_COOKIE['MoodleUserSession'],1)['IDusuario'] == 0) ) {
+					$OUT .= '<strong>No hay cursos registrados en los que est&eacute;s matriculado.</strong>';
+				} else {
+					$OUT .= '<p>En estos momentos no hay cursos publicados.</p>';
+				}
 			$OUT .= '</div>';
 		}
 		

@@ -148,4 +148,20 @@ function getAdjuntoData($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
 	return $adjunto;
 }
 
+/*
+ * getListaAdjuntosByVideoTemaCurso: devuelve un array con todos los adjuntos de un tema, video y un curso:
+ */
+function getListaAdjuntosByVideoTemaCurso($IDcurso, $IDtema, $IDvideo) {
+	global $db;
+	
+	$listaAdjuntos = array();
+
+	$res = $db->query('SELECT * FROM videosAdjuntos WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo).' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaAdjuntos, array($row['ID'], $row['nombre']));
+	}
+
+	return $listaAdjuntos;
+}
+
 ?>

@@ -151,27 +151,6 @@ function getCursoData($IDcurso) {
 }
 
 /*
- getCursoUsuarios: Obtiene una lista de los usuarios inscritos a un curso
- */
-function getUsuariosByCurso($IDcurso) {
-	global $db;
-	
-	$listaUsuarios = array();
-
-	$res = $db->query('SELECT * FROM usuarios WHERE ID IN (SELECT IDusuario FROM cursosUsuarios WHERE IDcurso = '.decrypt($IDcurso).')');
-	
-	while ($row = $res->fetchArray()) {
-		array_push($listaUsuarios, array(
-			'ID' => $row['ID'],
-			'fullname' => $row['fullname'],
-			'email' => $row['email']
-		));
-	}
-
-	return $listaUsuarios;
-}
-
-/*
  * getListaCursos: devuelve un array con todos los cursos ordenados:
  */
 function getListaCursos() {
@@ -181,57 +160,27 @@ function getListaCursos() {
 
 	$res = $db->query('SELECT * FROM cursos ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
-		array_push($listaCursos, array($row['IDencriptado'], $row['nombre']));
+		array_push($listaCursos, array($row['IDencriptado'], $row['nombre'], $row['IDcursoMoodle']));
 	}
 
 	return $listaCursos;
 }
-/*
- * getListaTemasByCurso: devuelve un array con todos los temas de un curso:
- */
-function getListaTemasByCurso($IDcurso) {
-	global $db;
-	
-	$listaTemas = array();
-
-	$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.decrypt($IDcurso).' ORDER BY orden, nombre');
-	while ($row = $res->fetchArray()) {
-		array_push($listaTemas, array($row['IDencriptado'], $row['nombre']));
-	}
-
-	return $listaTemas;
-}
 
 /*
- * getListaVideosByTemaCurso: devuelve un array con todos los vídeos de un tema y un curso:
+ * encriptarCursos: Encripta todos los IDs de los cursos:
  */
-function getListaVideosByTemaCurso($IDcurso, $IDtema) {
+function encriptarCursos($encriptarForzado = 0) {
 	global $db;
 	
-	$listaVideos = array();
-
-	$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' ORDER BY orden, nombre');
+	$res = $db->query('SELECT ID FROM cursos');
 	while ($row = $res->fetchArray()) {
-		array_push($listaVideos, array($row['IDencriptado'], $row['nombre']));
+		if ($encriptarForzado == 0) {
+			$db->exec('UPDATE cursos SET IDencriptado = "'.$row['ID'].'" WHERE ID = '.$row['ID']);
+		} else {
+			$db->exec('UPDATE cursos SET IDencriptado = "'.encrypt($row['ID'], $encriptarForzado).'" WHERE ID = '.$row['ID']);
+		}
 	}
-
-	return $listaVideos;
 }
 
-/*
- * getListaAdjuntosByVideoTemaCurso: devuelve un array con todos los adjuntos de un tema, video y un curso:
- */
-function getListaAdjuntosByVideoTemaCurso($IDcurso, $IDtema, $IDvideo) {
-	global $db;
-	
-	$listaAdjuntos = array();
-
-	$res = $db->query('SELECT * FROM videosAdjuntos WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo).' ORDER BY orden, nombre');
-	while ($row = $res->fetchArray()) {
-		array_push($listaAdjuntos, array($row['ID'], $row['nombre']));
-	}
-
-	return $listaAdjuntos;
-}
 
 ?>

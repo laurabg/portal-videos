@@ -84,7 +84,7 @@ function loadAjaxForm() {
 		format: 'yyyy-mm-dd',
 		language: 'es'
 	});
-
+	
 	$('form[name="config"] .add-ub').click(function() {
 		newUb = '<div class="row"><div class="col-md-2"></div><div class="col-md-10">';
 		newUb = newUb + '<input type="text" class="form-control" name="ubicacion-new[]" id="ubicacion" value="" /></div></div>';
@@ -177,7 +177,17 @@ function loadAjaxForm() {
 			showRemove: false
 		});
 	}
-	
+
+	encriptarChange = 0;
+	$('input[name="_ENCRIPTAR"]').change(function() {
+		encriptarChange = 0;
+		if ( ($(this).is(':checked'))&&($('input[name="_ENCRIPTARORI"]').val() == '') ) {
+			encriptarChange = 1;
+		} else if ( (!$(this).is(':checked'))&&($('input[name="_ENCRIPTARORI"]').val() == 'on') ) {
+			encriptarChange = 1;
+		}
+	});
+
 	$('.btn-cancel').click(function() {
 		window.location.reload();
 	});
@@ -198,24 +208,45 @@ function beforeSubmit(formData, jqForm, options) {
 	// Si se ha pulsado "eliminar", pedir confirmacion:
 	if (queryString.indexOf('formDel') != -1) {
 		if (confirm('¿Desea eliminar este elemento?')) {
+			$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+			$('.main').find('form').hide();
+
 			return true;
 		}
 
 	// Si se ha pulsado "autorizar acceso usuario", pedir confirmacion:
 	} else if (queryString.indexOf('unblock-access-user') != -1) {
 		if (confirm('¿Desea desbloquear el acceso de este usuario a sus cursos?')) {
+			$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+			$('.main').find('form').hide();
+
 			return true;
 		}
 
 	// Si se ha pulsado "desautorizar acceso usuario", pedir confirmacion:
 	} else if (queryString.indexOf('block-access-user') != -1) {
 		if (confirm('¿Desea bloquear el acceso de este usuario a sus cursos?')) {
+			$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+			$('.main').find('form').hide();
+
 			return true;
 		}
 
 	// Si se ha pulsado "desautorizar acceso usuario", pedir confirmacion:
 	} else if (queryString.indexOf('del-user') != -1) {
 		if (confirm('¿Desea eliminar este usuario?')) {
+			$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+			$('.main').find('form').hide();
+
+			return true;
+		}
+
+	// Si se ha cambiado el valor de _ENCRIPTAR, mostrar alerta:
+	} else if (encriptarChange == 1) {
+		if (confirm('¿Seguro que desea cambiar la configuracion de encriptacion de identificadores?')) {
+			$('.main').children('.row').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+			$('.main').find('form').hide();
+
 			return true;
 		}
 
@@ -225,7 +256,7 @@ function beforeSubmit(formData, jqForm, options) {
 
 		return true;
 	}
-
+	
 	return false;
 } 
  
@@ -264,103 +295,6 @@ function submitDone(responseText, statusText, xhr, $form)  {
 	loadAjaxForm();
 } 
 
-function loadCharts() {
-	if ($('#totalVisualizaciones').length > 0) {
-		// Build the chart
-		$.ajax({
-			type: 'POST',
-			url: 'modules-admin/charts.php',
-			data: 'chartName=totalVisualizaciones',
-			success: function(infoChart) {
-				infoChart = window.JSON.parse(infoChart);
-				
-				$('#totalVisualizaciones').highcharts({
-					chart: {
-						plotBackgroundColor: null,
-						plotBorderWidth: null,
-						plotShadow: false
-					},
-					title: {
-						text: ''
-					},
-					tooltip: {
-						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-					},
-					plotOptions: {
-						pie: {
-							allowPointSelect: true,
-							cursor: 'pointer',
-							dataLabels: {
-								enabled: true,
-								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-								style: {
-									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-								},
-								connectorColor: 'silver'
-							},
-							showInLegend: true
-						}
-					},
-					series: [{
-						type: 'pie',
-						name: 'Total reproducciones',
-						data: infoChart
-					}]
-				});
-			}
-		});
-	}
-
-	if ($('#videosMasVistos').length > 0) {
-		// Build the chart
-		$.ajax({
-			type: 'POST',
-			url: 'modules-admin/charts.php',
-			data: 'chartName=videosMasVistos',
-			success: function(infoChart) {
-				infoChart = window.JSON.parse(infoChart);
-
-				console.log(infoChart.categories);
-				$('#videosMasVistos').highcharts({
-					chart: {
-						type: 'bar'
-					},
-					title: {
-						text: ''
-					},
-					xAxis: {
-						categories: infoChart.categories,
-						title: {
-							text: null
-						}
-					},
-					yAxis: {
-						min: 0,
-						title: {
-							text: '',
-							align: 'high'
-						},
-						labels: {
-							overflow: 'justify'
-						}
-					},
-					tooltip: {
-						valueSuffix: ' veces'
-					},
-					plotOptions: {
-						bar: {
-							dataLabels: {
-								enabled: true
-							}
-						}
-					},
-					series: infoChart.info
-				});
-			}
-		});
-	}
-}
-
 function beforeLoginSubmit(formData, jqForm, options) { 
 	var queryString = $.param(formData); 
 
@@ -392,6 +326,17 @@ function loadLoginForm() {
 	});
 }
 
+function getCookie(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0; i<ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1);
+		if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+	}
+	return "";
+}
+
 
 $(window).load(function() {
 	if ($('.nav-sidebar').length > 0) {
@@ -399,4 +344,11 @@ $(window).load(function() {
 	}
 	loadAjaxForm();
 	loadLoginForm();
+
+	if (getCookie('MoodleUserFaltaCorreo') != '') {
+		$('#pedirEmail').modal({
+			show: true,
+			backdrop: 'static'
+		});
+	}
 });

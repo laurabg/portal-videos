@@ -33,11 +33,47 @@ if ($_POST['form'] == 'config') {
 		updateAdminvar('_MOODLEALLUSERS', 0);
 	}
 
+	if ($_POST['_ALLOWFILEUPLOAD'] == 'on') {
+		updateAdminvar('_ALLOWFILEUPLOAD', 1);
+	} else {
+		updateAdminvar('_ALLOWFILEUPLOAD', 0);
+	}
+
+	if ($_POST['_ALLOWIMGUPLOAD'] == 'on') {
+		updateAdminvar('_ALLOWIMGUPLOAD', 1);
+	} else {
+		updateAdminvar('_ALLOWIMGUPLOAD', 0);
+	}
+
+	if ($_POST['_ALLOWVIDEOUPLOAD'] == 'on') {
+		updateAdminvar('_ALLOWVIDEOUPLOAD', 1);
+	} else {
+		updateAdminvar('_ALLOWVIDEOUPLOAD', 0);
+	}
+
+	if ($_POST['_ENCRIPTAR'] != $_POST['_ENCRIPTARORI']) {
+		if ($_POST['_ENCRIPTAR'] == 'on') {
+			$encriptar = 1;
+		} else {
+			$encriptar = 0;
+		}
+
+		updateAdminvar('_ENCRIPTAR', $encriptar);
+
+		define('_ENCRIPTAR', getAdminvar('_ENCRIPTAR'));
+
+		encriptarCursos($encriptar);
+		encriptarTemas($encriptar);
+		encriptarVideos($encriptar);
+	}
+
 	updateAdminvar('_DIRCURSOS', $_POST['_DIRCURSOS']);
 	updateAdminvar('_ADMINDEF', $_POST['_ADMINDEF']);
 	updateAdminvar('_ADMINPASS', $_POST['_ADMINPASS']);
 	updateAdminvar('_MOODLEURL', $_POST['_MOODLEURL']);
 	updateAdminvar('_WSTOKEN', $_POST['_WSTOKEN']);
+	updateAdminvar('_EKEY', $_POST['_EKEY']);
+	updateAdminvar('_AKEY', $_POST['_AKEY']);
 
 	if ($_POST['_MOODLEURL'] == '') {
 		$msgError .= ' Ha borrado la URL de Moodle. Ahora no se podr&aacute; acceder a los servicios web.';
@@ -72,7 +108,7 @@ if ($_POST['form'] == 'config') {
 				if (substr($ub, -1) != '/') {
 					$ub = $ub.'/';
 				}
-				crearUbicacion($ub);
+				createUbicacion($ub);
 			}
 		}
 	}
@@ -97,7 +133,47 @@ if ($_POST['form'] == 'config') {
 	if (sizeof($_POST['extension-new']) > 0) {
 		foreach ($_POST['extension-new'] as $ext) {
 			if ($ext != '') {
-				crearExtension($ext);
+				createExtension($ext);
+			}
+		}
+	}
+
+	if (sizeof($_POST['moodleRole']) > 0) {
+		foreach ($_POST['moodleRole'] as $ID => $nombre) {
+			if ($nombre != 'student') {
+				updateMoodleRol($ID, sizeof($_POST['esAdmin-moodleRole'][$ID]), sizeof($_POST['importar-moodleRole'][$ID]));
+			}
+		}
+
+		// Recorrer todos los cursos:
+		$configData = getConfigData();
+		$listaCursos = getListaCursos();
+
+		foreach ($listaCursos as $curso) {
+			// Desregistrar primero todos los usuarios del curso:
+			desregistrarUsuariosCurso($curso[0]);
+
+			if ($curso[2] > 0) {
+				// Obtener los usuarios inscritos al curso:
+				$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $curso[2] ));
+				foreach ($usuariosEnCurso as $user) {
+					$insertar = 0;
+					$esAdmin = 0;
+
+					// Comprobar si el rol se puede importar:
+					foreach ($user->roles as $rol) {
+						if (checkMoodleRol('nombre = "'.$rol->shortname.'" AND importar = 1')) {
+							$insertar = 1;
+						}
+						// Comprobar si el rol es de admin:
+						if (is_int(array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre')))) {
+							$esAdmin = $configData['listaMoodleRoles'][array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre'))]['esAdmin'];
+						}
+					}
+					if ($insertar == 1) {
+						registrarUsuarioCurso($curso[0], $curso[2], $user->fullname, $user->email, $esAdmin);
+					}
+				}
 			}
 		}
 	}

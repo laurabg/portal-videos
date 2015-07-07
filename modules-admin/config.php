@@ -10,6 +10,7 @@ $configData = getConfigData();
 
 $_POST['listaUbicaciones'] = $configData['listaUbicaciones'];
 $_POST['listaExtensiones'] = $configData['listaExtensiones'];
+$_POST['listaMoodleRoles'] = $configData['listaMoodleRoles'];
 $_POST['showErrors'] = $configData['showErrors'];
 $_POST['_OCULTO'] = $configData['_OCULTO'];
 $_POST['_MOODLEALLUSERS'] = $configData['_MOODLEALLUSERS'];
@@ -18,6 +19,12 @@ $_POST['_ADMINDEF'] = $configData['_ADMINDEF'];
 $_POST['_ADMINPASS'] = $configData['_ADMINPASS'];
 $_POST['_MOODLEURL'] = $configData['_MOODLEURL'];
 $_POST['_WSTOKEN'] = $configData['_WSTOKEN'];
+$_POST['_ALLOWFILEUPLOAD'] = $configData['_ALLOWFILEUPLOAD'];
+$_POST['_ALLOWIMGUPLOAD'] = $configData['_ALLOWIMGUPLOAD'];
+$_POST['_ALLOWVIDEOUPLOAD'] = $configData['_ALLOWVIDEOUPLOAD'];
+$_POST['_ENCRIPTAR'] = $configData['_ENCRIPTAR'];
+$_POST['_EKEY'] = $configData['_EKEY'];
+$_POST['_AKEY'] = $configData['_AKEY'];
 
 $OUT = '';
 
@@ -25,7 +32,7 @@ if ($msgError != '') {
 	$OUT .= '<div class="alert alert-'.$error.'">'.$msgError.'</div>';
 }
 
-$OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORTALROOT.'modules-admin/config.php">';
+$OUT .= '<form name="config" role="form" method="POST" action="'._PORTALROOT.'modules-admin/config.php">';
 	$OUT .= '<div class="checkbox">';
 		$OUT .= '<input name="showErrors" type="checkbox"';
 		if ($_POST['showErrors'] == 1) {
@@ -40,13 +47,46 @@ $OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORT
 		}
 		$OUT .= '> Al crear un curso, mostrarlo oculto</label>';
 	$OUT .= '</div>';
-	$OUT .= '<div class="checkbox">';
+	/*$OUT .= '<div class="checkbox">';
 		$OUT .= '<input name="_MOODLEALLUSERS" type="checkbox"';
 		if ($_POST['_MOODLEALLUSERS'] == 1) {
 			$OUT .= ' checked';
 		}
-		$OUT .= '> Importar todos los usuarios de Moodle (por defecto, solo alumnos)</label>';
+		$OUT .= '> Al relacionar un curso con Moodle, importar todos los usuarios de Moodle (por defecto, solo alumnos)</label>';
+	$OUT .= '</div>';*/
+
+	$OUT .= '<div class="form-group ubicaciones">';
+		$OUT .= '<label for="ubicaciones">Listado de roles v&aacute;lidos de Moodle: </label>';
+		$OUT .= '<div class="listado listaMoodleRoles">';
+		foreach ($_POST['listaMoodleRoles'] as $rol) {
+			$OUT .= '<div class="row">';
+				$OUT .= '<div class="col-md-3">';
+					$OUT .= '<input type="text" class="txt-as-label pull-right" readonly name="moodleRole['.$rol['ID'].']" value="'.$rol['nombre'].'" />';
+				$OUT .= '</div>';
+				$OUT .= '<div class="col-md-2">';
+					if ($rol['nombre'] != 'student') {
+						$OUT .= '<input type="checkbox" name="esAdmin-moodleRole['.$rol['ID'].']" value="'.$rol['ID'].'"';
+						if ($rol['esAdmin'] == 1) {
+							$OUT .= ' checked';
+						}
+						$OUT .= ' /> Es administrador';
+					}
+				$OUT .= '</div>';
+				$OUT .= '<div class="col-md-2">';
+					$OUT .= '<input '.( ($rol['nombre'] == 'student') ? 'disabled ' : '' ).'type="checkbox" name="importar-moodleRole['.$rol['ID'].']" value="'.$rol['ID'].'"';
+					if ($rol['importar'] == 1) {
+						$OUT .= ' checked';
+					}
+					$OUT .= ' /> Importar';
+				$OUT .= '</div>';
+				
+			$OUT .= '</div>';
+		}
+		$OUT .= '</div>';
+		//$OUT .= '<button type="button" class="add-rol btn btn-success">Añadir una extensi&oacute;n</button>';
 	$OUT .= '</div>';
+
+
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="_DIRCURSOS">Directorio donde se almacenar&aacute;n y linkar&aacute;n los cursos:</label>';
 		$OUT .= '<input type="text" name="_DIRCURSOS" class="form-control" id="_DIRCURSOS" placeholder="Directorio donde se almacenar&aacute;n y linkar&aacute;n los cursos" value="'.$_POST['_DIRCURSOS'].'" />';
@@ -66,6 +106,42 @@ $OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORT
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="_WSTOKEN">Token para servicio web de Moodle:</label>';
 		$OUT .= '<input type="text" name="_WSTOKEN" class="form-control" id="_WSTOKEN" placeholder="Token para servicio web de Moodle" value="'.$_POST['_WSTOKEN'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_ALLOWFILEUPLOAD" type="checkbox"';
+		if ($_POST['_ALLOWFILEUPLOAD'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Permitir subir ficheros en Administraci&oacute;n</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_ALLOWIMGUPLOAD" type="checkbox"';
+		if ($_POST['_ALLOWIMGUPLOAD'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Permitir subir im&aacute;genes en Administraci&oacute;n</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_ALLOWVIDEOUPLOAD" type="checkbox"';
+		if ($_POST['_ALLOWVIDEOUPLOAD'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Permitir subir v&iacute;deos en Administraci&oacute;n</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="checkbox">';
+		$OUT .= '<input name="_ENCRIPTAR" type="checkbox"';
+		if ($_POST['_ENCRIPTAR'] == 1) {
+			$OUT .= ' checked';
+		}
+		$OUT .= '> Encriptar los identificadores</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_EKEY">Clave de encriptaci&oacute;n:</label>';
+		$OUT .= '<input type="text" name="_EKEY" class="form-control" id="_EKEY" placeholder="Clave de encriptaci&oacute;n" value="'.$_POST['_EKEY'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_AKEY">Clave de autenticaci&oacute;n:</label>';
+		$OUT .= '<input type="text" name="_AKEY" class="form-control" id="_AKEY" placeholder="Clave de autenticaci&oacute;n" value="'.$_POST['_AKEY'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group ubicaciones">';
 		$OUT .= '<label for="ubicaciones">Listado de ubicaciones: </label>';
@@ -102,11 +178,11 @@ $OUT .= '<form name="'.$_GET['opt'].'" role="form" method="POST" action="'._PORT
 	$OUT .= '<button type="submit" value="save" class="btn btn-default">Guardar</button>';
 	$OUT .= '<button type="button" value="cancel" class="btn btn-default btn-cancel">Cancelar</button>';
 	$OUT .= '<input type="hidden" value="config" name="form" />';
+	$OUT .= '<input type="hidden" value="'.( $_POST['_ENCRIPTAR']==1 ? 'on' : '' ).'" name="_ENCRIPTARORI" />';
 $OUT .= '</form>';
 
 print($OUT);
 ?>
-
 
 	</div>
 </div>

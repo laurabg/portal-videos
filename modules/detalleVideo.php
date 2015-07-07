@@ -106,9 +106,15 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 					$OUT .= '<p>Descargas</p>';
 					$OUT .= '<ul class="list-group">';
 						foreach ($videoData['adjuntos'] as $adjunto) {
-							$OUT .= '<li class="list-group-item"><span class="glyphicon glyphicon-download-alt"></span><span class="badge">0</span> <a href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'].'" target="_blank">'.$adjunto['nombre'].'</a></li>';
+							$OUT .= '<li class="list-group-item">';
+								$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], $adjunto['IDadjunto']).'</span> ';
+								$OUT .= '<a class="descargarArchivo" rel="'.$adjunto['IDadjunto'].'" href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'].'" target="_blank">'.$adjunto['nombre'].'</a>';
+							$OUT .= '</li>';
 						}
-						$OUT .= '<li class="list-group-item"><span class="glyphicon glyphicon-download-alt"></span><span class="badge">0</span> <a download href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" target="_blank">Descargar v&iacute;deo</a></li>';
+						$OUT .= '<li class="list-group-item">';
+							$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], 0).'</span> ';
+							$OUT .= '<a class="descargarArchivo" download href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" target="_blank">Descargar v&iacute;deo</a>';
+						$OUT .= '</li>';
 					$OUT .= '</ul>';
 				$OUT .= '</div>';
 			$OUT .= '</div>';

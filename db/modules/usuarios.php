@@ -24,6 +24,14 @@ function createUsuario($fullname, $email, $bloqueado, $username, $esAdmin) {
 }
 
 /*
+ updateUsuarioEsAdmin: Actualiza un usuario a administrador o no
+ */
+function updateUsuarioEsAdmin($IDusuario, $esAdmin) {
+	global $db;
+	
+	$db->exec('UPDATE usuarios SET esAdmin = '.$esAdmin.' WHERE ID = '.$IDusuario);
+}
+/*
  deleteUsuario: Elimina un usuario
  */
 function deleteUsuario($IDusuario) {
@@ -84,12 +92,12 @@ function getUserID($username) {
 /*
  getAllUsuarios: Obtener la lista completa de usuarios
  */
-function getAllUsuarios() {
+function getAllUsuarios($returnAdmin = 0) {
 	global $db;
 	
 	$listaUsuarios = array();
 
-	$res = $db->query('SELECT * FROM usuarios ORDER BY fullname');
+	$res = $db->query('SELECT * FROM usuarios'.( $returnAdmin==0 ? ' WHERE fullname != "Administrador"' : '' ).' ORDER BY fullname');
 	while ($row = $res->fetchArray()) {
 		$cursos = array();
 
@@ -98,7 +106,7 @@ function getAllUsuarios() {
 			array_push($cursos, $rowCursos['IDcursoMoodle']);
 		}
 		
-		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email'], 'bloqueado' => $row['bloqueado'], 'cursos' => $cursos ));
+		array_push($listaUsuarios, array( 'ID' => $row['ID'], 'fullname' => $row['fullname'], 'email' => $row['email'], 'bloqueado' => $row['bloqueado'], 'esAdmin' => $row['esAdmin'], 'username' => $row['username'], 'cursos' => $cursos ));
 	}
 
 	return $listaUsuarios;
@@ -110,7 +118,14 @@ function getAllUsuarios() {
 function getUserData($IDusuario, $username, $email) {
 	global $db;
 	
-	$usuario = array();
+	$usuario = array(
+		'IDusuario' => 0,
+		'fullname' => $username,
+		'email' => $email,
+		'bloqueado' => 0,
+		'username' => $username,
+		'esAdmin' => 0
+	);
 
 	$SQL = 'SELECT * FROM usuarios WHERE ';
 	( ($IDusuario != '') ? $SQL .= 'ID = '.$IDusuario : ( ($username != '') ? $SQL .= 'username = "'.$username.'"' : ( ($email != '') ? $SQL .= 'email = "'.$email.'"' : '' ) ) );
@@ -122,11 +137,34 @@ function getUserData($IDusuario, $username, $email) {
 			'fullname' => $row['fullname'],
 			'email' => $row['email'],
 			'bloqueado' => $row['bloqueado'],
+			'username' => $row['username'],
 			'esAdmin' => $row['esAdmin']
 		);
 	}
 
 	return $usuario;
+}
+
+/*
+ getCursoUsuarios: Obtiene una lista de los usuarios inscritos a un curso
+ */
+function getUsuariosByCurso($IDcurso) {
+	global $db;
+	
+	$listaUsuarios = array();
+
+	$res = $db->query('SELECT * FROM usuarios WHERE ID IN (SELECT IDusuario FROM cursosUsuarios WHERE IDcurso = '.decrypt($IDcurso).')');
+	
+	while ($row = $res->fetchArray()) {
+		array_push($listaUsuarios, array(
+			'ID' => $row['ID'],
+			'fullname' => $row['fullname'],
+			'email' => $row['email'],
+			'esAdmin' => $row['esAdmin']
+		));
+	}
+
+	return $listaUsuarios;
 }
 
 
@@ -170,16 +208,21 @@ function checkCursoUsuario($condicion) {
 /*
  registrarUsuarioCurso: Registra una serie de usuarios en un curso
  */
-function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email) {
+function registrarUsuarioCurso($IDcurso, $IDcursoMoodle, $fullname, $email, $esAdmin) {
 	global $db;
 
 	// Comprobar si el usuario existe en la BBDD:
 	if (checkUsuario('email = "'.$email.'"') == 0) {
-		createUsuario($fullname, $email, 0, '', 0);
+		createUsuario($fullname, $email, 0, '', $esAdmin);
 	}
 
 	// Obtener el ID de usuario:
 	$IDusuario = $db->querySingle('SELECT ID FROM usuarios WHERE email = "'.$email.'"');
+
+	// Comprobar si el usuario existe y tiene el rol de admin bien puesto:
+	if ( (checkUsuario('email = "'.$email.'"') > 0)&&(checkUsuario('email = "'.$email.'" AND esAdmin = '.$esAdmin) == 0) ) {
+		updateUsuarioEsAdmin($IDusuario, $esAdmin);
+	}
 
 	// Añadir usuario a curso:
 	createCursoUsuario($IDcurso, $IDcursoMoodle, $IDusuario);

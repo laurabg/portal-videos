@@ -122,4 +122,35 @@ function getTemaData($IDcurso, $IDtema) {
 	return $tema;
 }
 
+/*
+ * getListaTemasByCurso: devuelve un array con todos los temas de un curso:
+ */
+function getListaTemasByCurso($IDcurso) {
+	global $db;
+	
+	$listaTemas = array();
+
+	$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.decrypt($IDcurso).' ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaTemas, array($row['IDencriptado'], $row['nombre']));
+	}
+
+	return $listaTemas;
+}
+
+/*
+ * encriptarTemas: Encripta todos los IDs de los temas:
+ */
+function encriptarTemas($encriptarForzado = 0) {
+	global $db;
+	
+	$res = $db->query('SELECT ID FROM temas');
+	while ($row = $res->fetchArray()) {
+		if ($encriptarForzado == 0) {
+			$db->exec('UPDATE temas SET IDencriptado = "'.$row['ID'].'" WHERE ID = '.$row['ID']);
+		} else {
+			$db->exec('UPDATE temas SET IDencriptado = "'.encrypt($row['ID'], $encriptarForzado).'" WHERE ID = '.$row['ID']);
+		}
+	}
+}
 ?>
