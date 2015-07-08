@@ -13,14 +13,14 @@ function createTema($IDcurso, $nombre, $descripcion, $ruta, $orden, $ocultar) {
 	$SQL .= ($descripcion != '')?',descripcion':'';
 	$SQL .= ($ruta != '')?',ruta':'';
 	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ',ocultar';
 	$SQL .= ') VALUES (';
 	$SQL .= decrypt($IDcurso);
 	$SQL .= ',"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
 	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ($ocultar != '')?','.$ocultar:'';
+	$SQL .= ','.$ocultar;
 	$SQL .= ')';
 	//print $SQL;
 	$db->exec($SQL);
@@ -45,7 +45,7 @@ function updateTema($IDtema, $IDcurso, $nombre, $descripcion, $ruta, $orden, $oc
 	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
 	$SQL .= ($orden != '')?', orden = '.$orden:'';
-	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ' WHERE ID = '.decrypt($IDtema);
 	
 	$db->exec($SQL);

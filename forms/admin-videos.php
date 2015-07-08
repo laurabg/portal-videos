@@ -112,7 +112,7 @@ if ($_POST['form'] == 'videos') {
 					$_POST['img'] = getPortada($_POST['rutaVideo'], $dir);
 					
 					// Crear el video en la base de datos:
-					createVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['orden'], $_POST['ocultar']);
+					createVideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
 					
 					$_POST['IDvideo'] = getIDvideo($_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['rutaVideo'], 0);
 				}
@@ -215,7 +215,7 @@ if ($_POST['form'] == 'videos') {
 					$msgError = 'Datos actualizados correctamente';
 
 					// Actualizar el video en la base de datos:
-					updateVideo($_POST['IDvideo'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['orden'], $_POST['ocultar']);
+					updateVideo($_POST['IDvideo'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
 				}
 			}
 		}

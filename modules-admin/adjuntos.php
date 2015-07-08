@@ -26,8 +26,9 @@ $dir = '';
 if ($error == 'danger') {
 	$_POST['IDadjunto'] = '';
 	$_POST['nombreAdjunto'] = '';
-	$_POST['rutaAdjunto'] = '';
 	$_POST['descripcion'] = '';
+	$_POST['rutaAdjunto'] = '';
+	$_POST['fechaCaducidad'] = '';
 	$_POST['orden'] = '';
 	$_POST['ocultar'] = '';
 
@@ -46,6 +47,7 @@ if ($error == 'danger') {
 	$_POST['nombreAdjunto'] = $adjuntoData['nombre'];
 	$_POST['descripcion'] = $adjuntoData['descripcion'];
 	$_POST['rutaAdjunto'] = $adjuntoData['ruta'];
+	$_POST['fechaCaducidad'] = $adjuntoData['fechaCaducidad'];
 	$_POST['orden'] = $adjuntoData['orden'];
 	$_POST['ocultar'] = $adjuntoData['ocultar'];
 
@@ -78,6 +80,10 @@ $OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del archivo adjunto:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group input-group input-daterange">';
+		$OUT .= '<label for="fechaCaducidad">Fecha en la que dejar de mostrar el adjunto:</label>';
+		$OUT .= '<input type="text" class="form-control" name="fechaCaducidad" value="'.$_POST['fechaCaducidad'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		if (_ALLOWFILEUPLOAD == 1) {

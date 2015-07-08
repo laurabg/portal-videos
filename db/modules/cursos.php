@@ -13,22 +13,22 @@ function createCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar,
 	$SQL .= ($ruta != '')?',ruta':'';
 	$SQL .= ($ubicacion != '')?',ubicacion':'';
 	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ',ocultar';
 	$SQL .= ($IDcursoMoodle != '')?',IDcursoMoodle':'';
-	$SQL .= ($fechaIni != '')?',fechaIni':'';
-	$SQL .= ($fechaFin != '')?',fechaFin':'';
-	$SQL .= ($publico != '')?',publico':'';
+	$SQL .= ',fechaIni';
+	$SQL .= ',fechaFin';
+	$SQL .= ',publico';
 	$SQL .= ') VALUES (';
 	$SQL .= '"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
 	$SQL .= ($ubicacion != '')?','.$ubicacion:'';
 	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ($ocultar != '')?','.$ocultar:'';
+	$SQL .= ','.$ocultar;
 	$SQL .= ($IDcursoMoodle != '')?','.$IDcursoMoodle:'';
-	$SQL .= ($fechaIni != '')?',"'.$fechaIni.'"':'';
-	$SQL .= ($fechaFin != '')?',"'.$fechaFin.'"':'';
-	$SQL .= ($publico != '')?','.$publico:'';
+	$SQL .= ',"'.$fechaIni.'"';
+	$SQL .= ',"'.$fechaFin.'"';
+	$SQL .= ','.$publico;
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -52,13 +52,13 @@ function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden,
 	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
 	$SQL .= ($ubicacion != '')?', ubicacion = '.$ubicacion:'';
 	$SQL .= ($orden != '')?', orden = '.$orden:'';
-	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ($IDcursoMoodle != '')?', IDcursoMoodle = '.$IDcursoMoodle:'';
-	$SQL .= ($fechaIni != '')?', fechaIni = "'.$fechaIni.'"':'';
-	$SQL .= ($fechaFin != '')?', fechaFin = "'.$fechaFin.'"':'';
-	$SQL .= ($publico != '')?', publico = '.$publico:'';
+	$SQL .= ', fechaIni = "'.$fechaIni.'"';
+	$SQL .= ', fechaFin = "'.$fechaFin.'"';
+	$SQL .= ', publico = '.$publico;
 	$SQL .= ' WHERE ID = '.decrypt($IDcurso);
-
+	
 	$db->exec($SQL);
 }
 

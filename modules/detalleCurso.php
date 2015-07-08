@@ -71,33 +71,61 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 	$OUT .= '</div>';
 	
 	$OUT .= '<div class="container listado-paginado">';
-		$totalCursos = $db->querySingle('SELECT COUNT(*) FROM temas WHERE IDcurso = '.decrypt($cursoData['IDcurso']).' AND ID IN (SELECT IDtema FROM videos)');
+		$SQLCount = 'SELECT COUNT(*) FROM temas WHERE';
+		$SQLCount .= ' ocultar = 0';
+		$SQLCount .= ' AND IDcurso = '.decrypt($cursoData['IDcurso']);
+		$SQLCount .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))';
+	
+		$totalCursos = $db->querySingle($SQLCount);
 
-		$res = $db->query('SELECT * FROM temas WHERE IDcurso = '.decrypt($cursoData['IDcurso']).' AND ID IN (SELECT IDtema FROM videos)'.( (isset($_GET['last'])) ? ' AND orden < '.$_GET['last'] : '' ).' ORDER BY orden DESC, nombre LIMIT '.$totalPorPag);
+		$SQL = 'SELECT * FROM temas WHERE';
+		$SQL .= ' ocultar = 0';
+		$SQL .= ' AND IDcurso = '.decrypt($cursoData['IDcurso']);
+		$SQL .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))';
+		$SQL .= ( (isset($_GET['last'])) ? ' AND orden < '.$_GET['last'] : '' );
+		$SQL .= ' ORDER BY orden DESC, nombre LIMIT '.$totalPorPag;
+
+		$res = $db->query($SQL);
 		while ($row = $res->fetchArray()) {
 			$OUT .= '<div class="panel panel-primary">';
 				$OUT .= '<div class="panel-heading">'.$row['nombre'].'</div>';
 				$OUT .= '<div class="panel-body">';
 				// Listar videos de cada tema:
-				$resVideo = $db->query('SELECT * FROM videos WHERE IDtema = '.$row['ID'].' AND IDcurso = '.decrypt($cursoData['IDcurso']).' ORDER BY orden DESC, nombre');
+				$resVideo = $db->query('SELECT * FROM videos WHERE ocultar = 0 AND IDtema = '.$row['ID'].' AND IDcurso = '.decrypt($cursoData['IDcurso']).' ORDER BY orden DESC, nombre');
 				while ($rowVideo = $resVideo->fetchArray()) {
-					if ( ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 1) )||(!isset($_COOKIE['listMode'])) ) {
-						$OUT .= '<div class="col-sm-6 col-md-3 video-col">';
-							$OUT .= '<a class="ver-video" href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">';
-								$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$row['ruta'].'/img/'.$rowVideo['img'].'" />';
-								$OUT .= '<span>'.$rowVideo['nombre'].'</span>';
-							$OUT .= '</a>';
-						$OUT .= '</div>';
-					} else if ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 2) ) {
-						$OUT .= '<div class="row"><div class="col-md-3">';
-							$OUT .= '<a class="ver-video" href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">';
-								$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$row['ruta'].'/img/'.$rowVideo['img'].'" />';
-							$OUT .= '</a>';
-						$OUT .= '</div>';
-						$OUT .= '<div class="col-md-9 caption">';
-							$OUT .= '<a href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">'.$rowVideo['nombre'].'</a>';
-							$OUT .= '<p>'.$rowVideo['descripcion'].'</p>';
-						$OUT .= '</div></div>';
+					$mostrar = 1;
+
+					// Comprobar que el video, si tiene fecha de caducidad, se encuentre en fechas validas:
+					if ($rowVideo['fechaCaducidad'] != '') {
+						$mostrar = 0;
+
+						$date1 = new DateTime();
+						$date2 = new DateTime($rowVideo['fechaCaducidad']);
+
+						if ($date1 <= $date2) {
+							$mostrar = 1;
+						}
+					}
+
+					if ($mostrar == 1) {
+						if ( ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 1) )||(!isset($_COOKIE['listMode'])) ) {
+							$OUT .= '<div class="col-sm-6 col-md-3 video-col">';
+								$OUT .= '<a class="ver-video" href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">';
+									$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$row['ruta'].'/img/'.$rowVideo['img'].'" />';
+									$OUT .= '<span>'.$rowVideo['nombre'].'</span>';
+								$OUT .= '</a>';
+							$OUT .= '</div>';
+						} else if ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 2) ) {
+							$OUT .= '<div class="row"><div class="col-md-3">';
+								$OUT .= '<a class="ver-video" href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">';
+									$OUT .= '<img src="'._PORTALROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$row['ruta'].'/img/'.$rowVideo['img'].'" />';
+								$OUT .= '</a>';
+							$OUT .= '</div>';
+							$OUT .= '<div class="col-md-9 caption">';
+								$OUT .= '<a href="?IDcurso='.urlencode($cursoData['IDcurso']).'&IDtema='.urlencode($row['IDencriptado']).'&IDvideo='.urlencode($rowVideo['IDencriptado']).'">'.$rowVideo['nombre'].'</a>';
+								$OUT .= '<p>'.$rowVideo['descripcion'].'</p>';
+							$OUT .= '</div></div>';
+						}
 					}
 				}
 				$OUT .= '</div>';

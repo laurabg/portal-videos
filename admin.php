@@ -85,6 +85,7 @@ include_once('config.php');
 				include_once(_DOCUMENTROOT.'modules/pedirEmail.php');
 			}
 		?>
+		<div class="modal fade" id="duplicarContenido" tabindex="-1" role="dialog" ></div>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->

@@ -11,13 +11,13 @@ function createUsuario($fullname, $email, $bloqueado, $username, $esAdmin) {
 	$SQL .= ($email != '')?',email':'';
 	$SQL .= ($bloqueado != '')?',bloqueado':'';
 	$SQL .= ($username != '')?',username':'';
-	$SQL .= ($esAdmin != '')?',esAdmin':'';
+	$SQL .= ',esAdmin';
 	$SQL .= ') VALUES (';
 	$SQL .= '"'.$fullname.'"';
 	$SQL .= ($email != '')?',"'.$email.'"':'';
 	$SQL .= ($bloqueado != '')?','.$bloqueado:'';
 	$SQL .= ($username != '')?',"'.$username.'"':'';
-	$SQL .= ($esAdmin != '')?','.$esAdmin:'';
+	$SQL .= ','.$esAdmin;
 	$SQL .= ')';
 	
 	$db->exec($SQL);

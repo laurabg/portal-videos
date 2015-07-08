@@ -116,6 +116,7 @@ function crearTablas() {
 		descripcion TEXT, 
 		ruta TEXT, 
 		img TEXT, 
+		fechaCaducidad DATE,
 		orden INTEGER,
 		ocultar INTEGER);'
 	);
@@ -127,6 +128,7 @@ function crearTablas() {
 		nombre TEXT, 
 		descripcion TEXT, 
 		ruta TEXT, 
+		fechaCaducidad DATE,
 		orden INTEGER,
 		ocultar INTEGER);'
 	);
@@ -172,6 +174,10 @@ function crearTablasConfig() {
 	createAdminvar('_ENCRIPTAR', 0);
 	createAdminvar('_EKEY', '4243bcdce4ffdb41b613');
 	createAdminvar('_AKEY', 'ef515dff755448e12100');
+	createAdminvar('cronProgramado', 0);
+	createAdminvar('cronTime', '00:00');
+	createAdminvar('cronRepeat', 'daily');
+	createAdminvar('cronConfig', '');
 
 	$dbConfig->exec('CREATE TABLE ubicaciones (
 		ID INTEGER PRIMARY KEY, 

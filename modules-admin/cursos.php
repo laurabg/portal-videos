@@ -77,7 +77,7 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cu
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="ubicacion">* Seleccione una ubicaci&oacute;n:</label>';
-		$OUT .= '<select class="form-control" name="ubicacion" id="ubicacion" >';
+		$OUT .= '<select required class="form-control" name="ubicacion" id="ubicacion" >';
 			$OUT .= '<option value="">Seleccione una ubicaci&oacute;n </option>';
 			if (sizeof($listaDirs) > 0) {
 				foreach ($listaDirs as $ub) {

@@ -1,3 +1,18 @@
+$(window).load(function() {
+	if ($('.nav-sidebar').length > 0) {
+		loadMenu();
+	}
+	loadAjaxForm();
+	loadLoginForm();
+
+	if (getCookie('MoodleUserFaltaCorreo') != '') {
+		$('#pedirEmail').modal({
+			show: true,
+			backdrop: 'static'
+		});
+	}
+});
+
 function loadMenu() {
 	$('.nav-sidebar a').click(function() {
 		$('.nav-sidebar li').removeClass('active');
@@ -21,6 +36,46 @@ function loadMenu() {
 
 		$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
 		setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
+
+		return false;
+	});
+	
+	$('a.dup').unbind().click(function() {
+		$('#duplicarContenido').html('').load('modules-admin/duplicar.php?'+$(this).attr('href').split('?')[1], function() {
+			// Cargar funcionalidad ajax para todos los formularios:
+			$('form[name="duplicarContenido"]').unbind().ajaxForm({
+				target: 		'#duplicarContenido .form-error',
+				beforeSubmit: 	function(formData, jqForm, options) { 
+					$('#duplicarContenido').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+					$('#duplicarContenido').find('form').hide();
+					return true;
+				},
+				success: 		function(responseText, statusText, xhr, $form)  { 
+					if (responseText.indexOf('?opt=') != -1) {
+						$('#duplicarContenido').modal('hide');
+						template = getUrlParameter('opt', responseText);
+						url = 'modules-admin/'+template+'.php'+responseText;
+						
+						console.log(url);
+						console.log('modules-admin/menu.php'+responseText);
+						$('.sidebar').html('').load('modules-admin/menu.php'+responseText, function() {
+							loadMenu();
+						});
+						$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+						setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
+					} else if (responseText == '') {
+						$('#duplicarContenido').modal('hide');
+					} else {
+						$('#duplicarContenido').find('.form-error').show();
+						$('#loading-content').detach();
+						$('#duplicarContenido').find('form').show();
+					}
+				}
+			});
+			$('#duplicarContenido').modal({
+				show: true
+			});
+		});
 
 		return false;
 	});
@@ -336,19 +391,3 @@ function getCookie(cname) {
 	}
 	return "";
 }
-
-
-$(window).load(function() {
-	if ($('.nav-sidebar').length > 0) {
-		loadMenu();
-	}
-	loadAjaxForm();
-	loadLoginForm();
-
-	if (getCookie('MoodleUserFaltaCorreo') != '') {
-		$('#pedirEmail').modal({
-			show: true,
-			backdrop: 'static'
-		});
-	}
-});

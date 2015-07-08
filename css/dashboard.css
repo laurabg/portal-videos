@@ -26,17 +26,38 @@ body {
 	padding-top: 50px;
 }
 
-header form .form-error {
+.input-group {
+	width: 100%;
+}
+
+.form-group.input-group * {
+	text-align: left;
+}
+
+.file-caption-name {
+	max-height: 24px;
+}
+
+.kv-fileinput-caption {
+	padding-top: 0px;
+}
+
+form .form-error {
 	display: none;
 	float: left;
 	margin-right: 10px;
 }
 
-header form .form-error-show {
+#duplicarContenido .modal-dialog .form-error {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+form .form-error-show {
 	display: block;
 }
 
-header form .form-group span {
+form .form-group span {
 	color: #999;
 	padding: 5px;
 }

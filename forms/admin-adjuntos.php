@@ -83,7 +83,7 @@ if ($_POST['form'] == 'adjuntos') {
 					$msgError = 'Datos guardados correctamente';
 
 					// Crear el adjunto en la base de datos:
-					createAdjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['orden'], $_POST['ocultar']);
+					createAdjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
 					
 					$_POST['IDadjunto'] = getIDadjunto($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['rutaAdjunto'], 0);
 				}
@@ -138,7 +138,7 @@ if ($_POST['form'] == 'adjuntos') {
 					$msgError = 'Datos actualizados correctamente';
 
 					// Actualizar el adjunto en la base de datos:
-					updateAdjunto($_POST['IDadjunto'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['orden'], $_POST['ocultar']);
+					updateAdjunto($_POST['IDadjunto'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
 				}
 			}
 		}

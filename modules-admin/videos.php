@@ -26,6 +26,7 @@ if ($error == 'danger') {
 	$_POST['rutaVideo'] = '';
 	$_POST['descripcion'] = '';
 	$_POST['img'] = '';
+	$_POST['fechaCaducidad'] = '';
 	$_POST['orden'] = '';
 	$_POST['ocultar'] = '';
 
@@ -44,6 +45,7 @@ if ($error == 'danger') {
 	$_POST['descripcion'] = $videoData['descripcion'];
 	$_POST['rutaVideo'] = $videoData['ruta'];
 	$_POST['img'] = $videoData['img'];
+	$_POST['fechaCaducidad'] = $videoData['fechaCaducidad'];
 	$_POST['orden'] = $videoData['orden'];
 	$_POST['ocultar'] = $videoData['ocultar'];
 
@@ -76,6 +78,10 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del vídeo:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group input-group input-daterange">';
+		$OUT .= '<label for="fechaCaducidad">Fecha en la que dejar de mostrar el v&iacute;deo:</label>';
+		$OUT .= '<input type="text" class="form-control" name="fechaCaducidad" value="'.$_POST['fechaCaducidad'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
 		if (_ALLOWVIDEOUPLOAD == 1) {

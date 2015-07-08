@@ -115,4 +115,67 @@ function removeFile($rutaFile) {
 	return preg_replace('/[^A-Za-z0-9\-\.]/', '', $string); // Removes special chars.
 }
 
+
+/*
+ createOrRenameCursoDir: Crea o renombra las carpetas correspondientes para el curso
+ Parámetros:
+	ubicacion				Ubicacion del curso
+	rutaCurso				Carpeta del curso
+	rutaCursoORI 			Carpeta del curso original
+ */
+function createOrRenameCursoDir($ubicacion, $rutaCurso, $rutaCursoORI) {
+	// Obtener la ubicacion del curso:
+	if (is_int(array_search($ubicacion, array_column($listaDirs, 'ID')))) {
+		$dir = $listaDirs[array_search($ubicacion, array_column($listaDirs, 'ID'))]['ruta'];
+		$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+	}
+
+	// Si existe el curso original, renombrarlo:
+	if ($rutaCursoORI != '') {
+		if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCursoORI)) {
+			rename(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCursoORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso);
+		}
+	}
+
+	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso)) {
+		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso);
+	}
+}
+
+/*
+ createOrRenameTemaDir: Crea o renombra las carpetas correspondientes para el tema
+ Parámetros:
+	ubicacion				Ubicacion del curso
+	rutaCurso				Carpeta del curso
+	rutaTema 				Carpeta del tema
+	rutaTemaORI 			Carpeta del tema original
+ */
+function createOrRenameTemaDir($ubicacion, $rutaCurso, $rutaTema, $rutaTemaORI) {
+	// Obtener la ubicacion del curso:
+	if (is_int(array_search($ubicacion, array_column($listaDirs, 'ID')))) {
+		$dir = $listaDirs[array_search($ubicacion, array_column($listaDirs, 'ID'))]['ruta'];
+		$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+	}
+	
+	// Si existe el tema original, renombrarlo:
+	if ($rutaTemaORI != '') {
+		if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTemaORI)) {
+			rename(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTemaORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema);
+		}
+	}
+
+	// Crear la carpeta del tema, y la de "docs" e "img":
+	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema)) {
+		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema);
+	}
+
+	// Comprobar si existen las siguientes carpetas; sino crearlas:
+	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img')) {
+		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img');
+	}
+	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs')) {
+		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs');
+	}
+}
+
 ?>

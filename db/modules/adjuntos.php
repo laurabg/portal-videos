@@ -3,7 +3,7 @@
 /*
  createAdjunto: Crea un adjunto a un video con los parámetros que se facilitan
  */
-function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $orden, $ocultar) {
+function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $fechaCaducidad, $orden, $ocultar) {
 	global $db;
 
 	$SQL = 'INSERT INTO videosAdjuntos (';
@@ -13,8 +13,9 @@ function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta
 	$SQL .= ',nombre';
 	$SQL .= ($descripcion != '')?',descripcion':'';
 	$SQL .= ($ruta != '')?',ruta':'';
+	$SQL .= ',fechaCaducidad';
 	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ',ocultar';
 	$SQL .= ') VALUES (';
 	$SQL .= decrypt($IDcurso);
 	$SQL .= ','.decrypt($IDtema);
@@ -22,8 +23,9 @@ function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta
 	$SQL .= ',"'.$nombre.'"';
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
+	$SQL .= ',"'.$fechaCaducidad.'"';
 	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ($ocultar != '')?','.$ocultar:'';
+	$SQL .= ','.$ocultar;
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -32,7 +34,7 @@ function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta
 /*
  updateAdjunto: Actualiza un adjunto existente
  */
-function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $orden, $ocultar) {
+function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $fechaCaducidad, $orden, $ocultar) {
 	global $db;
 
 	$SQL = 'UPDATE videosAdjuntos SET ';
@@ -40,10 +42,11 @@ function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descri
 	$SQL .= ', IDtema = '.decrypt($IDtema);
 	$SQL .= ', IDvideo = '.decrypt($IDvideo);
 	$SQL .= ', nombre = "'.$nombre.'"';
-	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
+	$SQL .= ', descripcion = "'.$descripcion.'"';
 	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ', fechaCaducidad = "'.$fechaCaducidad.'"';
 	$SQL .= ($orden != '')?', orden = '.$orden:'';
-	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ' WHERE ID = '.$IDadjunto;
 	
 	$db->exec($SQL);
@@ -76,7 +79,7 @@ function getIDadjunto($IDcurso, $IDtema, $IDvideo, $nombre, $ruta, $crearAdjunto
 	if ( ($crearAdjunto == 1)&&(checkAdjunto('WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo)) == 0) ) {
 		$orden = getNextOrdenAdjunto($IDcurso, $IDtema, $IDvideo);
 
-		createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $nombre, $ruta, $orden, _OCULTO);
+		createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $nombre, $ruta, '', $orden, _OCULTO);
 	}
 
 	return $db->querySingle('SELECT ID FROM videosAdjuntos WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo));
@@ -114,6 +117,7 @@ function getAllAdjuntos($IDcurso, $IDtema, $IDvideo) {
 			'nombre' => $row['nombre'],
 			'descripcion' => $row['descripcion'],
 			'ruta' => $row['ruta'],
+			'fechaCaducidad' => $row['fechaCaducidad'],
 			'orden' => $row['orden'],
 			'ocultar' => $row['ocultar']
 		));
@@ -140,6 +144,7 @@ function getAdjuntoData($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
 			'nombre' => $row['nombre'],
 			'descripcion' => $row['descripcion'],
 			'ruta' => $row['ruta'],
+			'fechaCaducidad' => $row['fechaCaducidad'],
 			'orden' => $row['orden'],
 			'ocultar' => $row['ocultar']
 		);

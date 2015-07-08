@@ -25,6 +25,10 @@ $_POST['_ALLOWVIDEOUPLOAD'] = $configData['_ALLOWVIDEOUPLOAD'];
 $_POST['_ENCRIPTAR'] = $configData['_ENCRIPTAR'];
 $_POST['_EKEY'] = $configData['_EKEY'];
 $_POST['_AKEY'] = $configData['_AKEY'];
+$_POST['cronProgramado'] = $configData['cronProgramado'];
+$_POST['cronTime'] = $configData['cronTime'];
+$_POST['cronRepeat'] = $configData['cronRepeat'];
+$_POST['cronConfig'] = $configData['cronConfig'];
 
 $OUT = '';
 
@@ -136,12 +140,24 @@ $OUT .= '<form name="config" role="form" method="POST" action="'._PORTALROOT.'mo
 		$OUT .= '> Encriptar los identificadores</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="_WSTOKEN">Token para servicio web de Moodle:</label>';
+		$OUT .= '<input type="text" name="_WSTOKEN" class="form-control" id="_WSTOKEN" placeholder="Token para servicio web de Moodle" value="'.$_POST['_WSTOKEN'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="_EKEY">Clave de encriptaci&oacute;n:</label>';
 		$OUT .= '<input type="text" name="_EKEY" class="form-control" id="_EKEY" placeholder="Clave de encriptaci&oacute;n" value="'.$_POST['_EKEY'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="_AKEY">Clave de autenticaci&oacute;n:</label>';
-		$OUT .= '<input type="text" name="_AKEY" class="form-control" id="_AKEY" placeholder="Clave de autenticaci&oacute;n" value="'.$_POST['_AKEY'].'" />';
+		$OUT .= '<label for="cronTime">Hora a la que ejecutar el robot:</label> <em>Este valor solo se actualizar&aacute; cuando se pulse el bot&oacute;n "Programar Robot" o "Reprogramar Robot"</em>';
+		$OUT .= '<input type="text" name="cronTime" class="form-control" id="cronTime" placeholder="Hora a la que ejecutar el robot" value="'.$_POST['cronTime'].'" />';
+	$OUT .= '</div>';
+	$OUT .= '<div class="form-group">';
+		$OUT .= '<label for="cronRepeat">Ejecutar el robot cada:</label> <em>Este valor solo se actualizar&aacute; cuando se pulse el bot&oacute;n "Programar Robot" o "Reprogramar Robot"</em>';
+		$OUT .= '<select class="form-control" name="cronRepeat">';
+			$OUT .= '<option value="daily"'.( $_POST['cronRepeat']=='daily' ? ' selected' : '' ).'>Diariamente</option>';
+			$OUT .= '<option value="every-minute"'.( $_POST['cronRepeat']=='every-minute' ? ' selected' : '' ).'>Cada X minutos</option>';
+		$OUT .= '</select>';
+	//	$OUT .= '<input type="text" name="cronRepeat" class="form-control" id="cronRepeat" placeholder="Ejecutar el robot cada" value="'.$_POST['cronRepeat'].'" />';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group ubicaciones">';
 		$OUT .= '<label for="ubicaciones">Listado de ubicaciones: </label>';
@@ -175,9 +191,17 @@ $OUT .= '<form name="config" role="form" method="POST" action="'._PORTALROOT.'mo
 		$OUT .= '</div>';
 		$OUT .= '<button type="button" class="add-ext btn btn-success">Añadir una extensi&oacute;n</button>';
 	$OUT .= '</div>';
-	$OUT .= '<button type="submit" value="save" class="btn btn-default">Guardar</button>';
+	$OUT .= '<button type="submit"name="action"  value="save" class="btn btn-default">Guardar</button>';
 	$OUT .= '<button type="button" value="cancel" class="btn btn-default btn-cancel">Cancelar</button>';
+	$OUT .= '<button type="submit" name="action" value="ejecutar-robot" class="btn btn-primary">Ejecutar Robot</button>';
+	if ($_POST['cronProgramado'] == 0) {
+		$OUT .= '<button type="submit" name="action" value="programar-robot" class="btn btn-success">Programar Robot</button>';
+	} else {
+		$OUT .= '<button type="submit" name="action" value="programar-robot" class="btn btn-success">Reprogramar Robot</button>';
+		$OUT .= '<button type="submit" name="action" value="desprogramar-robot" class="btn btn-warning">Desprogramar Robot</button>';
+	}
 	$OUT .= '<input type="hidden" value="config" name="form" />';
+	$OUT .= '<input type="hidden" value="'.$_POST['cronConfig'].'" name="cronConfig" />';
 	$OUT .= '<input type="hidden" value="'.( $_POST['_ENCRIPTAR']==1 ? 'on' : '' ).'" name="_ENCRIPTARORI" />';
 $OUT .= '</form>';
 

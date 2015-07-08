@@ -63,8 +63,17 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 				$OUT .= '<div class="panel panel-primary listado-videos">';
 					$OUT .= '<div class="panel-heading">'.$temaData['nombre'].'</div>';
 					$OUT .= '<div class="panel-body">';
+
+					$SQL = 'SELECT * FROM videos WHERE';
+					$SQL .= ' IDcurso = '.decrypt($cursoData['IDcurso']);
+					$SQL .= ' AND IDtema = '.decrypt($temaData['IDtema']);
+					$SQL .= ' AND ID != '.decrypt($videoData['IDvideo']);
+					$SQL .= ' AND ocultar = 0';
+					$SQL .= ' AND( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") )';
+					$SQL .= ' ORDER BY orden DESC, nombre LIMIT 5';
+
 					// Listado del resto de vídeos del tema:
-					$res = $db->query('SELECT * FROM videos WHERE IDcurso = '.decrypt($cursoData['IDcurso']).' AND IDtema = '.decrypt($temaData['IDtema']).' AND ID != '.decrypt($videoData['IDvideo']).' ORDER BY orden DESC, nombre LIMIT 5');
+					$res = $db->query($SQL);
 					while ($row = $res->fetchArray()) {
 						if ( ( (isset($_COOKIE['listMode']))&&($_COOKIE['listMode'] == 1) )||(!isset($_COOKIE['listMode'])) ) {
 							$OUT .= '<div class="item">';
@@ -97,25 +106,56 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 				// Detalle del vídeo seleccionado:
 				$OUT .= '<h2>'.$videoData['nombre'].'</h2>';
 				$OUT .= '<div class="video">';
-					$OUT .= '<div class="flowplayer margin-bottom" data-swf="js/flowplayer-5.4.4/flowplayer.swf">';
-						$OUT .= '<video controls preload="auto" width="100%" poster="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$videoData['img'].'">';
-							$OUT .= '<source src="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" type="video/mp4" />';
-						$OUT .= '</video>';
-					$OUT .= '</div>';
-					$OUT .= '<p>'.$videoData['descripcion'].'</p>';
-					$OUT .= '<p>Descargas</p>';
-					$OUT .= '<ul class="list-group">';
-						foreach ($videoData['adjuntos'] as $adjunto) {
-							$OUT .= '<li class="list-group-item">';
-								$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], $adjunto['IDadjunto']).'</span> ';
-								$OUT .= '<a class="descargarArchivo" rel="'.$adjunto['IDadjunto'].'" href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'].'" target="_blank">'.$adjunto['nombre'].'</a>';
-							$OUT .= '</li>';
+					$mostrar = 1;
+					if ($videoData['fechaCaducidad'] != '') {
+						$date1 = new DateTime();
+						$date2 = new DateTime($videoData['fechaCaducidad']);
+
+						if ($date2 <= $date1) {
+							$OUT .= '<p>Este v&iacute;deo ya no est&aacute; disponible.</p>';
+
+							$mostrar = 0;
 						}
-						$OUT .= '<li class="list-group-item">';
-							$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], 0).'</span> ';
-							$OUT .= '<a class="descargarArchivo" download href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" target="_blank">Descargar v&iacute;deo</a>';
-						$OUT .= '</li>';
-					$OUT .= '</ul>';
+					}
+
+					if ($mostrar == 1) {
+						$OUT .= '<div class="flowplayer margin-bottom" data-swf="js/flowplayer-5.4.4/flowplayer.swf">';
+							$OUT .= '<video controls preload="auto" width="100%" poster="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$videoData['img'].'">';
+								$OUT .= '<source src="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" type="video/mp4" />';
+							$OUT .= '</video>';
+						$OUT .= '</div>';
+						$OUT .= '<p>'.$videoData['descripcion'].'</p>';
+						$OUT .= '<p>Descargas</p>';
+						$OUT .= '<ul class="list-group">';
+							foreach ($videoData['adjuntos'] as $adjunto) {
+								$mostrar = 1;
+								if ($adjunto['ocultar'] == 1) {
+									$mostrar = 0;
+								}
+								if ($adjunto['fechaCaducidad'] != '') {
+									$date1 = new DateTime();
+									$date2 = new DateTime($adjunto['fechaCaducidad']);
+
+									if ($date2 <= $date1) {
+										$mostrar = 0;
+									}
+								}
+								if ($mostrar == 1) {
+									$OUT .= '<li class="list-group-item">';
+										$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], $adjunto['IDadjunto']).'</span> ';
+										$OUT .= '<a class="descargarArchivo" rel="'.$adjunto['IDadjunto'].'" href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'].'" target="_blank">'.$adjunto['nombre'].'</a>';
+										if ($adjunto['descripcion'] != '') {
+											$OUT .= '<p class="adjunto-desc">'.$adjunto['descripcion'].'</p>';
+										}
+									$OUT .= '</li>';
+								}
+							}
+							$OUT .= '<li class="list-group-item">';
+								$OUT .= '<span class="glyphicon glyphicon-download-alt"></span><span class="badge">'.getTotalDescargas($cursoData['IDcurso'], $temaData['IDtema'], $videoData['IDvideo'], 0).'</span> ';
+								$OUT .= '<a class="descargarArchivo" download href="'._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$videoData['ruta'].'" target="_blank">Descargar v&iacute;deo</a>';
+							$OUT .= '</li>';
+						$OUT .= '</ul>';
+					}
 				$OUT .= '</div>';
 			$OUT .= '</div>';
 

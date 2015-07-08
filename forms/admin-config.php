@@ -11,7 +11,7 @@ $error = '';
 //foreach ($_POST as $key => $value)
 //	print "Field ".$key." is ".$value."<br>";
 
-if ($_POST['form'] == 'config') {
+if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'save') ) {
 	$msgError = 'Datos guardados correctamente.';
 	$error = 'success';
 
@@ -74,6 +74,8 @@ if ($_POST['form'] == 'config') {
 	updateAdminvar('_WSTOKEN', $_POST['_WSTOKEN']);
 	updateAdminvar('_EKEY', $_POST['_EKEY']);
 	updateAdminvar('_AKEY', $_POST['_AKEY']);
+	updateAdminvar('cronTime', $_POST['cronTime']);
+	updateAdminvar('cronRepeat', $_POST['cronRepeat']);
 
 	if ($_POST['_MOODLEURL'] == '') {
 		$msgError .= ' Ha borrado la URL de Moodle. Ahora no se podr&aacute; acceder a los servicios web.';
@@ -177,6 +179,84 @@ if ($_POST['form'] == 'config') {
 			}
 		}
 	}
+
+} else if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'ejecutar-robot') ) {
+	$msgError = 'Robot ejecutado';
+	$error = 'success';
+
+	include_once(_DOCUMENTROOT.'robot/index.php');
+
+} else if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'programar-robot') ) {
+	updateAdminvar('cronProgramado', 1);
+	updateAdminvar('cronTime', $_POST['cronTime']);
+	updateAdminvar('cronRepeat', $_POST['cronRepeat']);
+	
+	$cronConfig = '';
+
+	if ($_POST['cronRepeat'] == 'daily') {
+		$pos = strrpos($_POST['cronTime'], ':');
+		if ($pos === false) { // nota: tres signos de igual
+			$msgError = 'Para la programaci&oacute;n diaria, el valor de tiempo debe ser una hora. Ejemplo: 10:00.';
+			$error = 'warning';
+		} else {
+			list($hora, $min) = split(':', $_POST['cronTime']);
+
+			$cronConfig = $min.' '.$hora.' * * * wget http://'.$_SERVER['SERVER_NAME']._PORTALROOT.'robot/index.php';
+
+			$msgError = 'Robot programado.';
+			$error = 'success';
+		}
+		
+	} else if ($_POST['cronRepeat'] == 'every-minute') {
+		$pos = strrpos($_POST['cronTime'], ':');
+		if ($pos === false) { // nota: tres signos de igual
+			$cronConfig = '*/'.$_POST['cronTime'].' * * * * wget http://'.$_SERVER['SERVER_NAME']._PORTALROOT.'robot/index.php';
+			
+			$msgError = 'Robot programado.';
+			$error = 'success';
+		} else {
+			$msgError = 'Para la programaci&oacute;n repetitiva, el valor de tiempo debe ser un n&uacute;mero entero.';
+			$error = 'warning';
+		}
+		
+	} else {
+		$msgError = 'Esta opci&oacute;n no est&aacute; implementada ('.$_POST['cronRepeat'].')';
+		$error = 'danger';
+	}
+	
+	if ($cronConfig != '') {
+		$output = shell_exec('crontab -l');
+		$cron_file = '/tmp/crontab.txt';
+		
+		if ($cronConfig != $_POST['cronConfig']) {
+			$output = str_replace($_POST['cronConfig'], '', $output);
+			file_put_contents($cron_file, $output.PHP_EOL);
+
+			updateAdminvar('cronConfig', $cronConfig);
+		}
+		
+		file_put_contents($cron_file, $output.$cronConfig.PHP_EOL);
+		exec("crontab $cron_file");
+	}
+	
+
+} else if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'desprogramar-robot') ) {
+	updateAdminvar('cronProgramado', 0);
+
+	// Quitar del cron el comando:
+	$output = shell_exec('crontab -l');
+	$cron_file = '/tmp/crontab.txt';
+	
+	$output = str_replace($_POST['cronConfig'], '', $output);
+	
+	file_put_contents($cron_file, $output.PHP_EOL);
+	exec("crontab $cron_file");
+	
+	// Actualizar el registro en la tabla:
+	updateAdminvar('cronConfig', '');
+		
+	$msgError = 'Robot desprogramado';
+	$error = 'success';
 }
 
 ?>

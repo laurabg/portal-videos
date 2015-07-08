@@ -9,15 +9,22 @@ global $db;
 $OUT = '';
 $found = 0;
 
-$SQL = 'SELECT * FROM cursos WHERE publico = 1';
+$SQL = 'SELECT * FROM cursos WHERE';
+$SQL .= ' (publico = 1'; // Mostrar los cursos publicos
 
+// O mostrar los cursos que tengan asociado uno de Moodle
 if ( (isset($_COOKIE['MoodleUserSession']))&&(decrypt($_COOKIE['MoodleUserSession'],1)['esAdmin'] == 1) ) {
 	$SQL .= ' OR (IDcursoMoodle IS NOT NULL AND IDcursoMoodle != "")';
 } else if ( (isset($_COOKIE['MoodleUserSession']))&&(!isset($_COOKIE['MoodleUserFaltaCorreo'])) ) {
 	$SQL .= ' OR IDcursoMoodle IN (SELECT IDcursoMoodle FROM cursosUsuarios WHERE IDusuario = '.decrypt($_COOKIE['MoodleUserSession'],1)['IDusuario'].')';
 }
+$SQL .= ')';
 
-$SQL .= ' ORDER BY orden, nombre';
+// Y el curso, si tiene fecha de inicio y fin, se encuentra en fechas
+$SQL .= ' AND ( (fechaIni != "" AND fechaFin != "" AND DATE("now") BETWEEN fechaIni AND fechaFin) OR (fechaIni = "" AND fechaFin = "") )';
+$SQL .= ' AND ocultar = 0'; // Y que no esten ocultos
+$SQL .= ' AND ID IN (SELECT IDcurso FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))'; // Y que tengan videos
+$SQL .= ' ORDER BY orden DESC, nombre'; // Ordenados por orden descendente y nombre
 
 $OUT .= '<div class="container">';
 	$OUT .= '<div class="row">';
@@ -40,8 +47,15 @@ $OUT .= '<div class="container">';
 					$OUT .= '<div class="panel-heading">Novedades en: <a href="?IDcurso='.urlencode($row['IDencriptado']).'"><b>'.$row['nombre'].'</b></a></div>';
 					$OUT .= '<div class="panel-body">';
 						$OUT .= '<div class="row">';
+							
+							$SQLVideos = 'SELECT a.IDencriptado AS IDvideo, a.nombre AS nombreVideo, a.img, a.descripcion AS descVideo, a.ruta AS rutaVideo, b.IDencriptado AS IDtema, b.nombre AS nombreTema, b.ruta AS rutaTema FROM videos a, temas b WHERE';
+							$SQLVideos .= ' a.ocultar = 0 AND b.ocultar = 0';
+							$SQLVideos .= ' AND ( (a.fechaCaducidad != "" AND DATE("now") < a.fechaCaducidad) OR (a.fechaCaducidad = "") )';
+							$SQLVideos .= ' AND a.IDtema = b.ID AND a.IDcurso = '.$row['ID'];
+							$SQLVideos .= ' ORDER BY b.orden DESC, b.nombre, a.orden DESC, a.nombre LIMIT 4';
+
 							// Listar videos del tema:
-							$resVideo = $db->query('SELECT a.IDencriptado AS IDvideo, a.nombre AS nombreVideo, a.img, a.descripcion AS descVideo, a.ruta AS rutaVideo, b.IDencriptado AS IDtema, b.nombre AS nombreTema, b.ruta AS rutaTema FROM videos a, temas b WHERE a.IDtema = b.ID AND a.IDcurso = '.$row['ID'].' ORDER BY b.orden DESC, b.nombre, a.orden DESC, a.nombre LIMIT 4');
+							$resVideo = $db->query($SQLVideos);
 							while ($rowVideo = $resVideo->fetchArray()) {
 								$OUT .= '<div class="col-sm-6 col-md-3">';
 									$OUT .= '<a class="ver-video" href="?IDcurso='.urlencode($row['IDencriptado']).'&IDtema='.urlencode($rowVideo['IDtema']).'&IDvideo='.urlencode($rowVideo['IDvideo']).'">';

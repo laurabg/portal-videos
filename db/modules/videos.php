@@ -3,7 +3,7 @@
 /*
  createVideo: Crea un video con los parámetros que se facilitan
  */
-function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $orden, $ocultar) {
+function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $fechaCaducidad, $orden, $ocultar) {
 	global $db;
 
 	$SQL = 'INSERT INTO videos (';
@@ -13,8 +13,9 @@ function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $ord
 	$SQL .= ($descripcion != '')?',descripcion':'';
 	$SQL .= ($ruta != '')?',ruta':'';
 	$SQL .= ($img != '')?',img':'';
+	$SQL .= ',fechaCaducidad';
 	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ($ocultar != '')?',ocultar':'';
+	$SQL .= ',ocultar';
 	$SQL .= ') VALUES ('; 
 	$SQL .= decrypt($IDcurso);
 	$SQL .= ','.decrypt($IDtema);
@@ -22,8 +23,9 @@ function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $ord
 	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
 	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
 	$SQL .= ($img != '')?',"'.$img.'"':'';
+	$SQL .= ',"'.$fechaCaducidad.'"';
 	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ($ocultar != '')?','.$ocultar:'';
+	$SQL .= ','.$ocultar;
 	$SQL .= ')';
 	
 	$db->exec($SQL);
@@ -38,18 +40,19 @@ function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $ord
 /*
  updateVideo: Actualiza un video existente
  */
-function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $orden, $ocultar) {
+function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $fechaCaducidad, $orden, $ocultar) {
 	global $db;
 
 	$SQL = 'UPDATE videos SET ';
 	$SQL .= 'IDcurso = '.decrypt($IDcurso);
 	$SQL .= ', IDtema = '.decrypt($IDtema);
 	$SQL .= ', nombre = "'.$nombre.'"';
-	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
+	$SQL .= ', descripcion = "'.$descripcion.'"';
 	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
 	$SQL .= ($img != '')?', img = "'.$img.'"':'';
+	$SQL .= ', fechaCaducidad = "'.$fechaCaducidad.'"';
 	$SQL .= ($orden != '')?', orden = '.$orden:'';
-	$SQL .= ($ocultar != '')?', ocultar = '.$ocultar:'';
+	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ' WHERE ID = '.decrypt($IDvideo);
 	
 	$db->exec($SQL);
@@ -91,7 +94,7 @@ function getIDvideo($IDcurso, $IDtema, $nombre, $ruta, $crearVideo) {
 	if ( ($crearVideo == 1)&&(checkVideo('nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema)) == 0) ) {
 		$orden = getNextOrdenVideo($IDcurso, $IDtema);
 
-		createVideo($IDcurso, $IDtema, $nombre, $nombre, $ruta, $img, $orden, _OCULTO);
+		createVideo($IDcurso, $IDtema, $nombre, $nombre, $ruta, $img, '', $orden, _OCULTO);
 	}
 
 	return $db->querySingle('SELECT IDencriptado FROM videos WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema));
@@ -130,6 +133,7 @@ function getVideoData($IDcurso, $IDtema, $IDvideo) {
 			'descripcion' => $row['descripcion'],
 			'ruta' => $row['ruta'],
 			'img' => $row['img'],
+			'fechaCaducidad' => $row['fechaCaducidad'],
 			'orden' => $row['orden'],
 			'ocultar' => $row['ocultar'],
 			'adjuntos' => $adjuntos

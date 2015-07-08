@@ -42,8 +42,8 @@ function listaItemsCursos() {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-				$OUT .= '<a class="dup" href="?opt=duplicar&IDcurso='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" title="Editar Curso" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+			//	$OUT .= '<a class="dup" title="Duplicar Curso" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsTemas($item[0]);
@@ -92,8 +92,8 @@ function listaItemsTemas($IDcurso) {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-				$OUT .= '<a class="dup" href="?opt=duplicar&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" title="Editar Tema" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+			//	$OUT .= '<a class="dup" title="Duplicar Tema" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsVideos($IDcurso, $item[0]);
@@ -142,8 +142,8 @@ function listaItemsVideos($IDcurso, $IDtema) {
 				$OUT .= '<span class="glyphicon glyphicon-folder-close"></span>';
 			//	$OUT .= '<span class="glyphicon glyphicon-facetime-video"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-				$OUT .= '<a class="dup" href="?opt=duplicar&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'&IDvideo='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" title="Editar V&iacute;deo" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($item[0]).'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+			//	$OUT .= '<a class="dup" title="Duplicar V&iacute;deo" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'&IDvideo='.urlencode($item[0]).'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 			$OUT .= '<ul class="submenu">';
 				$OUT .= listaItemsAdjuntos($IDcurso, $IDtema, $item[0]);
@@ -187,8 +187,8 @@ function listaItemsAdjuntos($IDcurso, $IDtema, $IDvideo) {
 			$OUT .= '<div class="item">';
 				$OUT .= '<span class="glyphicon glyphicon-file"></span>';
 				$OUT .= '<span class="txt" title="'.$item[1].'">'.$item[1].'</span>';
-				$OUT .= '<a class="edit" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
-				$OUT .= '<a class="dup" href="?opt=duplicar&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'&IDvideo='.urlencode($item[0]).'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
+				$OUT .= '<a class="edit" title="Editar Adjunto" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>';
+			//	$OUT .= '<a class="dup" title="Duplicar Adjunto" href="?opt='.$opt.'&IDcurso='.urlencode($item[0]).'&IDtema='.urlencode($item[0]).'&IDvideo='.urlencode($item[0]).'&IDadjunto='.$item[0].'"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}

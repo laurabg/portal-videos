@@ -102,6 +102,10 @@ a.ver-video:hover span.play-video {
 	color: #000;
 	border-color: #000;
 }
+
+p.adjunto-desc {
+	margin-top: 10px;
+}
 /*.row {
 	margin-bottom: 20px;
 }*/
