@@ -13,7 +13,6 @@ $dirORI = '';
 $dir = '';
 $msgError = '';
 $error = 'success';
-$configData = getConfigData();
 
 //foreach ($_POST as $key => $value)
 //	print "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
@@ -104,26 +103,7 @@ if ($_POST['form'] == 'cursos') {
 					$_POST['IDcurso'] = getIDcurso($_POST['nombreCurso'], $rutalimpia, $_POST['ubicacion'], 0);
 
 					if ($_POST['IDcursoMoodle'] != '') {
-						// Obtener los usuarios inscritos al curso:
-						$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
-						foreach ($usuariosEnCurso as $user) {
-							$insertar = 0;
-							$esAdmin = 0;
-
-							// Comprobar si el rol se puede importar:
-							foreach ($user->roles as $rol) {
-								if (checkMoodleRol('nombre = "'.$rol->shortname.'" AND importar = 1')) {
-									$insertar = 1;
-								}
-								// Comprobar si el rol es de admin:
-								if (is_int(array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre')))) {
-									$esAdmin = $configData['listaMoodleRoles'][array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre'))]['esAdmin'];
-								}
-							}
-							if ($insertar == 1) {
-								registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->fullname, $user->email, $esAdmin);
-							}
-						}
+						wsRegistrarUsuarios($_POST['IDcurso'], $_POST['IDcursoMoodle']);
 					}
 				}
 
@@ -175,27 +155,7 @@ if ($_POST['form'] == 'cursos') {
 					if ( ($_POST['IDcursoMoodle'] != '')&&($_POST['IDcursoMoodle'] != $_POST['IDcursoMoodleORI']) ) {
 						desregistrarUsuariosCurso($_POST['IDcurso']);
 						
-						// Obtener los usuarios inscritos al curso:
-						$usuariosEnCurso = connect('core_enrol_get_enrolled_users', array( 'courseid' => $_POST['IDcursoMoodle'] ));
-						
-						foreach ($usuariosEnCurso as $user) {
-							$insertar = 0;
-							$esAdmin = 0;
-
-							// Comprobar si el rol se puede importar:
-							foreach ($user->roles as $rol) {
-								if (checkMoodleRol('nombre = "'.$rol->shortname.'" AND importar = 1')) {
-									$insertar = 1;
-								}
-								// Comprobar si el rol es de admin:
-								if (is_int(array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre')))) {
-									$esAdmin = $configData['listaMoodleRoles'][array_search($rol->shortname, array_column($configData['listaMoodleRoles'], 'nombre'))]['esAdmin'];
-								}
-							}
-							if ($insertar == 1) {
-								registrarUsuarioCurso($_POST['IDcurso'], $_POST['IDcursoMoodle'], $user->fullname, $user->email, $esAdmin);
-							}
-						}
+						wsRegistrarUsuarios($_POST['IDcurso'], $_POST['IDcursoMoodle']);
 					}
 
 					// Actualizar el curso en la base de datos:

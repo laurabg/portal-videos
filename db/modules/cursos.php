@@ -7,30 +7,9 @@
 function createCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
 	global $db;
 
-	$SQL = 'INSERT INTO cursos (';
-	$SQL .= 'nombre';
-	$SQL .= ($descripcion != '')?',descripcion':'';
-	$SQL .= ($ruta != '')?',ruta':'';
-	$SQL .= ($ubicacion != '')?',ubicacion':'';
-	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ',ocultar';
-	$SQL .= ($IDcursoMoodle != '')?',IDcursoMoodle':'';
-	$SQL .= ',fechaIni';
-	$SQL .= ',fechaFin';
-	$SQL .= ',publico';
-	$SQL .= ') VALUES (';
-	$SQL .= '"'.$nombre.'"';
-	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
-	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
-	$SQL .= ($ubicacion != '')?','.$ubicacion:'';
-	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ','.$ocultar;
-	$SQL .= ($IDcursoMoodle != '')?','.$IDcursoMoodle:'';
-	$SQL .= ',"'.$fechaIni.'"';
-	$SQL .= ',"'.$fechaFin.'"';
-	$SQL .= ','.$publico;
-	$SQL .= ')';
-	
+	$SQL = 'INSERT INTO cursos (nombre, descripcion, ruta, ubicacion, orden, ocultar, IDcursoMoodle, fechaIni, fechaFin, publico) ';
+	$SQL .= 'VALUES ("'.$nombre.'", "'.$descripcion.'", "'.$ruta.'", '.$ubicacion.', '.$orden.', '.$ocultar.', '.( $IDcursoMoodle == "" ? 0 : $IDcursoMoodle ).', "'.$fechaIni.'", "'.$fechaFin.'", '.$publico.')';
+
 	$db->exec($SQL);
 
 	// Una vez creado el curso, obtener su ID y encriptarlo:
@@ -48,12 +27,12 @@ function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden,
 
 	$SQL = 'UPDATE cursos SET ';
 	$SQL .= 'nombre = "'.$nombre.'"';
-	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
-	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
-	$SQL .= ($ubicacion != '')?', ubicacion = '.$ubicacion:'';
-	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ', descripcion = "'.$descripcion.'"';
+	$SQL .= ', ruta = "'.$ruta.'"';
+	$SQL .= ', ubicacion = '.$ubicacion;
+	$SQL .= ', orden = '.$orden;
 	$SQL .= ', ocultar = '.$ocultar;
-	$SQL .= ($IDcursoMoodle != '')?', IDcursoMoodle = '.$IDcursoMoodle:'';
+	$SQL .= ', IDcursoMoodle = '.$IDcursoMoodle;
 	$SQL .= ', fechaIni = "'.$fechaIni.'"';
 	$SQL .= ', fechaFin = "'.$fechaFin.'"';
 	$SQL .= ', publico = '.$publico;
@@ -93,7 +72,7 @@ function getIDcurso($nombre, $ruta, $IDubicacion, $crearCurso) {
 	if ( ($crearCurso == 1)&&(checkCurso('ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion) == 0) ) {
 		$orden = getNextOrdenCurso();
 
-		createCurso($nombre, $nombre, $ruta, $IDubicacion, $orden, _OCULTO, '', '', '', 0);
+		createCurso($nombre, '', $ruta, $IDubicacion, $orden, _OCULTO, 0, '', '', 0);
 	}
 	
 	return $db->querySingle('SELECT IDencriptado FROM cursos WHERE ruta = "'.$ruta.'" AND ubicacion = '.$IDubicacion);

@@ -65,6 +65,7 @@ if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'save') ) {
 		encriptarCursos($encriptar);
 		encriptarTemas($encriptar);
 		encriptarVideos($encriptar);
+		encriptarCategorias($encriptar);
 	}
 
 	updateAdminvar('_DIRCURSOS', $_POST['_DIRCURSOS']);
@@ -72,8 +73,6 @@ if ( ($_POST['form'] == 'config')&&($_POST['action'] == 'save') ) {
 	updateAdminvar('_ADMINPASS', $_POST['_ADMINPASS']);
 	updateAdminvar('_MOODLEURL', $_POST['_MOODLEURL']);
 	updateAdminvar('_WSTOKEN', $_POST['_WSTOKEN']);
-	updateAdminvar('_EKEY', $_POST['_EKEY']);
-	updateAdminvar('_AKEY', $_POST['_AKEY']);
 	updateAdminvar('cronTime', $_POST['cronTime']);
 	updateAdminvar('cronRepeat', $_POST['cronRepeat']);
 

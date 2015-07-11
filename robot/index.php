@@ -1,5 +1,6 @@
 <?php
 
+include_once(_DOCUMENTROOT.'util/ws-connection.php');
 
 /*********************************************************************
  buscarCursos: Rastrea una ruta en busca de cursos
@@ -11,7 +12,7 @@ function buscarCursos($IDdir, $dir, &$listaCursosExistentes) {
 	
 	$IDcurso = 0;
 	$cont = 0;
-	$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
+	//$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
 	
 	if ($handle = opendir($dir)) {
 		while (false !== ($filename = readdir($handle))) {
@@ -30,6 +31,14 @@ function buscarCursos($IDdir, $dir, &$listaCursosExistentes) {
 					if ($IDcurso != '') {
 						array_push($listaCursosExistentes, $IDcurso);
 						
+						// Si el curso ya existia, y tiene curso de Moodle asociado, recargar usuarios:
+						if (checkCurso('ID = '.decrypt($IDcurso).' AND IDcursoMoodle != 0')) {
+							$cursoData = getCursoData($IDcurso);
+
+							desregistrarUsuariosCurso($IDcurso);
+							wsRegistrarUsuarios($IDcurso, $cursoData['IDcursoMoodle']);
+						}
+
 						// Buscar temas dentro del curso:
 						buscarTemas($IDcurso, $dir.$filenameNEW);
 					} else {
@@ -63,7 +72,7 @@ function buscarTemas($IDcurso, $dir) {
 
 	$IDtema = 0;
 	$cont = 0;
-	$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
+	//$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
 
 	if ($handle = opendir($dir)) {
 		while (false !== ($filename = readdir($handle))) {
@@ -125,7 +134,7 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 	global $extensionesValidas;
 
 	$cont = 0;
-	$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
+	//$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
 
 	if ($handle = opendir($dir)) {
 		while (false !== ($filename = readdir($handle))) {
@@ -148,6 +157,11 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 						logAction("Encontrado vídeo ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
 						$IDvideo = getIDvideo($IDcurso, $IDtema, $filename, $filenameNEW, 1);
 
+						// Buscar adjuntos cuyo nombre comience por el nombre del video:
+						if (is_dir($dir."/docs")) {
+							buscarAdjuntosByName($IDcurso, $IDtema, $IDvideo, str_replace(".".$extension, "", $filenameNEW), $dir."/docs");
+						}
+
 						$img = getPortada($filenameNEW, $dir);
 						logAction("Obtenida imagen ".$img." del video ".$filenameNEW);
 						
@@ -160,9 +174,55 @@ function buscarVideos($IDcurso, $IDtema, $dir) {
 				}
 			}
 		}
-
+		
 		if ($cont == 0) {
 			logAction($dir." no contiene vídeos");
+		}
+	} else {
+		logAction("Error al leer ".$dir);
+	}
+}
+
+
+
+/*********************************************************************
+ buscarAdjuntosByName: Rastrea la ruta docs de un tema en busca de adjuntos
+ Parámetros:
+	IDcurso				ID del curso
+	IDtema				ID del tema
+	IDvideo				ID del video
+	nombreVideo			Nombre del video, sin extension
+	dir					Ruta del adjunto
+ *********************************************************************/
+function buscarAdjuntosByName($IDcurso, $IDtema, $IDvideo, $nombreVideo, $dir) {
+	$cont = 0;
+	//$ubicacion = str_replace(_DOCUMENTROOT._DIRCURSOS, '', $dir);
+
+	if ($handle = opendir($dir)) {
+		while (false !== ($filename = readdir($handle))) {
+			if ($filename != "." && $filename != "..") {
+				// Si existe la carpeta de INBOX, leer su contenido:
+				if (is_dir($dir."/".$filename)) {
+					logAction($dir."/".$filename." no se procesará, ya que no es un archivo");
+				} else {
+					// Limpiar el nombre de la carpeta de caracteres extraños y espacios
+					$filenameNEW = clean($filename);
+					rename($dir."/".$filename, $dir."/".$filenameNEW);
+					
+					// Si el nombre del adjunto comienza por el nombre del video:
+					if ( is_int(strpos($filenameNEW, $nombreVideo))&&(strpos($filenameNEW, $nombreVideo) == 0) ) {
+						// Guardar el adjunto:
+						logAction("Encontrado adjunto ".$dir."/".$filename.". Renombrado a ".$filenameNEW);
+						$IDadjunto = getIDadjunto($IDcurso, $IDtema, $IDvideo, $filename, $filenameNEW, 1);
+					} else {
+						logAction($dir."/".$filename." no hay ningun video al que asociar el adjunto");
+					}
+				}
+			}
+		}
+		
+		if ($cont == 0) {
+			logAction($dir." no contiene adjuntos");
 		}
 	} else {
 		logAction("Error al leer ".$dir);

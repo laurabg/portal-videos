@@ -295,6 +295,29 @@ div.checkbox {
 	margin-left: 20px;
 }
 
+div.add-cat {
+	margin-bottom: 0px;
+}
+
+div.listaCategorias {
+	margin-bottom: 15px;
+}
+div.listaCategorias div.categoria {
+	margin-top: 5px;
+}
+/*
+div.listaCategorias div.categoria {
+	float: left;
+	margin-top: 5px;
+	margin-right: 10px;
+}
+
+div.listaCategorias div.categoria input {
+	border: 0px;
+	background: transparent;
+	cursor: pointer;
+}*/
+
 input.checkbox-con-margen {
 	margin-left: 15px;
 }

@@ -14,7 +14,7 @@ $SQL .= ' (publico = 1'; // Mostrar los cursos publicos
 
 // O mostrar los cursos que tengan asociado uno de Moodle
 if ( (isset($_COOKIE['MoodleUserSession']))&&(decrypt($_COOKIE['MoodleUserSession'],1)['esAdmin'] == 1) ) {
-	$SQL .= ' OR (IDcursoMoodle IS NOT NULL AND IDcursoMoodle != "")';
+	$SQL .= ' OR (IDcursoMoodle > 0)';
 } else if ( (isset($_COOKIE['MoodleUserSession']))&&(!isset($_COOKIE['MoodleUserFaltaCorreo'])) ) {
 	$SQL .= ' OR IDcursoMoodle IN (SELECT IDcursoMoodle FROM cursosUsuarios WHERE IDusuario = '.decrypt($_COOKIE['MoodleUserSession'],1)['IDusuario'].')';
 }

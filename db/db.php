@@ -5,6 +5,7 @@ include_once('modules/cursos.php');
 include_once('modules/temas.php');
 include_once('modules/videos.php');
 include_once('modules/adjuntos.php');
+include_once('modules/categorias.php');
 include_once('modules/usuarios.php');
 
 
@@ -132,6 +133,14 @@ function crearTablas() {
 		orden INTEGER,
 		ocultar INTEGER);'
 	);
+	$db->exec('CREATE TABLE categorias (
+		ID INTEGER PRIMARY KEY, 
+		IDencriptado TEXT,
+		IDcurso INTEGER,
+		IDtema INTEGER, 
+		IDvideo INTEGER, 
+		nombre TEXT);'
+	);
 	$db->exec('CREATE TABLE usuarios (
 		ID INTEGER PRIMARY KEY, 
 		fullname TEXT, 
@@ -238,11 +247,20 @@ function crearTablasAnalytics() {
 		IDusuario INTEGER,
 		"timestamp" DATETIME DEFAULT CURRENT_TIMESTAMP);'
 	);
+
+	$dbAn->exec('CREATE TABLE accesos (
+		ID INTEGER PRIMARY KEY, 
+		IDusuario INTEGER,
+		tipo TEXT,
+		action TEXT,
+		"timestamp" DATETIME DEFAULT CURRENT_TIMESTAMP);'
+	);
 }
 
 function resetDB() {
 	global $db;
 
+	$db->exec('DELETE FROM videosAdjuntos');
 	$db->exec('DELETE FROM videos');
 	$db->exec('DELETE FROM temas');
 	$db->exec('DELETE FROM cursos');
@@ -258,6 +276,8 @@ function resetDBAnalytics() {
 	global $dbAn;
 
 	$dbAn->exec('DELETE FROM analytics');
+	$dbAn->exec('DELETE FROM descargas');
+	$dbAn->exec('DELETE FROM accesos');
 }
 
 
@@ -303,21 +323,14 @@ function getTotalDescargas($IDcurso, $IDtema, $IDvideo, $IDadjunto) {
 	return $dbAn->querySingle('SELECT COUNT(*) FROM descargas WHERE IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo).' AND IDadjunto = '.$IDadjunto);
 }
 
-function deleteCursoPlayed($IDcurso) {
+function logAcceso($IDusuario, $tipo, $action) {
 	global $dbAn;
 
-	$dbAn->exec('DELETE FROM analytics WHERE IDcurso = '.decrypt($IDcurso));
+	if ($IDusuario != '') {
+		$dbAn->exec('INSERT INTO accesos (IDusuario, tipo, action) VALUES ('.$IDusuario.',"'.$tipo.'","'.$action.'")');
+	} else {
+		$dbAn->exec('INSERT INTO accesos (tipo, action) VALUES ("'.$tipo.'","'.$action.'")');
+	}
 }
 
-function deleteTemaPlayed($IDcurso) {
-	global $dbAn;
-
-	$dbAn->exec('DELETE FROM analytics WHERE IDtema = '.decrypt($IDtema));
-}
-
-function deleteVideoPlayed($IDcurso) {
-	global $dbAn;
-
-	$dbAn->exec('DELETE FROM analytics WHERE IDvideo = '.decrypt($IDvideo));
-}
 ?>

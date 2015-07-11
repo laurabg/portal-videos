@@ -29,6 +29,7 @@ if ($error == 'danger') {
 	$_POST['fechaCaducidad'] = '';
 	$_POST['orden'] = '';
 	$_POST['ocultar'] = '';
+	$_POST['categorias'] = '';
 
 // Si estamos viendo un curso, pero no se ha enviado el formulario, mostrar sus datos:
 } else if ( ($_POST['IDcurso'] != '')&&($_POST['IDtema'] != '')&&($_POST['IDvideo'] != '') ) {
@@ -48,6 +49,7 @@ if ($error == 'danger') {
 	$_POST['fechaCaducidad'] = $videoData['fechaCaducidad'];
 	$_POST['orden'] = $videoData['orden'];
 	$_POST['ocultar'] = $videoData['ocultar'];
+	$_POST['categorias'] = $videoData['categorias'];
 
 }
 
@@ -78,6 +80,22 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="descripcion">Descripción del vídeo:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="add-cat form-group">';
+		$OUT .= '<label for="categorias">Categor&iacute;as / etiquetas del vídeo:</label>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="input-group">';
+		$OUT .='<input type="text" name="categoria-nueva" class="form-control" placeholder="Añadir nueva categoria" />';
+		$OUT .= '<span class="input-group-btn"><button class="btn btn-default btn-add-cat" type="button"><span class="glyphicon glyphicon-plus"></span></button></span>';
+	$OUT .= '</div>';
+	$OUT .= '<div class="listaCategorias">';
+		foreach ($_POST['categorias'] as $categoria) {
+			$OUT .= '<div class="input-group categoria">';
+				$OUT .='<input type="text" name="categorias[]" class="form-control" value="'.$categoria['nombre'].'" />';
+				$OUT .= '<span class="input-group-btn"><button class="btn btn-danger btn-remove-cat" type="button"><span class="glyphicon glyphicon-remove"></span></button></span>';
+			$OUT .= '</div>';
+//			$OUT .= '<div class="categoria"><span class="glyphicon glyphicon-remove"></span><input class="form-control" name="categorias[]" value="'.$categoria['nombre'].'" /></div>';
+		}
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group input-group input-daterange">';
 		$OUT .= '<label for="fechaCaducidad">Fecha en la que dejar de mostrar el v&iacute;deo:</label>';

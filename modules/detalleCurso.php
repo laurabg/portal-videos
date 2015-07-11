@@ -12,6 +12,7 @@ $cont = 0;
 $totalPorPag = 3;
 
 $cursoData = getCursoData($_GET['IDcurso']);
+$listaCat = getListaCategoriasByCurso($_GET['IDcurso']);
 
 if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 	$OUT .= '<div class="container">';
@@ -63,10 +64,25 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 				}
 				$OUT .= '" type="button"><span class="glyphicon glyphicon-th-list"></span></button></a>';
 			$OUT .= '</div>';
-			$OUT .= '<div class="col-md-3">';
+			$OUT .= '<div class="col-md-3 pull-right">';
 				
 			$OUT .= '</div>';
-			$OUT .= '<div class="col-md-6"></div>';
+			$OUT .= '<div class="col-md-6">';
+				if (count($listaCat) > 0) {
+					$OUT .= '<select class="form-control" name="select-categoria" placeholder="Seleccione qu&eacute; categor&iacute; desea ver">';
+						$OUT .= '<option value="ALL"'.( ((!isset($_COOKIE['cat'])) || (isset($_COOKIE['cat']))&&($_COOKIE['cat'] == 'ALL')) ? ' selected' : '' ).'>Ver todas las categor&iacute;as</option>';
+						$OUT .= '<option value="noCat"'.( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] == 'noCat') ? ' selected' : '' ).'>Ver v&iacute;deos sin categor&iacute;as</option>';
+						foreach ($listaCat as $cat) {
+							$OUT .= '<option value="'.$cat[0].'"'.( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] == $cat[0]) ? ' selected' : '' ).'>Categor&iacute;a: '.$cat[1].'</option>';
+						}
+					$OUT .= '</select>';
+				} else {
+					if (isset($_COOKIE['cat'])) {
+						unset($_COOKIE['cat']);
+						setcookie('cat', null, -1, _PORTALROOT);
+					}
+				}
+			$OUT .= '</div>';
 		$OUT .= '</div>';
 	$OUT .= '</div>';
 	
@@ -74,14 +90,26 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 		$SQLCount = 'SELECT COUNT(*) FROM temas WHERE';
 		$SQLCount .= ' ocultar = 0';
 		$SQLCount .= ' AND IDcurso = '.decrypt($cursoData['IDcurso']);
-		$SQLCount .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))';
-	
+		$SQLCount .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") )';
+		if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] != 'noCat') ) {
+			$SQLCount .= ' AND ID IN (SELECT IDvideo FROM categorias WHERE ID = '.(decrypt($_COOKIE['cat'])).')';
+		} else if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] == 'noCat') ) {
+			$SQLCount .= ' AND ID NOT IN (SELECT IDvideo FROM categorias)';
+		}
+		$SQLCount .= ')';
+		
 		$totalCursos = $db->querySingle($SQLCount);
 
 		$SQL = 'SELECT * FROM temas WHERE';
 		$SQL .= ' ocultar = 0';
 		$SQL .= ' AND IDcurso = '.decrypt($cursoData['IDcurso']);
-		$SQL .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))';
+		$SQL .= ' AND ID IN (SELECT IDtema FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") )';
+		if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] != 'noCat') ) {
+			$SQL .= ' AND ID IN (SELECT IDvideo FROM categorias WHERE ID = '.(decrypt($_COOKIE['cat'])).')';
+		} else if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] == 'noCat') ) {
+			$SQL .= ' AND ID NOT IN (SELECT IDvideo FROM categorias)';
+		}
+		$SQL .= ')';
 		$SQL .= ( (isset($_GET['last'])) ? ' AND orden < '.$_GET['last'] : '' );
 		$SQL .= ' ORDER BY orden DESC, nombre LIMIT '.$totalPorPag;
 
@@ -91,7 +119,15 @@ if ( ($cursoData['publico'] == 0)&&(!isset($_COOKIE['MoodleUserSession'])) ) {
 				$OUT .= '<div class="panel-heading">'.$row['nombre'].'</div>';
 				$OUT .= '<div class="panel-body">';
 				// Listar videos de cada tema:
-				$resVideo = $db->query('SELECT * FROM videos WHERE ocultar = 0 AND IDtema = '.$row['ID'].' AND IDcurso = '.decrypt($cursoData['IDcurso']).' ORDER BY orden DESC, nombre');
+				$SQLvideos = 'SELECT * FROM videos WHERE ocultar = 0 AND IDtema = '.$row['ID'].' AND IDcurso = '.decrypt($cursoData['IDcurso']);
+				if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] != 'noCat') ) {
+					$SQLvideos .= ' AND ID IN (SELECT IDvideo FROM categorias WHERE ID = '.(decrypt($_COOKIE['cat'])).')';
+				} else if ( (isset($_COOKIE['cat']))&&($_COOKIE['cat'] != 'ALL')&&($_COOKIE['cat'] == 'noCat') ) {
+					$SQLvideos .= ' AND ID NOT IN (SELECT IDvideo FROM categorias)';
+				}
+				$SQLvideos .= ' ORDER BY orden DESC, nombre';
+
+				$resVideo = $db->query($SQLvideos);
 				while ($rowVideo = $resVideo->fetchArray()) {
 					$mostrar = 1;
 

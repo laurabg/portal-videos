@@ -214,8 +214,43 @@ if ($_POST['form'] == 'videos') {
 				if ($error == 'success') {
 					$msgError = 'Datos actualizados correctamente';
 
+					if ($_POST['rutaVideo'] == '') {
+						$_POST['rutaVideo'] = $_POST['rutaVideoORI'];
+					}
+
+					if ($_POST['img'] == '') {
+						$_POST['img'] = $_POST['imgORI'];
+					}
+
 					// Actualizar el video en la base de datos:
 					updateVideo($_POST['IDvideo'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['nombreVideo'], $_POST['descripcion'], $_POST['rutaVideo'], $_POST['img'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
+				}
+			}
+			
+			$videoData = getVideoData($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo']);
+
+			if ( ($_POST['categorias'] != '')||(count($videoData['categorias']) > 0) ) {
+				if ($_POST['categorias'] != '') {
+					// Añadir las categorias nuevas:
+					foreach ($_POST['categorias'] as $categoria) {
+						$IDcategoria = getIDcategoria($_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $categoria, 1);
+					}
+				}
+				
+				$borrarTodo = 0;
+				if ( (count($videoData['categorias']) > 0)&&(count($_POST['categorias']) == 0) ) {
+					$borrarTodo = 1;
+				}
+				
+				// Recorrer las categorias originales, borrar las que no esten:
+				foreach ($videoData['categorias'] as $categoriaDel) {
+					if ($borrarTodo == 0) {
+						if (!is_int(array_search($categoriaDel['nombre'], $_POST['categorias']))) {
+							deleteCategoria($categoriaDel['IDcategoria']);
+						}
+					} else {
+						deleteCategoria($categoriaDel['IDcategoria']);
+					}
 				}
 			}
 		}

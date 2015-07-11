@@ -1,5 +1,7 @@
 <?php
-
+ini_set('display_errors',1);
+	ini_set('display_startup_errors',1);
+	error_reporting(E_ERROR | E_WARNING | E_PARSE);
 // Definición de constantes
 define('_PORTALROOT', '/portal-videos/');
 define('_DOCUMENTROOT', $_SERVER['DOCUMENT_ROOT']._PORTALROOT);
@@ -33,9 +35,6 @@ define('_ALLOWVIDEOUPLOAD', getAdminvar('_ALLOWVIDEOUPLOAD'));
 define('_ENCRIPTAR', getAdminvar('_ENCRIPTAR'),true);
 define('_EKEY', getAdminvar('_EKEY'));
 define('_AKEY', getAdminvar('_AKEY'));
-/*define('_EKEY', '4243bcdce4ffdb41b613');
-define('_AKEY', 'ef515dff755448e12100');*/
-
 
 //define('_WSTOKEN', '418a443a4b1696cb83716eb1eb106c64');
 //define('_MOODLEURL', 'http://localhost/moodle');

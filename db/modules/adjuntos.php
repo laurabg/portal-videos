@@ -6,27 +6,8 @@
 function createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $descripcion, $ruta, $fechaCaducidad, $orden, $ocultar) {
 	global $db;
 
-	$SQL = 'INSERT INTO videosAdjuntos (';
-	$SQL .= 'IDcurso';
-	$SQL .= ',IDtema';
-	$SQL .= ',IDvideo';
-	$SQL .= ',nombre';
-	$SQL .= ($descripcion != '')?',descripcion':'';
-	$SQL .= ($ruta != '')?',ruta':'';
-	$SQL .= ',fechaCaducidad';
-	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ',ocultar';
-	$SQL .= ') VALUES (';
-	$SQL .= decrypt($IDcurso);
-	$SQL .= ','.decrypt($IDtema);
-	$SQL .= ','.decrypt($IDvideo);
-	$SQL .= ',"'.$nombre.'"';
-	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
-	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
-	$SQL .= ',"'.$fechaCaducidad.'"';
-	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ','.$ocultar;
-	$SQL .= ')';
+	$SQL = 'INSERT INTO videosAdjuntos (IDcurso, IDtema, IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar) ';
+	$SQL .= 'VALUES ('.decrypt($IDcurso).', '.decrypt($IDtema).', '.decrypt($IDvideo).', "'.$nombre.'", "'.$descripcion.'", "'.$ruta.'", "'.$fechaCaducidad.'", '.$orden.', '.$ocultar.')';
 	
 	$db->exec($SQL);
 }
@@ -43,9 +24,9 @@ function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descri
 	$SQL .= ', IDvideo = '.decrypt($IDvideo);
 	$SQL .= ', nombre = "'.$nombre.'"';
 	$SQL .= ', descripcion = "'.$descripcion.'"';
-	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
+	$SQL .= ', ruta = "'.$ruta.'"';
 	$SQL .= ', fechaCaducidad = "'.$fechaCaducidad.'"';
-	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ', orden = '.$orden;
 	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ' WHERE ID = '.$IDadjunto;
 	
@@ -76,10 +57,10 @@ function checkAdjunto($condicion) {
 function getIDadjunto($IDcurso, $IDtema, $IDvideo, $nombre, $ruta, $crearAdjunto) {
 	global $db;
 
-	if ( ($crearAdjunto == 1)&&(checkAdjunto('WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo)) == 0) ) {
+	if ( ($crearAdjunto == 1)&&(checkAdjunto('nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo)) == 0) ) {
 		$orden = getNextOrdenAdjunto($IDcurso, $IDtema, $IDvideo);
 
-		createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, $nombre, $ruta, '', $orden, _OCULTO);
+		createAdjunto($IDcurso, $IDtema, $IDvideo, $nombre, '', $ruta, '', $orden, _OCULTO);
 	}
 
 	return $db->querySingle('SELECT ID FROM videosAdjuntos WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo));

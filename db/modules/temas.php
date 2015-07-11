@@ -7,21 +7,9 @@
 function createTema($IDcurso, $nombre, $descripcion, $ruta, $orden, $ocultar) {
 	global $db;
 
-	$SQL = 'INSERT INTO temas (';
-	$SQL .= 'IDcurso';
-	$SQL .= ',nombre';
-	$SQL .= ($descripcion != '')?',descripcion':'';
-	$SQL .= ($ruta != '')?',ruta':'';
-	$SQL .= ($orden != '')?',orden':'';
-	$SQL .= ',ocultar';
-	$SQL .= ') VALUES (';
-	$SQL .= decrypt($IDcurso);
-	$SQL .= ',"'.$nombre.'"';
-	$SQL .= ($descripcion != '')?',"'.$descripcion.'"':'';
-	$SQL .= ($ruta != '')?',"'.$ruta.'"':'';
-	$SQL .= ($orden != '')?','.$orden:'';
-	$SQL .= ','.$ocultar;
-	$SQL .= ')';
+	$SQL = 'INSERT INTO temas (IDcurso, nombre, descripcion, ruta, orden, ocultar) ';
+	$SQL .= 'VALUES ('.decrypt($IDcurso).', "'.$nombre.'", "'.$descripcion.'", "'.$ruta.'", '.$orden.', '.$ocultar.')';
+	
 	//print $SQL;
 	$db->exec($SQL);
 
@@ -42,9 +30,9 @@ function updateTema($IDtema, $IDcurso, $nombre, $descripcion, $ruta, $orden, $oc
 	$SQL = 'UPDATE temas SET ';
 	$SQL .= 'IDcurso = '.decrypt($IDcurso);
 	$SQL .= ', nombre = "'.$nombre.'"';
-	$SQL .= ($descripcion != '')?', descripcion = "'.$descripcion.'"':'';
-	$SQL .= ($ruta != '')?', ruta = "'.$ruta.'"':'';
-	$SQL .= ($orden != '')?', orden = '.$orden:'';
+	$SQL .= ', descripcion = "'.$descripcion.'"';
+	$SQL .= ', ruta = "'.$ruta.'"';
+	$SQL .= ', orden = '.$orden;
 	$SQL .= ', ocultar = '.$ocultar;
 	$SQL .= ' WHERE ID = '.decrypt($IDtema);
 	
@@ -79,7 +67,7 @@ function getIDtema($IDcurso, $nombre, $ruta, $crearTema) {
 	if ( ($crearTema == 1)&&(checkTema('ruta = "'.$ruta.'" AND IDcurso = '.decrypt($IDcurso)) == 0) ) {
 		$orden = getNextOrdenTema($IDcurso);
 
-		createTema($IDcurso, $nombre, $nombre, $ruta, $orden, _OCULTO);
+		createTema($IDcurso, $nombre, '', $ruta, $orden, _OCULTO);
 	}
 
 	return $db->querySingle('SELECT IDencriptado FROM temas WHERE ruta = "'.$ruta.'" AND IDcurso = '.decrypt($IDcurso));

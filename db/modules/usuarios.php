@@ -10,13 +10,13 @@ function createUsuario($fullname, $email, $bloqueado, $username, $esAdmin) {
 	$SQL .= 'fullname';
 	$SQL .= ($email != '')?',email':'';
 	$SQL .= ($bloqueado != '')?',bloqueado':'';
-	$SQL .= ($username != '')?',username':'';
+	$SQL .= ',username';
 	$SQL .= ',esAdmin';
 	$SQL .= ') VALUES (';
 	$SQL .= '"'.$fullname.'"';
 	$SQL .= ($email != '')?',"'.$email.'"':'';
 	$SQL .= ($bloqueado != '')?','.$bloqueado:'';
-	$SQL .= ($username != '')?',"'.$username.'"':'';
+	$SQL .= ',"'.$username.'"';
 	$SQL .= ','.$esAdmin;
 	$SQL .= ')';
 	
@@ -127,19 +127,21 @@ function getUserData($IDusuario, $username, $email) {
 		'esAdmin' => 0
 	);
 
-	$SQL = 'SELECT * FROM usuarios WHERE ';
-	( ($IDusuario != '') ? $SQL .= 'ID = '.$IDusuario : ( ($username != '') ? $SQL .= 'username = "'.$username.'"' : ( ($email != '') ? $SQL .= 'email = "'.$email.'"' : '' ) ) );
-	
-	$res = $db->query($SQL);
-	while ($row = $res->fetchArray()) {
-		$usuario = array(
-			'IDusuario' => $row['ID'],
-			'fullname' => $row['fullname'],
-			'email' => $row['email'],
-			'bloqueado' => $row['bloqueado'],
-			'username' => $row['username'],
-			'esAdmin' => $row['esAdmin']
-		);
+	if ( ($IDusuario > 0)||($username != '')||($email != '') ) {
+		$SQL = 'SELECT * FROM usuarios WHERE ';
+		( ($IDusuario != '') ? $SQL .= 'ID = '.$IDusuario : ( ($username != '') ? $SQL .= 'username = "'.$username.'"' : ( ($email != '') ? $SQL .= 'email = "'.$email.'"' : '' ) ) );
+		
+		$res = $db->query($SQL);
+		while ($row = $res->fetchArray()) {
+			$usuario = array(
+				'IDusuario' => $row['ID'],
+				'fullname' => $row['fullname'],
+				'email' => $row['email'],
+				'bloqueado' => $row['bloqueado'],
+				'username' => $row['username'],
+				'esAdmin' => $row['esAdmin']
+			);
+		}
 	}
 
 	return $usuario;

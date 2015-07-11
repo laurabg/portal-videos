@@ -134,6 +134,40 @@ function loadAjaxForm() {
 
 	$('#loading-content').detach();
 
+	if ($('.listaCategorias').length > 0) {
+		$('.btn-add-cat').click(function() {
+			if ($('input[name="categoria-nueva"]').val() != '') {
+				catList = $('input[name="categoria-nueva"]').val();
+				catList = catList.replace(/, /g,',');
+				catList = catList.split(',');
+
+				$('input[name="categoria-nueva"]').val('');
+
+				for (i=0; i < catList.length; i++) {
+					nuevaCat = '<div class="input-group categoria">';
+						nuevaCat += '<input type="text" name="categorias[]" class="form-control" value="'+catList[i]+'" />';
+						nuevaCat += '<span class="input-group-btn"><button class="btn btn-danger btn-remove-cat" type="button"><span class="glyphicon glyphicon-remove"></span></button></span>';
+					nuevaCat += '</div>';
+
+					$('.listaCategorias').append(nuevaCat);
+				}
+			}
+		});
+
+		$('.btn-remove-cat').click(function() {
+			$(this).parent().parent().detach();
+		});
+
+		$('input[name="categoria-nueva"]').on('keyup keypress', function(e) {
+			var code = e.keyCode || e.which;
+			if (code == 13) { 
+				$('.btn-add-cat').click();
+				e.preventDefault();
+				return false;
+			}
+		});
+	}
+
 	$('.input-group.input-daterange').datepicker({
 		weekStart: 1,
 		format: 'yyyy-mm-dd',

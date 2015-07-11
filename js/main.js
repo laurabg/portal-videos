@@ -1,46 +1,3 @@
-
-function beforeSubmit(formData, jqForm, options) { 
-	var queryString = $.param(formData); 
-
-	console.log('enviando... ('+queryString+')');
-
-	if (queryString.indexOf('logout') != -1) {
-		location.reload();
-	}
-
-	return true;
-} 
- 
-function submitDone(responseText, statusText, xhr, $form)  { 
-	console.log('done!!!');
-	
-	if (responseText != '') {
-		$('.form-error').show();
-		loadAjaxForm();
-	} else {
-		location.reload();
-	}
-} 
-
-function loadAjaxForm() {
-	$('form[name="userSession"]').ajaxForm({
-		target: 		'.form-error',
-		beforeSubmit: 	beforeSubmit,
-		success: 		submitDone
-	});
-}
-
-function getCookie(cname) {
-	var name = cname + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0; i<ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1);
-		if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
-	}
-	return "";
-}
-
 $(window).load(function() {
 	loadAjaxForm();
 	
@@ -86,4 +43,52 @@ $(window).load(function() {
 			}
 		});
 	});
+
+	if ($('select[name="select-categoria"]').length > 0) {
+		$('select[name="select-categoria"]').change(function() {
+			window.location = '?'+sPageURL+'&cat='+$(this).val();
+		});
+	}
 });
+
+function beforeSubmit(formData, jqForm, options) { 
+	var queryString = $.param(formData); 
+
+	console.log('enviando... ('+queryString+')');
+
+	if (queryString.indexOf('logout') != -1) {
+		location.reload();
+	}
+
+	return true;
+} 
+ 
+function submitDone(responseText, statusText, xhr, $form)  { 
+	console.log('done!!!');
+	
+	if (responseText != '') {
+		$('.form-error').show();
+		loadAjaxForm();
+	} else {
+		location.reload();
+	}
+} 
+
+function loadAjaxForm() {
+	$('form[name="userSession"]').ajaxForm({
+		target: 		'.form-error',
+		beforeSubmit: 	beforeSubmit,
+		success: 		submitDone
+	});
+}
+
+function getCookie(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0; i<ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1);
+		if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+	}
+	return "";
+}

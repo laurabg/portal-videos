@@ -1,19 +1,19 @@
 <?php
 	
 	include_once(__DIR__.'/../config.php');
-	include_once(_DOCUMENTROOT.'db/db.php');
 	
 	if ( (isset($_GET['username']))&&(isset($_GET['email'])) ) {
 		if (checkUsuario('email = "'.$_GET['email'].'" AND username = ""') > 0) {
 			asociarUsernameEmail($_GET['email'], $_GET['username']);
 		}
 		$usuario = getUserData('', $_GET['username'], '');
-		setcookie('MoodleUserSession', serialize($usuario), time() + (86400 * 30), _PORTALROOT);
-
-		if (checkUsuario('username = "'.$_POST['userName'].'" AND esAdmin = 1') > 0) {
-			setcookie('MoodleUserAdmin', 1, time() + (86400 * 30), _PORTALROOT);
+		setcookie('MoodleUserSession', encrypt($usuario,1), time() + (86400 * 30), _PORTALROOT);
+		
+		// Añadir registro al log de accesos:
+		if (isset($_COOKIE['MoodleUserSession'])) {
+			logAcceso($usuario['IDusuario'], 'login-moodle', 'Acceso desde Moodle de '.$usuario['fullname']);
 		}
-
+		
 		header('Location: http://'.$_SERVER['HTTP_HOST']._PORTALROOT.'?IDcurso='.$_GET['IDcurso']);
 		die();
 	}
@@ -22,6 +22,14 @@
 		setcookie('listMode', $_GET['opt'], time() + (86400 * 30), _PORTALROOT);
 
 		$params = str_replace('opt='.$_GET['opt'].'&', '', $_SERVER['QUERY_STRING']);
+		header('Location: http://'.$_SERVER['HTTP_HOST']._PORTALROOT.'?'.$params);
+		die();
+	}
+
+	if ( (isset($_GET['cat'])) ) {
+		setcookie('cat', $_GET['cat'], time() + (86400 * 30), _PORTALROOT);
+
+		$params = str_replace('&cat='.$_GET['cat'], '', $_SERVER['QUERY_STRING']);
 		header('Location: http://'.$_SERVER['HTTP_HOST']._PORTALROOT.'?'.$params);
 		die();
 	}
@@ -39,4 +47,10 @@
 		include_once(_DOCUMENTROOT.'modules/detalleVideo.php');
 	}
 
+	// Añadir registro al log de accesos:
+	if (isset($_COOKIE['MoodleUserSession'])) {
+		logAcceso(decrypt($_COOKIE['MoodleUserSession'],1)['IDusuario'], 'visita', 'http://'.$_SERVER['HTTP_HOST']._PORTALROOT.'?'.$_SERVER['QUERY_STRING']);
+	} else {
+		logAcceso(0, 'visita', 'http://'.$_SERVER['HTTP_HOST']._PORTALROOT.'?'.$_SERVER['QUERY_STRING']);
+	}
 ?>
