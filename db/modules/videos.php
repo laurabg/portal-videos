@@ -40,6 +40,15 @@ function updateVideo($IDvideo, $IDcurso, $IDtema, $nombre, $descripcion, $ruta, 
 }
 
 /*
+ updateVideoOrden: Actualiza el orden de un video
+ */
+function updateVideoOrden($IDvideo, $orden) {
+	global $db;
+
+	$db->exec('UPDATE videos SET orden = '.$orden.' WHERE ID = '.decrypt($IDvideo));
+}
+
+/*
  * updateVideoIMG: Actualiza el registro del video para asociarle una imagen
  */
 function updateVideoIMG($IDvideo, $img) {

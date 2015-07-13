@@ -59,18 +59,18 @@ function loadMenu() {
 	});
 
 	$('a.dup').unbind().click(function() {
-		$('#duplicarContenido').html('').load('modules-admin/duplicar.php?'+$(this).attr('href').split('?')[1], function() {
+		$('#modalContent').html('').load('modules-admin/duplicar.php?'+$(this).attr('href').split('?')[1], function() {
 			// Cargar funcionalidad ajax para todos los formularios:
 			$('form[name="duplicarContenido"]').unbind().ajaxForm({
-				target: 		'#duplicarContenido .form-error',
+				target: 		'#modalContent .form-error',
 				beforeSubmit: 	function(formData, jqForm, options) { 
-					$('#duplicarContenido').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
-					$('#duplicarContenido').find('form').hide();
+					$('#modalContent').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+					$('#modalContent').find('form').hide();
 					return true;
 				},
 				success: 		function(responseText, statusText, xhr, $form)  { 
 					if (responseText.indexOf('?opt=') != -1) {
-						$('#duplicarContenido').modal('hide');
+						$('#modalContent').modal('hide');
 						template = getUrlParameter('opt', responseText);
 						url = 'modules-admin/'+template+'.php'+responseText;
 						
@@ -82,17 +82,58 @@ function loadMenu() {
 						$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
 						setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
 					} else if (responseText == '') {
-						$('#duplicarContenido').modal('hide');
+						$('#modalContent').modal('hide');
 					} else {
-						$('#duplicarContenido').find('.form-error').show();
+						$('#modalContent').find('.form-error').show();
 						$('#loading-content').detach();
-						$('#duplicarContenido').find('form').show();
+						$('#modalContent').find('form').show();
 					}
 				}
 			});
-			$('#duplicarContenido').modal({
+			$('#modalContent').modal({
 				show: true
 			});
+		});
+
+		return false;
+	});
+
+	$('a.order').unbind().click(function() {
+		url = '?'+$(this).attr('href').split('?')[1];
+
+		template = getUrlParameter('opt', url);
+		urlReload = 'modules-admin/'+template+'.php'+url;
+		
+		$('#modalContent').html('').load('modules-admin/ordenar.php'+url, function() {
+			var group = $('ol#lista-sortable').sortable({
+				onDrop: function ($item, container, _super) {
+					var data = group.sortable('serialize').get();
+					var jsonString = JSON.stringify(data, null, ' ');
+
+					$.ajax({
+						type: 'POST',
+						url: 'forms/admin-ordenar.php',
+						data: 'nuevoOrden='+jsonString,
+						success: function(msg) {
+							console.log(msg);
+						}
+					});
+
+					console.log(data);
+					
+					_super($item, container);
+				}
+			});
+			$('#modalContent').modal({
+				show: true
+			});
+			$('#modalContent').on('hide.bs.modal', function (e) {
+				$('.sidebar').html('').load('modules-admin/menu.php'+url, function() {
+					loadMenu();
+				});
+				$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+				setTimeout("$('.main').load(urlReload, function () { loadAjaxForm(); });",500);
+			})
 		});
 
 		return false;
@@ -153,18 +194,18 @@ function loadAjaxForm() {
 	$('#loading-content').detach();
 
 	$('#archivar-curso').unbind().click(function() {
-		$('#archivarCurso').html('').load('modules-admin/archivarCurso.php?'+$(this).attr('rel'), function() {
+		$('#modalContent').html('').load('modules-admin/archivarCurso.php?'+$(this).attr('rel'), function() {
 			// Cargar funcionalidad ajax para todos los formularios:
 			$('form[name="archivarCurso"]').unbind().ajaxForm({
-				target: 		'#archivarCurso .form-error',
+				target: 		'#modalContent .form-error',
 				beforeSubmit: 	function(formData, jqForm, options) { 
-					$('#archivarCurso').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
-					$('#archivarCurso').find('form').hide();
+					$('#modalContent').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+					$('#modalContent').find('form').hide();
 					return true;
 				},
 				success: 		function(responseText, statusText, xhr, $form)  { 
 					if (responseText == '') {
-						$('#archivarCurso').modal('hide');
+						$('#modalContent').modal('hide');
 						url = 'modules-admin/cursos.php?opt=cursos';
 						
 						console.log(url);
@@ -175,15 +216,15 @@ function loadAjaxForm() {
 						$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
 						setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
 					} else {
-						$('#archivarCurso').find('.form-error').show();
+						$('#modalContent').find('.form-error').show();
 						$('#loading-content').detach();
-						$('#archivarCurso').find('form').show();
+						$('#modalContent').find('form').show();
 					}
 					$('#loading-content').detach();
-					$('#archivarCurso').find('form').show();
+					$('#modalContent').find('form').show();
 				}
 			});
-			$('#archivarCurso').modal({
+			$('#modalContent').modal({
 				show: true
 			});
 		});

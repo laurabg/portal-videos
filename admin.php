@@ -85,8 +85,7 @@ include_once('config.php');
 				include_once(_DOCUMENTROOT.'modules/pedirEmail.php');
 			}
 		?>
-		<div class="modal fade" id="duplicarContenido" tabindex="-1" role="dialog" ></div>
-		<div class="modal fade" id="archivarCurso" tabindex="-1" role="dialog" ></div>
+		<div class="modal fade" id="modalContent" tabindex="-1" role="dialog" ></div>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
@@ -99,6 +98,7 @@ include_once('config.php');
 		<script type="text/javascript" src="js/highcharts-4.1.6/highcharts.js"></script>
 		<script type="text/javascript" src="js/highcharts-4.1.6/modules/drilldown.js"></script>
 		<script type="text/javascript" src="js/fileinput/fileinput.min.js"></script>
+		<script type="text/javascript" src="js/jquery-sortable.js"></script>
 		<!--script type="text/javascript" src="js/highcharts-4.1.6/modules/exporting.js"></script-->
 		<script type="text/javascript" src="js/charts.js"></script>
 		<script type="text/javascript" src="js/admin.js"></script>

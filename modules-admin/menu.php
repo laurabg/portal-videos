@@ -21,6 +21,7 @@ function listaItemsCursos($anoAcademico = "", $crear = 1) {
 				$OUT .= '<a href="?opt='.$opt.'">';
 					$OUT .= '<span class="txt" title="Crear nuevo curso">Crear nuevo curso</span>';
 				$OUT .= '</a>';
+				$OUT .= '<a class="order pull-right" title="Ordenar Cursos" href="?opt='.$opt.'"><span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}
@@ -73,6 +74,7 @@ function listaItemsTemas($IDcurso, $crear = 1) {
 				$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'">';
 					$OUT .= '<span class="txt" title="Añadir nuevo tema">Añadir nuevo tema</span>';
 				$OUT .= '</a>';
+				$OUT .= '<a class="order pull-right" title="Ordenar Temas" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'"><span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}
@@ -124,6 +126,7 @@ function listaItemsVideos($IDcurso, $IDtema, $crear = 1) {
 				$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'">';
 					$OUT .= '<span class="txt" title="Añadir nuevo vídeo">Añadir nuevo vídeo</span>';
 				$OUT .= '</a>';
+				$OUT .= '<a class="order pull-right" title="Ordenar V&iacute;deos" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'"><span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}
@@ -177,6 +180,7 @@ function listaItemsAdjuntos($IDcurso, $IDtema, $IDvideo, $crear = 1) {
 				$OUT .= '<a href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'">';
 					$OUT .= '<span class="txt" title="Añadir nuevo adjunto">Añadir nuevo adjunto</span>';
 				$OUT .= '</a>';
+				$OUT .= '<a class="order pull-right" title="Ordenar Adjuntos" href="?opt='.$opt.'&IDcurso='.urlencode($IDcurso).'&IDtema='.urlencode($IDtema).'&IDvideo='.urlencode($IDvideo).'"><span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span></a>';
 			$OUT .= '</div>';
 		$OUT .= '</li>';
 	}

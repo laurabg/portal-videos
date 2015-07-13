@@ -40,6 +40,14 @@ function updateTema($IDtema, $IDcurso, $nombre, $descripcion, $ruta, $orden, $oc
 }
 
 /*
+ updateTemaOrden: Actualiza el orden de un tema
+ */
+function updateTemaOrden($IDtema, $orden) {
+	global $db;
+
+	$db->exec('UPDATE temas SET orden = '.$orden.' WHERE ID = '.decrypt($IDtema));
+}
+/*
  deleteFullTema: Elimina un tema completo, con sus videos
  */
 function deleteFullTema($IDtema) {

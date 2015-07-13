@@ -44,6 +44,15 @@ function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden,
 }
 
 /*
+ updateCursoOrden: Actualiza el orden de un curso
+ */
+function updateCursoOrden($IDcurso, $orden) {
+	global $db;
+
+	$db->exec('UPDATE cursos SET orden = '.$orden.' WHERE ID = '.decrypt($IDcurso));
+}
+
+/*
  deleteFullCurso: Elimina un curso completo, con sus temas y videos
  */
 function deleteFullCurso($IDcurso) {

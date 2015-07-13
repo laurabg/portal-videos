@@ -34,6 +34,15 @@ function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descri
 }
 
 /*
+ updateAdjuntoOrden: Actualiza el orden de un adjunto
+ */
+function updateAdjuntoOrden($IDadjunto, $orden) {
+	global $db;
+
+	$db->exec('UPDATE videosAdjuntos SET orden = '.$orden.' WHERE ID = '.decrypt($IDadjunto));
+}
+
+/*
  deleteAdjunto: Elimina un adjunto
  */
 function deleteAdjunto($IDadjunto) {
