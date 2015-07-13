@@ -144,6 +144,26 @@ function getListaTemasByCurso($IDcurso) {
 }
 
 /*
+ * getListaTemasDisponibles: Devuelve la lista de cursos y temas disponibles, salvo el dado
+ */
+function getListaTemasDisponibles($IDtema) {
+	global $db;
+	
+	$listaUbicaciones = array();
+
+	$res = $db->query('SELECT a.IDencriptado AS IDcurso, a.nombre AS curso, b.IDencriptado AS IDtema, b.nombre AS tema FROM cursos a JOIN temas b ON a.ID = b.IDcurso WHERE b.ID != '.decrypt($IDtema).' AND a.archivar = 0 ORDER BY a.orden, a.nombre, b.orden, b.nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaUbicaciones, array(
+			'IDcurso' => $row['IDcurso'], 
+			'IDtema' => $row['IDtema'], 
+			'nombre' => $row['curso'].': '.$row['tema']
+		));
+	}
+
+	return $listaUbicaciones;
+}
+
+/*
  * encriptarTemas: Encripta todos los IDs de los temas:
  */
 function encriptarTemas($encriptarForzado = 0) {
@@ -157,5 +177,14 @@ function encriptarTemas($encriptarForzado = 0) {
 			$db->exec('UPDATE temas SET IDencriptado = "'.encrypt($row['ID'], $encriptarForzado).'" WHERE ID = '.$row['ID']);
 		}
 	}
+}
+
+/*
+ * temaCambiarIDcurso: Cambia el ID curso asociado a un tema
+ */
+function temaCambiarIDcurso($IDcurso, $IDcursoNew, $IDtema) {
+	global $db;
+	
+	$db->exec('UPDATE temas SET IDcurso = '.decrypt($IDcursoNew).' WHERE ID = '.$IDtema.' AND IDcurso = '.decrypt($IDcurso));
 }
 ?>

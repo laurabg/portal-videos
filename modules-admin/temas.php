@@ -13,6 +13,8 @@ if (!isset($_POST['IDtema'])) {
 	$_POST['IDtema'] = ( ($_GET['IDtema'] != '') ? $_GET['IDtema'] : '' );
 }
 
+$listaCursos = getListaCursosDisponibles($_POST['IDcurso']);
+
 // Si se ha eliminado el tema, borrar sus datos:
 if ($error == 'danger') {
 	$_POST['IDtema'] = '';
@@ -61,9 +63,18 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '<label for="descripcion">Descripción del tema:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
-	if ($cursoData['archivar'] == 0) {
-		$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if (sizeof($listaCursos) > 0) {
+		$OUT .= '<div class="form-group">';
+			$OUT .= '<label for="cambiar-tema">Seleccione el curso donde quiere cambiar el tema:</label>';
+			$OUT .= '<select class="form-control" name="cambiar-tema" id="cambiar-teman" >';
+				$OUT .= '<option value="">Seleccione un curso</option>';
+				foreach ($listaCursos as $curso) {
+					$OUT .= '<option value="'.$curso['ID'].'">'.$curso['nombre'].'</option>';
+				}
+			$OUT .= '</select>';
+		$OUT .= '</div>';
 	}
+	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
 	if ($_POST['IDtema'] != '') {
 		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
 	}

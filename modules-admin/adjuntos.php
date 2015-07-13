@@ -21,6 +21,7 @@ if (!isset($_POST['IDadjunto'])) {
 }
 
 $dir = '';
+$listaVideos = getListaVideosDisponibles($_POST['IDvideo']);
 
 // Si se ha eliminado el adjunto, borrar sus datos:
 if ($error == 'danger') {
@@ -81,6 +82,17 @@ $OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'
 		$OUT .= '<label for="descripcion">Descripción del archivo adjunto:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
+	if (sizeof($listaVideos) > 0) {
+		$OUT .= '<div class="form-group">';
+			$OUT .= '<label for="cambiar-adjunto">Seleccione el v&iacute;deo donde quiere cambiar el archivo adjunto:</label>';
+			$OUT .= '<select class="form-control" name="cambiar-adjunto" id="cambiar-adjunto" >';
+				$OUT .= '<option value="">Seleccione un v&iacute;deo</option>';
+				foreach ($listaVideos as $video) {
+					$OUT .= '<option value="'.$video['IDcurso'].'/-/'.$video['IDtema'].'/-/'.$video['IDvideo'].'">'.$video['nombre'].'</option>';
+				}
+			$OUT .= '</select>';
+		$OUT .= '</div>';
+	}
 	$OUT .= '<div class="form-group input-group input-daterange">';
 		$OUT .= '<label for="fechaCaducidad">Fecha en la que dejar de mostrar el adjunto:</label>';
 		$OUT .= '<input type="text" class="form-control" name="fechaCaducidad" value="'.$_POST['fechaCaducidad'].'" />';

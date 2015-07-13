@@ -181,6 +181,25 @@ function getListaCursosArchivados() {
 }
 
 /*
+ * getListaCursosDisponibles: Devuelve la lista de cursos disponibles, salvo el dado
+ */
+function getListaCursosDisponibles($IDcurso) {
+	global $db;
+	
+	$listaUbicaciones = array();
+
+	$res = $db->query('SELECT * FROM cursos WHERE ID != '.decrypt($IDcurso).' AND archivar = 0 ORDER BY orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaUbicaciones, array(
+			'ID' => $row['IDencriptado'], 
+			'nombre' => $row['nombre']
+		));
+	}
+
+	return $listaUbicaciones;
+}
+
+/*
  * encriptarCursos: Encripta todos los IDs de los cursos:
  */
 function encriptarCursos($encriptarForzado = 0) {
@@ -213,4 +232,5 @@ function recuperarCursoArchivado($IDcurso) {
 	
 	$db->exec('UPDATE cursos SET archivar = 0, anoAcademico = "" WHERE ID = '.decrypt($IDcurso));
 }
+
 ?>

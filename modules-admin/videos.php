@@ -18,6 +18,7 @@ if (!isset($_POST['IDvideo'])) {
 }
 
 $dir = '';
+$listaTemas = getListaTemasDisponibles($_POST['IDtema']);
 
 // Si se ha eliminado el video, borrar sus datos:
 if ($error == 'danger') {
@@ -81,6 +82,17 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 		$OUT .= '<label for="descripcion">Descripción del vídeo:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
+	if (sizeof($listaTemas) > 0) {
+		$OUT .= '<div class="form-group">';
+			$OUT .= '<label for="cambiar-video">Seleccione el tema donde quiere cambiar el v&iacute;deo:</label>';
+			$OUT .= '<select class="form-control" name="cambiar-video" id="cambiar-video" >';
+				$OUT .= '<option value="">Seleccione un tema</option>';
+				foreach ($listaTemas as $tema) {
+					$OUT .= '<option value="'.$tema['IDcurso'].'/-/'.$tema['IDtema'].'">'.$tema['nombre'].'</option>';
+				}
+			$OUT .= '</select>';
+		$OUT .= '</div>';
+	}
 	$OUT .= '<div class="add-cat form-group">';
 		$OUT .= '<label for="categorias">Categor&iacute;as / etiquetas del vídeo:</label>';
 	$OUT .= '</div>';

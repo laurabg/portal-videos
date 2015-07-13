@@ -29,6 +29,7 @@ if ($_POST['form'] == 'videos') {
 	}
 
 	// Obtener el path completo del video:
+	$dirORI = _DOCUMENTROOT._DIRCURSOS.$dir;
 	$dir = _DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/';
 
 	// Eliminar el video y la imagen de portada:
@@ -251,6 +252,45 @@ if ($_POST['form'] == 'videos') {
 					} else {
 						deleteCategoria($categoriaDel['IDcategoria']);
 					}
+				}
+			}
+
+			if ($_POST['cambiar-video'] != '') {
+				list($IDcursoNew, $IDtemaNew) = split('/-/', $_POST['cambiar-video']);
+
+				$cursoDestinoData = getCursoData($IDcursoNew);
+
+				// Obtener la ubicacion del curso:
+				if (is_int(array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID')))) {
+					$dirDestino = $listaDirs[array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+					$dirDestino = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dirDestino);
+					$dirDestino = _DOCUMENTROOT._DIRCURSOS.$dirDestino;
+				}
+				
+				$temaDestinoData = getTemaData($IDcursoNew, $IDtemaNew);
+				
+				// Si existe el archivo original y no existe en el destino, moverlo junto con su imagen y sus adjuntos:
+				if ( (file_exists($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$_POST['rutaVideo']))&&(!file_exists($dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/'.$_POST['rutaVideo'])) ) {
+					// Mover el archivo de video:
+					rename($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/'.$_POST['rutaVideo'], $dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/'.$_POST['rutaVideo']);
+					// Mover la imagen:
+					rename($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/img/'.$_POST['img'], $dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/img/'.$_POST['img']);
+
+					// Recorrer los adjuntos y moverlos todos:
+					foreach ($videoData['adjuntos'] as $adjunto) {
+						// Mover la imagen:
+						rename($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$adjunto['ruta'], $dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/docs/'.$adjunto['ruta']);
+					}
+
+					videoCambiarIDcursoTema($_POST['IDcurso'], $IDcursoNew, $_POST['IDtema'], $IDtemaNew, $_POST['IDvideo']);
+					adjuntoCambiarIDcursoTemaByVideo($_POST['IDcurso'], $IDcursoNew, $_POST['IDtema'], $IDtemaNew, $_POST['IDvideo']);
+					
+					$_POST['IDcurso'] = $IDcursoNew;
+					$_POST['IDtema'] = $IDtemaNew;
+
+				} else if (file_exists($dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/'.$_POST['rutaVideo'])) {
+					$msgError = 'El v&iacute;deo ya existe en el curso y tema destino';
+					$error = 'warning';
 				}
 			}
 		}

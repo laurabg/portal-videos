@@ -18,18 +18,18 @@ $error = 'success';
 if ($_POST['form'] == 'temas') {
 	// Obtener la informacion del curso:
 	$cursoData = getCursoData($_POST['IDcurso']);
+	
+	// Obtener la ubicacion del curso:
+	if (is_int(array_search($cursoData['ubicacion'], array_column($listaDirs, 'ID')))) {
+		$dir = $listaDirs[array_search($cursoData['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+		$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
+	}
 
 	// Obtener la ruta limpia del tema:
 	$rutalimpia = clean($_POST['nombreTema']);
 	
 	// Eliminar el tema y todos sus videos y eliminar todas las carpetas hijas:
 	if (isset($_POST['formDel'])) {
-		// Obtener la ubicacion del curso:
-		if (is_int(array_search($cursoData['ubicacion'], array_column($listaDirs, 'ID')))) {
-			$dir = $listaDirs[array_search($cursoData['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
-			$dir = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dir);
-		}
-		
 		// Elimiar la carpeta del tema y todos sus hijos:
 		if (file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$rutalimpia)) {
 			removeDir(_DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$rutalimpia);
@@ -114,6 +114,32 @@ if ($_POST['form'] == 'temas') {
 
 					// Actualizar el tema en la base de datos:
 					updateTema($_POST['IDtema'], $_POST['IDcurso'], $_POST['nombreTema'], $_POST['descripcion'], $rutalimpia, $_POST['orden'], $_POST['ocultar']);
+				}
+
+				if ($_POST['cambiar-tema'] != '') {
+					$cursoDestinoData = getCursoData($_POST['cambiar-tema']);
+
+					// Obtener la ubicacion del curso:
+					if (is_int(array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID')))) {
+						$dirDestino = $listaDirs[array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+						$dirDestino = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dirDestino);
+						$dirDestino = _DOCUMENTROOT._DIRCURSOS.$dirDestino;
+					}
+					
+					// Si existe el tema original, renombrarlo:
+					if ( (is_dir(_DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$rutalimpia))&&(!is_dir($dirDestino.$cursoDestinoData['ruta'].'/'.$rutalimpia)) ) {
+						rename(_DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$rutalimpia, $dirDestino.$cursoDestinoData['ruta'].'/'.$rutalimpia);
+
+						temaCambiarIDcurso($_POST['IDcurso'], $_POST['cambiar-tema'], $_POST['IDtema']);
+						videoCambiarIDcursoByTema($_POST['IDcurso'], $_POST['cambiar-tema'], $_POST['IDtema']);
+						adjuntoCambiarIDcursoByTema($_POST['IDcurso'], $_POST['cambiar-tema'], $_POST['IDtema']);
+
+						$_POST['IDcurso'] = $_POST['cambiar-tema'];
+
+					} else if (is_dir($dirDestino.$cursoDestinoData['ruta'].'/'.$rutalimpia)) {
+						$msgError = 'El tema ya existe en el curso destino';
+						$error = 'warning';
+					}
 				}
 			}
 		}

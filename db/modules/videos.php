@@ -176,6 +176,32 @@ function getListaVideosByTemaCurso($IDcurso, $IDtema) {
 }
 
 /*
+ * getListaVideosDisponibles: Devuelve la lista de cursos, temas y videos disponibles, salvo el dado
+ */
+function getListaVideosDisponibles($IDvideo) {
+	global $db;
+	
+	$listaUbicaciones = array();
+
+	$SQL = 'SELECT a.IDencriptado AS IDcurso, a.nombre AS curso, b.IDencriptado AS IDtema, b.nombre AS tema, c.IDencriptado AS IDvideo, c.nombre AS video ';
+	$SQL .= 'FROM cursos a JOIN temas b ON a.ID = b.IDcurso JOIN videos c ON a.ID = c.IDcurso AND b.ID = c.IDtema ';
+	$SQL .= 'WHERE c.ID != '.decrypt($IDvideo).' AND a.archivar = 0 ';
+	$SQL .= 'ORDER BY a.orden, a.nombre, b.orden, b.nombre, c.orden, c.nombre';
+	
+	$res = $db->query($SQL);
+	while ($row = $res->fetchArray()) {
+		array_push($listaUbicaciones, array(
+			'IDcurso' => $row['IDcurso'], 
+			'IDtema' => $row['IDtema'], 
+			'IDvideo' => $row['IDvideo'], 
+			'nombre' => $row['curso'].': '.$row['tema'].' --> '.$row['video']
+		));
+	}
+
+	return $listaUbicaciones;
+}
+
+/*
  * encriptarVideos: Encripta todos los IDs de los videos:
  */
 function encriptarVideos($encriptarForzado = 0) {
@@ -190,4 +216,23 @@ function encriptarVideos($encriptarForzado = 0) {
 		}
 	}
 }
+
+/*
+ * videoCambiarIDcursoTema: Cambia el ID curso e ID tema asociado a un video
+ */
+function videoCambiarIDcursoTema($IDcurso, $IDcursoNew, $IDtema, $IDtemaNew, $IDvideo) {
+	global $db;
+
+	$db->exec('UPDATE videos SET IDcurso = '.decrypt($IDcursoNew).', IDtema = '.decrypt($IDtemaNew).' WHERE ID = '.decrypt($IDvideo).' AND IDtema = '.decrypt($IDtema).' AND IDcurso = '.decrypt($IDcurso));
+}
+
+/*
+ * videoCambiarIDcursoByTema: Cambia el ID curso asociado a un video
+ */
+function videoCambiarIDcursoByTema($IDcurso, $IDcursoNew, $IDtema) {
+	global $db;
+	
+	$db->exec('UPDATE videos SET IDcurso = '.decrypt($IDcursoNew).' WHERE IDtema = '.decrypt($IDtema).' AND IDcurso = '.decrypt($IDcurso));
+}
+
 ?>

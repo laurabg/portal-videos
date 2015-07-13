@@ -24,7 +24,7 @@ function updateAdjunto($IDadjunto, $IDcurso, $IDtema, $IDvideo, $nombre, $descri
 	$SQL .= ', IDvideo = '.decrypt($IDvideo);
 	$SQL .= ', nombre = "'.$nombre.'"';
 	$SQL .= ', descripcion = "'.$descripcion.'"';
-	$SQL .= ', ruta = "'.$ruta.'"';
+	$SQL .= ( ($ruta != '') ? ', ruta = "'.$ruta.'"' : '' );
 	$SQL .= ', fechaCaducidad = "'.$fechaCaducidad.'"';
 	$SQL .= ', orden = '.$orden;
 	$SQL .= ', ocultar = '.$ocultar;
@@ -184,6 +184,33 @@ function getListaAdjuntosByVideoTemaCurso($IDcurso, $IDtema, $IDvideo) {
 	}
 
 	return $listaAdjuntos;
+}
+
+/*
+ * adjuntoCambiarIDcursoTemaVideo: Cambia el ID curso, ID tema e ID video asociado a un adjunto
+ */
+function adjuntoCambiarIDcursoTemaVideo($IDcurso, $IDcursoNew, $IDtema, $IDtemaNew, $IDvideo, $IDvideoNew, $IDadjunto) {
+	global $db;
+	
+	$db->exec('UPDATE videosAdjuntos SET IDcurso = '.decrypt($IDcursoNew).', IDtema = '.decrypt($IDtemaNew).', IDvideo = '.decrypt($IDvideoNew).' WHERE ID = '.$IDadjunto.' AND IDvideo = '.decrypt($IDvideo).' AND IDtema = '.decrypt($IDtema).' AND IDcurso = '.decrypt($IDcurso));
+}
+
+/*
+ * adjuntoCambiarIDcursoByTema: Cambia el ID curso asociado a un adjunto
+ */
+function adjuntoCambiarIDcursoByTema($IDcurso, $IDcursoNew, $IDtema) {
+	global $db;
+	
+	$db->exec('UPDATE videosAdjuntos SET IDcurso = '.decrypt($IDcursoNew).' WHERE IDtema = '.decrypt($IDtema).' AND IDcurso = '.decrypt($IDcurso));
+}
+
+/*
+ * adjuntoCambiarIDcursoTemaByVideo: Cambia el ID curso e ID tema asociado a un adjunto
+ */
+function adjuntoCambiarIDcursoTemaByVideo($IDcurso, $IDcursoNew, $IDtema, $IDtemaNew, $IDvideo) {
+	global $db;
+	
+	$db->exec('UPDATE videosAdjuntos SET IDcurso = '.decrypt($IDcursoNew).', IDtema = '.decrypt($IDtemaNew).' WHERE IDvideo = '.decrypt($IDvideo).' AND IDtema = '.decrypt($IDtema).' AND IDcurso = '.decrypt($IDcurso));
 }
 
 ?>

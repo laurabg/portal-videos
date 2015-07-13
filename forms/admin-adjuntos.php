@@ -30,6 +30,7 @@ if ($_POST['form'] == 'adjuntos') {
 	}
 
 	// Obtener el path completo del adjunto:
+	$dirORI = _DOCUMENTROOT._DIRCURSOS.$dir;
 	$dir = _DOCUMENTROOT._DIRCURSOS.$dir.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/';
 
 	// Eliminar el adjunto:
@@ -127,6 +128,10 @@ if ($_POST['form'] == 'adjuntos') {
 						}
 					}
 				}
+
+				if ( ($_POST['rutaAdjunto'] == '')&&($_POST['rutaAdjuntoORI'] != '') ) {
+					$_POST['rutaAdjunto'] = $_POST['rutaAdjuntoORI'];
+				}
 				
 				// Comprobar que no exista el nombre, ni la ruta en el mismo tema y curso:
 				if ( ($_POST['nombreAdjunto'] != '')&&( (checkAdjunto('ID != '.$_POST['IDadjunto'].' AND nombre = "'.$_POST['nombreAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0)||(checkAdjunto('ID != '.$_POST['IDadjunto'].' AND ruta = "'.$_POST['rutaAdjunto'].'" AND IDcurso = '.decrypt($_POST['IDcurso']).' AND IDtema = '.decrypt($_POST['IDtema']).' AND IDvideo = '.decrypt($_POST['IDvideo'])) > 0) ) ) {
@@ -139,6 +144,47 @@ if ($_POST['form'] == 'adjuntos') {
 
 					// Actualizar el adjunto en la base de datos:
 					updateAdjunto($_POST['IDadjunto'], $_POST['IDcurso'], $_POST['IDtema'], $_POST['IDvideo'], $_POST['nombreAdjunto'], $_POST['descripcion'], $_POST['rutaAdjunto'], $_POST['fechaCaducidad'], $_POST['orden'], $_POST['ocultar']);
+				}
+
+				if ($_POST['cambiar-adjunto'] != '') {
+					list($IDcursoNew, $IDtemaNew, $IDvideoNew) = split('/-/', $_POST['cambiar-adjunto']);
+
+					$cursoDestinoData = getCursoData($IDcursoNew);
+
+					// Obtener la ubicacion del curso destino:
+					if (is_int(array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID')))) {
+						$dirDestino = $listaDirs[array_search($cursoDestinoData['ubicacion'], array_column($listaDirs, 'ID'))]['ruta'];
+						$dirDestino = getRutaOrSymlink(_DOCUMENTROOT._DIRCURSOS, $dirDestino);
+						$dirDestino = _DOCUMENTROOT._DIRCURSOS.$dirDestino;
+					}
+					
+					$temaDestinoData = getTemaData($IDcursoNew, $IDtemaNew);
+					$videoDestinoData = getVideoData($IDcursoNew, $IDtemaNew, $IDvideoNew);
+					
+					// Si existe el archivo original y no existe en el destino, moverlo:
+					if ( (file_exists($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$_POST['rutaAdjunto']))&&(!file_exists($dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/docs/'.$_POST['rutaAdjunto'])) ) {
+						rename($dirORI.$cursoData['ruta'].'/'.$temaData['ruta'].'/docs/'.$_POST['rutaAdjunto'], $dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/docs/'.$_POST['rutaAdjunto']);
+						
+						adjuntoCambiarIDcursoTemaVideo($_POST['IDcurso'], $IDcursoNew, $_POST['IDtema'], $IDtemaNew, $_POST['IDvideo'], $IDvideoNew, $_POST['IDadjunto']);
+						
+						$_POST['IDcurso'] = $IDcursoNew;
+						$_POST['IDtema'] = $IDtemaNew;
+						$_POST['IDvideo'] = $IDvideoNew;
+
+					// Si existe el archivo en el destino, pero el tema origen y destino son el mismo, moverlo:
+					} else if ( ($cursoData['ruta'].'/'.$temaData['ruta'] == $cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'])&&(file_exists($dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/docs/'.$_POST['rutaAdjunto'])) ) {
+						adjuntoCambiarIDcursoTemaVideo($_POST['IDcurso'], $IDcursoNew, $_POST['IDtema'], $IDtemaNew, $_POST['IDvideo'], $IDvideoNew, $_POST['IDadjunto']);
+						
+						$_POST['IDcurso'] = $IDcursoNew;
+						$_POST['IDtema'] = $IDtemaNew;
+						$_POST['IDvideo'] = $IDvideoNew;
+
+					// Si existe el archivo en el destino, pero el tema origen y destino son distintos mismo, NO moverlo:
+					} else if ( ($cursoData['ruta'].'/'.$temaData['ruta'] != $cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'])&&(file_exists($dirDestino.$cursoDestinoData['ruta'].'/'.$temaDestinoData['ruta'].'/docs/'.$_POST['rutaAdjunto'])) ) {
+						$msgError = 'El adjunto ya existe en el curso, tema y v&iacute;deo destino';
+						$error = 'warning';
+						
+					}
 				}
 			}
 		}
