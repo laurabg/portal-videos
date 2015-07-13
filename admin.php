@@ -86,6 +86,7 @@ include_once('config.php');
 			}
 		?>
 		<div class="modal fade" id="duplicarContenido" tabindex="-1" role="dialog" ></div>
+		<div class="modal fade" id="archivarCurso" tabindex="-1" role="dialog" ></div>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->

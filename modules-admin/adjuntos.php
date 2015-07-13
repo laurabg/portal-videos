@@ -94,7 +94,9 @@ $OUT .= '<form name="adjuntos" role="form" method="POST" action="'._PORTALROOT.'
 			$OUT .= '<input required type="text" name="rutaAdjunto" class="form-control" id="rutaAdjunto-noUpload" placeholder="Nombre del archivo" value="'.$_POST['rutaAdjunto'].'" />';
 		}
 	$OUT .= '</div>';
-	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if ($cursoData['archivar'] == 0) {
+		$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	}
 	if ($_POST['IDadjunto'] != '') {
 		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
 	}

@@ -29,7 +29,7 @@ if ($error == 'danger') {
 	$_POST['fechaCaducidad'] = '';
 	$_POST['orden'] = '';
 	$_POST['ocultar'] = '';
-	$_POST['categorias'] = '';
+	$_POST['categorias'] = array();
 
 // Si estamos viendo un curso, pero no se ha enviado el formulario, mostrar sus datos:
 } else if ( ($_POST['IDcurso'] != '')&&($_POST['IDtema'] != '')&&($_POST['IDvideo'] != '') ) {
@@ -89,6 +89,7 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 		$OUT .= '<span class="input-group-btn"><button class="btn btn-default btn-add-cat" type="button"><span class="glyphicon glyphicon-plus"></span></button></span>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="listaCategorias">';
+	if (isset($_POST['categorias'])) {
 		foreach ($_POST['categorias'] as $categoria) {
 			$OUT .= '<div class="input-group categoria">';
 				$OUT .='<input type="text" name="categorias[]" class="form-control" value="'.$categoria['nombre'].'" />';
@@ -96,6 +97,7 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 			$OUT .= '</div>';
 //			$OUT .= '<div class="categoria"><span class="glyphicon glyphicon-remove"></span><input class="form-control" name="categorias[]" value="'.$categoria['nombre'].'" /></div>';
 		}
+	}
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group input-group input-daterange">';
 		$OUT .= '<label for="fechaCaducidad">Fecha en la que dejar de mostrar el v&iacute;deo:</label>';
@@ -123,7 +125,9 @@ $OUT .= '<form name="videos" role="form" method="POST" action="'._PORTALROOT.'mo
 			}
 		$OUT .= '</div>';
 	}
-	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if ($cursoData['archivar'] == 0) {
+		$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	}
 	if ($_POST['IDvideo'] != '') {
 		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
 	}

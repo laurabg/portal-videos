@@ -10,7 +10,7 @@ function createCategoria($IDcurso, $IDtema, $IDvideo, $nombre) {
 	$SQL .= 'VALUES ('.decrypt($IDcurso).', '.decrypt($IDtema).', '.decrypt($IDvideo).', "'.$nombre.'")';
 	
 	$db->exec($SQL);
-	echo $SQL;
+	
 	// Una vez creado la categoria, obtener su ID y encriptarlo:
 	$IDcategoria = $db->querySingle('SELECT ID FROM categorias WHERE nombre = "'.$nombre.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema).' AND IDvideo = '.decrypt($IDvideo));
 
@@ -39,7 +39,7 @@ function updateCategoria($IDcategoria, $IDcurso, $IDtema, $IDvideo, $nombre) {
  */
 function deleteCategoria($IDcategoria) {
 	global $db;
-	echo 'DELETE FROM categorias WHERE ID = '.decrypt($IDcategoria).'<br />';
+	
 	$db->exec('DELETE FROM categorias WHERE ID = '.decrypt($IDcategoria));
 }
 

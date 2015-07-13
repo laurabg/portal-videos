@@ -16,66 +16,12 @@
     to { transform: scale(1) rotate(360deg);}
 }
 
-
-/*
- * Base structure
- */
-
-/* Move down content because we have a fixed navbar that is 50px tall */
-body { 
-	padding-top: 50px;
-}
-
-.input-group {
-	width: 100%;
-}
-
-.form-group.input-group * {
-	text-align: left;
-}
-
-.file-caption-name {
-	max-height: 24px;
-}
-
-.kv-fileinput-caption {
-	padding-top: 0px;
-}
-
-form .form-error {
-	display: none;
-	float: left;
-	margin-right: 10px;
-}
-
-#duplicarContenido .modal-dialog .form-error {
-	width: 100%;
-	margin-bottom: 10px;
-}
-
-form .form-error-show {
+.mostrar {
 	display: block;
 }
 
-form .form-group span {
-	color: #999;
-	padding: 5px;
-}
-
-/*
- * Global add-ons
- */
-.sub-header {
-	padding-bottom: 10px;
-	border-bottom: 1px solid #eee;
-}
-
-/*
- * Top navigation
- * Hide default border to remove 1px line.
- */
-.navbar-fixed-top {
-	border: 0;
+.no-mostrar {
+	display: none;
 }
 
 /*
@@ -185,6 +131,96 @@ form .form-group span {
 .nav-sidebar .active > div.item span.glyphicon, .nav-sidebar .active > div.item a {
 	color: #fff;
 }
+
+/*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body { 
+	padding-top: 50px;
+}
+
+div.anoAcademico {
+	margin: 0px -20px;
+	padding: 0px 15px;
+	margin-top: 15px;
+	cursor: pointer;
+}
+
+div.anoAcademico:first-child {
+	margin-top: 0px;
+}
+
+div.anoAcademico div.titulo {
+	margin-bottom: 5px;
+}
+
+div.anoAcademico div.titulo span {
+	margin-right: 5px;
+}
+
+div.anoAcademico div.tree {
+	margin: 0px -15px;
+}
+
+div.anoAcademico div.tree ul.nav-sidebar {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.input-group {
+	width: 100%;
+}
+
+.form-group.input-group * {
+	text-align: left;
+}
+
+.file-caption-name {
+	max-height: 24px;
+}
+
+.kv-fileinput-caption {
+	padding-top: 0px;
+}
+
+form .form-error {
+	display: none;
+	float: left;
+	margin-right: 10px;
+}
+
+.modal-dialog .form-error {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+form .form-error-show {
+	display: block;
+}
+
+form .form-group span {
+	color: #999;
+	padding: 5px;
+}
+
+/*
+ * Global add-ons
+ */
+.sub-header {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #eee;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+.navbar-fixed-top {
+	border: 0;
+}
+
 /*
  * Main content
  */

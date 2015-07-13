@@ -40,6 +40,24 @@ function loadMenu() {
 		return false;
 	});
 	
+	$('div.anoAcademico').children('.titulo').click(function() {
+		if ($(this).siblings('.tree').hasClass('mostrar')) {
+			$(this).siblings('.tree').removeClass('mostrar');
+			$(this).children('span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+			altura = $(this).siblings('.tree').height();
+			$(this).siblings('.tree').animate({ 'height':'0px' },500,function() {
+				$(this).addClass('no-mostrar');
+				$(this).height(altura);
+			});
+		} else {
+			$(this).children('span').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+			altura = $(this).siblings('.tree').height();
+			$(this).siblings('.tree').height(0);
+			$(this).siblings('.tree').removeClass('no-mostrar').addClass('mostrar');
+			$(this).siblings('.tree').animate({ 'height':altura+'px' },500);
+		}
+	});
+
 	$('a.dup').unbind().click(function() {
 		$('#duplicarContenido').html('').load('modules-admin/duplicar.php?'+$(this).attr('href').split('?')[1], function() {
 			// Cargar funcionalidad ajax para todos los formularios:
@@ -133,6 +151,45 @@ function loadAjaxForm() {
 	loadCharts();
 
 	$('#loading-content').detach();
+
+	$('#archivar-curso').unbind().click(function() {
+		$('#archivarCurso').html('').load('modules-admin/archivarCurso.php?'+$(this).attr('rel'), function() {
+			// Cargar funcionalidad ajax para todos los formularios:
+			$('form[name="archivarCurso"]').unbind().ajaxForm({
+				target: 		'#archivarCurso .form-error',
+				beforeSubmit: 	function(formData, jqForm, options) { 
+					$('#archivarCurso').find('.modal-body').append('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+					$('#archivarCurso').find('form').hide();
+					return true;
+				},
+				success: 		function(responseText, statusText, xhr, $form)  { 
+					if (responseText == '') {
+						$('#archivarCurso').modal('hide');
+						url = 'modules-admin/cursos.php?opt=cursos';
+						
+						console.log(url);
+						console.log('modules-admin/menu.php?opt=cursos');
+						$('.sidebar').html('').load('modules-admin/menu.php?opt=cursos', function() {
+							loadMenu();
+						});
+						$('.main').html('<button id="loading-content" class="btn btn-lg btn-default"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Cargando...</button>');
+						setTimeout("$('.main').load(url, function () { loadAjaxForm(); });",500);
+					} else {
+						$('#archivarCurso').find('.form-error').show();
+						$('#loading-content').detach();
+						$('#archivarCurso').find('form').show();
+					}
+					$('#loading-content').detach();
+					$('#archivarCurso').find('form').show();
+				}
+			});
+			$('#archivarCurso').modal({
+				show: true
+			});
+		});
+
+		return false;
+	});
 
 	if ($('.listaCategorias').length > 0) {
 		$('.btn-add-cat').click(function() {

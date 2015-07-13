@@ -1,7 +1,5 @@
 <?php
-ini_set('display_errors',1);
-	ini_set('display_startup_errors',1);
-	error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
 // Definición de constantes
 define('_PORTALROOT', '/portal-videos/');
 define('_DOCUMENTROOT', $_SERVER['DOCUMENT_ROOT']._PORTALROOT);
@@ -44,4 +42,5 @@ $extensionesValidas = listaExtensiones(1);
 
 // Lista de directorios desde los que leer los cursos:
 $listaDirs = listaUbicaciones(1);
+
 ?>

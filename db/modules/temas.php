@@ -45,8 +45,25 @@ function updateTema($IDtema, $IDcurso, $nombre, $descripcion, $ruta, $orden, $oc
 function deleteFullTema($IDtema) {
 	global $db;
 
+	$db->exec('DELETE FROM videosAdjuntos WHERE IDtema = '.decrypt($IDtema));
 	$db->exec('DELETE FROM videos WHERE IDtema = '.decrypt($IDtema));
 	$db->exec('DELETE FROM temas WHERE ID = '.decrypt($IDtema));
+}
+
+/*
+ duplicateTemas: Duplica los registros de temas de un curso en otro
+ */
+function duplicateTemas($IDcursoORI, $IDcurso) {
+	global $db;
+
+	$res = $db->query('SELECT ID, '.decrypt($IDcurso).' AS IDcurso, nombre, descripcion, ruta, orden, ocultar FROM temas WHERE IDcurso = '.decrypt($IDcursoORI));
+	while ($row = $res->fetchArray()) {
+		createTema($row['IDcurso'], $row['nombre'], $row['descripcion'], $row['ruta'], $row['orden'], $row['ocultar']);
+
+		$IDnewTema = getIDtema($row['IDcurso'], $row['nombre'], $row['ruta'], 0);
+		
+		duplicateVideosByCurso($row['IDcurso'], $row['ID'], $IDnewTema);
+	}
 }
 
 /*

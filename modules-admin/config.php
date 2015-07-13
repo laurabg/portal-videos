@@ -129,10 +129,6 @@ $OUT .= '<form name="config" role="form" method="POST" action="'._PORTALROOT.'mo
 		$OUT .= '> Encriptar los identificadores</label>';
 	$OUT .= '</div>';
 	$OUT .= '<div class="form-group">';
-		$OUT .= '<label for="_WSTOKEN">Token para servicio web de Moodle:</label>';
-		$OUT .= '<input type="text" name="_WSTOKEN" class="form-control" id="_WSTOKEN" placeholder="Token para servicio web de Moodle" value="'.$_POST['_WSTOKEN'].'" />';
-	$OUT .= '</div>';
-	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="cronTime">Hora a la que ejecutar el robot:</label> <em>Este valor solo se actualizar&aacute; cuando se pulse el bot&oacute;n "Programar Robot" o "Reprogramar Robot"</em>';
 		$OUT .= '<input type="text" name="cronTime" class="form-control" id="cronTime" placeholder="Hora a la que ejecutar el robot" value="'.$_POST['cronTime'].'" />';
 	$OUT .= '</div>';

@@ -93,6 +93,8 @@ function crearTablas() {
 		ubicacion INTEGER,
 		orden INTEGER,
 		ocultar INTEGER,
+		archivar INTEGER,
+		anoAcademico TEXT,
 		IDcursoMoodle INTEGER,
 		fechaIni DATE,
 		fechaFin DATE,

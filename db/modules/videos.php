@@ -12,7 +12,7 @@ function createVideo($IDcurso, $IDtema, $nombre, $descripcion, $ruta, $img, $fec
 	$db->exec($SQL);
 
 	// Una vez creado el video, obtener su ID y encriptarlo:
-	$IDvideo = $db->querySingle('SELECT ID FROM videos WHERE ruta = "'.$ruta.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema));
+	$IDvideo = $db->querySingle('SELECT ID FROM videos WHERE nombre = "'.$nombre.'" AND ruta = "'.$ruta.'" AND IDcurso = '.decrypt($IDcurso).' AND IDtema = '.decrypt($IDtema));
 
 	// Actualizar el registro:
 	$db->exec('UPDATE videos SET IDencriptado = "'.encrypt($IDvideo).'" WHERE ID = '.$IDvideo);
@@ -54,7 +54,40 @@ function updateVideoIMG($IDvideo, $img) {
 function deleteVideo($IDvideo) {
 	global $db;
 
+	$db->exec('DELETE FROM videosAdjuntos WHERE IDvideo = '.decrypt($IDvideo));
 	$db->exec('DELETE FROM videos WHERE ID = '.decrypt($IDvideo));
+}
+
+/*
+ duplicateVideos: Duplica los registros de videos de un tema en otro
+ */
+function duplicateVideos($IDtemaORI, $IDtema) {
+	global $db;
+
+	$res = $db->query('SELECT ID, IDcurso, '.decrypt($IDtema).' AS IDtema, nombre, descripcion, ruta, img, fechaCaducidad, orden, ocultar FROM videos WHERE IDtema = '.decrypt($IDtemaORI));
+	while ($row = $res->fetchArray()) {
+		createVideo($row['IDcurso'], $row['IDtema'], $row['nombre'], $row['descripcion'], $row['ruta'], $row['img'], $row['fechaCaducidad'], $row['orden'], $row['ocultar']);
+
+		$IDnewVideo = getIDvideo($row['IDcurso'], $row['IDtema'], $row['nombre'], $row['ruta'], 0);
+
+		duplicateAdjuntosByTema($row['IDtema'], $row['ID'], $IDnewVideo);
+	}
+}
+
+/*
+ duplicateVideosByCurso: Duplica los registros de videos de un curso en otro
+ */
+function duplicateVideosByCurso($IDcurso, $IDtemaORI, $IDtema) {
+	global $db;
+
+	$res = $db->query('SELECT ID, '.decrypt($IDcurso).' AS IDcurso, '.decrypt($IDtema).' AS IDtema, nombre, descripcion, ruta, img, fechaCaducidad, orden, ocultar FROM videos WHERE IDtema = '.decrypt($IDtemaORI));
+	while ($row = $res->fetchArray()) {
+		createVideo($row['IDcurso'], $row['IDtema'], $row['nombre'], $row['descripcion'], $row['ruta'], $row['img'], $row['fechaCaducidad'], $row['orden'], $row['ocultar']);
+
+		$IDnewVideo = getIDvideo($row['IDcurso'], $row['IDtema'], $row['nombre'], $row['ruta'], 0);
+
+		duplicateAdjuntosByCurso($row['IDcurso'], $row['IDtema'], $row['ID'], $IDnewVideo);
+	}
 }
 
 /*

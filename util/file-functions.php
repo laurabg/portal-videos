@@ -81,6 +81,33 @@ function removeDir($rutaDir) {
 } 
 
 
+/*
+ duplicateDir: Duplica un directorio y todos sus archivos recursivamente
+ Parámetros:
+	rutaORI				Ruta + nombre del directorio a duplicar
+	rutaDir				Ruta + nombre del directorio destino
+ */
+function duplicateDir($rutaORI, $rutaDir) { 
+	if ( (is_dir($rutaORI))&&(is_dir($rutaDir)) ) { 
+		$objects = scandir($rutaORI); 
+		foreach ($objects as $object) { 
+			if ($object != "." && $object != "..") { 
+				if (filetype($rutaORI."/".$object) == "dir") {
+					createDir($rutaDir."/".$object);
+					duplicateDir($rutaORI."/".$object, $rutaDir."/".$object);
+				} else {
+					// Comprobar que el archivo no exista, para no crearla dos veces:
+					if (!file_exists($rutaDir."/".$object)) {
+						copy($rutaORI."/".$object, $rutaDir."/".$object);
+					}
+				}
+			} 
+		} 
+		reset($objects); 
+	} 
+} 
+
+
 
 /*
  removeFile: Elimina un fichero
@@ -119,11 +146,12 @@ function removeFile($rutaFile) {
 /*
  createOrRenameCursoDir: Crea o renombra las carpetas correspondientes para el curso
  Parámetros:
+	listaDirs				Lista de ubicaciones existentes
 	ubicacion				Ubicacion del curso
 	rutaCurso				Carpeta del curso
 	rutaCursoORI 			Carpeta del curso original
  */
-function createOrRenameCursoDir($ubicacion, $rutaCurso, $rutaCursoORI) {
+function createOrRenameCursoDir($listaDirs, $ubicacion, $rutaCurso, $rutaCursoORI, $renombrar, $duplicar) {
 	// Obtener la ubicacion del curso:
 	if (is_int(array_search($ubicacion, array_column($listaDirs, 'ID')))) {
 		$dir = $listaDirs[array_search($ubicacion, array_column($listaDirs, 'ID'))]['ruta'];
@@ -131,7 +159,7 @@ function createOrRenameCursoDir($ubicacion, $rutaCurso, $rutaCursoORI) {
 	}
 
 	// Si existe el curso original, renombrarlo:
-	if ($rutaCursoORI != '') {
+	if ( ($renombrar == 1)&&($rutaCursoORI != '') ) {
 		if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCursoORI)) {
 			rename(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCursoORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso);
 		}
@@ -140,17 +168,22 @@ function createOrRenameCursoDir($ubicacion, $rutaCurso, $rutaCursoORI) {
 	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso)) {
 		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso);
 	}
+
+	if ( ($duplicar == 1)&&($rutaCursoORI != '') ) {
+		duplicateDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCursoORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso);
+	}
 }
 
 /*
  createOrRenameTemaDir: Crea o renombra las carpetas correspondientes para el tema
  Parámetros:
+ 	listaDirs				Lista de ubicaciones existentes
 	ubicacion				Ubicacion del curso
 	rutaCurso				Carpeta del curso
 	rutaTema 				Carpeta del tema
 	rutaTemaORI 			Carpeta del tema original
  */
-function createOrRenameTemaDir($ubicacion, $rutaCurso, $rutaTema, $rutaTemaORI) {
+function createOrRenameTemaDir($listaDirs, $ubicacion, $rutaCurso, $rutaTema, $rutaTemaORI, $renombrar, $duplicar) {
 	// Obtener la ubicacion del curso:
 	if (is_int(array_search($ubicacion, array_column($listaDirs, 'ID')))) {
 		$dir = $listaDirs[array_search($ubicacion, array_column($listaDirs, 'ID'))]['ruta'];
@@ -158,7 +191,7 @@ function createOrRenameTemaDir($ubicacion, $rutaCurso, $rutaTema, $rutaTemaORI) 
 	}
 	
 	// Si existe el tema original, renombrarlo:
-	if ($rutaTemaORI != '') {
+	if ( ($renombrar == 1)&&($rutaTemaORI != '') ) {
 		if (is_dir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTemaORI)) {
 			rename(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTemaORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema);
 		}
@@ -169,12 +202,18 @@ function createOrRenameTemaDir($ubicacion, $rutaCurso, $rutaTema, $rutaTemaORI) 
 		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema);
 	}
 
-	// Comprobar si existen las siguientes carpetas; sino crearlas:
-	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img')) {
-		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img');
+	if ($duplicar == 0) {
+		// Comprobar si existen las siguientes carpetas; sino crearlas:
+		if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img')) {
+			createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/img');
+		}
+		if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs')) {
+			createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs');
+		}
 	}
-	if (!file_exists(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs')) {
-		createDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema.'/docs');
+
+	if ( ($duplicar == 1)&&($rutaTemaORI != '') ) {
+		duplicateDir(_DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTemaORI, _DOCUMENTROOT._DIRCURSOS.$dir.$rutaCurso.'/'.$rutaTema);
 	}
 }
 

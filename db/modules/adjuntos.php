@@ -43,6 +43,42 @@ function deleteAdjunto($IDadjunto) {
 }
 
 /*
+ duplicateAdjuntos: Duplica los registros de adjuntos de un video en otro
+ */
+function duplicateAdjuntos($IDvideoORI, $IDvideo) {
+	global $db;
+
+	$SQL = 'INSERT INTO videosAdjuntos (IDcurso, IDtema, IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar) ';
+	$SQL .= 'SELECT IDcurso, IDtema, '.decrypt($IDvideo).' AS IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar FROM videosAdjuntos WHERE IDvideo = '.decrypt($IDvideoORI);
+	
+	$db->exec($SQL);
+}
+
+/*
+ duplicateAdjuntosByTema: Duplica los registros de adjuntos de un tema en otro
+ */
+function duplicateAdjuntosByTema($IDtema, $IDvideoORI, $IDvideo) {
+	global $db;
+
+	$SQL = 'INSERT INTO videosAdjuntos (IDcurso, IDtema, IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar) ';
+	$SQL .= 'SELECT IDcurso, '.decrypt($IDtema).' AS IDtema, '.decrypt($IDvideo).' AS IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar FROM videosAdjuntos WHERE IDvideo = '.decrypt($IDvideoORI);
+	
+	$db->exec($SQL);
+}
+
+/*
+ duplicateAdjuntosByCurso: Duplica los registros de adjuntos de un curso en otro
+ */
+function duplicateAdjuntosByCurso($IDcurso, $IDtema, $IDvideoORI, $IDvideo) {
+	global $db;
+
+	$SQL = 'INSERT INTO videosAdjuntos (IDcurso, IDtema, IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar) ';
+	$SQL .= 'SELECT '.decrypt($IDcurso).' AS IDcurso, '.decrypt($IDtema).' AS IDtema, '.decrypt($IDvideo).' AS IDvideo, nombre, descripcion, ruta, fechaCaducidad, orden, ocultar FROM videosAdjuntos WHERE IDvideo = '.decrypt($IDvideoORI);
+	
+	$db->exec($SQL);
+}
+
+/*
  checkAdjunto: Devuelve true si el adjunto existe, y false si no.
  */
 function checkAdjunto($condicion) {

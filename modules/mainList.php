@@ -23,6 +23,7 @@ $SQL .= ')';
 // Y el curso, si tiene fecha de inicio y fin, se encuentra en fechas
 $SQL .= ' AND ( (fechaIni != "" AND fechaFin != "" AND DATE("now") BETWEEN fechaIni AND fechaFin) OR (fechaIni = "" AND fechaFin = "") )';
 $SQL .= ' AND ocultar = 0'; // Y que no esten ocultos
+$SQL .= ' AND archivar = 0'; // Y que no esten archivados
 $SQL .= ' AND ID IN (SELECT IDcurso FROM videos WHERE ocultar = 0 AND ( (fechaCaducidad != "" AND DATE("now") < fechaCaducidad) OR (fechaCaducidad = "") ))'; // Y que tengan videos
 $SQL .= ' ORDER BY orden DESC, nombre'; // Ordenados por orden descendente y nombre
 

@@ -4,11 +4,11 @@
 /*
  createCurso: Crea un curso con los parámetros que se facilitan
  */
-function createCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function createCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico, $archivar = 0, $anoAcademico = "") {
 	global $db;
 
-	$SQL = 'INSERT INTO cursos (nombre, descripcion, ruta, ubicacion, orden, ocultar, IDcursoMoodle, fechaIni, fechaFin, publico) ';
-	$SQL .= 'VALUES ("'.$nombre.'", "'.$descripcion.'", "'.$ruta.'", '.$ubicacion.', '.$orden.', '.$ocultar.', '.( $IDcursoMoodle == "" ? 0 : $IDcursoMoodle ).', "'.$fechaIni.'", "'.$fechaFin.'", '.$publico.')';
+	$SQL = 'INSERT INTO cursos (nombre, descripcion, ruta, ubicacion, orden, ocultar, IDcursoMoodle, fechaIni, fechaFin, publico, archivar, anoAcademico) ';
+	$SQL .= 'VALUES ("'.$nombre.'", "'.$descripcion.'", "'.$ruta.'", '.$ubicacion.', '.$orden.', '.$ocultar.', '.( $IDcursoMoodle == "" ? 0 : $IDcursoMoodle ).', "'.$fechaIni.'", "'.$fechaFin.'", '.$publico.', '.$archivar.', "'.$anoAcademico.'")';
 
 	$db->exec($SQL);
 
@@ -22,7 +22,7 @@ function createCurso($nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar,
 /*
  updateCurso: Crea un curso con los parámetros que se facilitan
  */
-function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico) {
+function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden, $ocultar, $IDcursoMoodle, $fechaIni, $fechaFin, $publico, $archivar = 0, $anoAcademico = "") {
 	global $db;
 
 	$SQL = 'UPDATE cursos SET ';
@@ -32,10 +32,12 @@ function updateCurso($IDcurso, $nombre, $descripcion, $ruta, $ubicacion, $orden,
 	$SQL .= ', ubicacion = '.$ubicacion;
 	$SQL .= ', orden = '.$orden;
 	$SQL .= ', ocultar = '.$ocultar;
-	$SQL .= ', IDcursoMoodle = '.$IDcursoMoodle;
+	$SQL .= ( ($IDcursoMoodle != "") ? ', IDcursoMoodle = '.$IDcursoMoodle : '' );
 	$SQL .= ', fechaIni = "'.$fechaIni.'"';
 	$SQL .= ', fechaFin = "'.$fechaFin.'"';
 	$SQL .= ', publico = '.$publico;
+	$SQL .= ( ($archivar != "") ? ', archivar = '.$archivar : '' );
+	$SQL .= ( ($anoAcademico != "") ? ', anoAcademico = "'.$anoAcademico.'"' : '' );
 	$SQL .= ' WHERE ID = '.decrypt($IDcurso);
 	
 	$db->exec($SQL);
@@ -49,6 +51,7 @@ function deleteFullCurso($IDcurso) {
 
 	desregistrarUsuariosCurso($IDcurso);
 	
+	$db->exec('DELETE FROM videosAdjuntos WHERE IDcurso = '.decrypt($IDcurso));
 	$db->exec('DELETE FROM videos WHERE IDcurso = '.decrypt($IDcurso));
 	$db->exec('DELETE FROM temas WHERE IDcurso = '.decrypt($IDcurso));
 	$db->exec('DELETE FROM cursos WHERE ID = '.decrypt($IDcurso));
@@ -123,6 +126,7 @@ function getCursoData($IDcurso) {
 			'fechaIni' => $row['fechaIni'],
 			'fechaFin' => $row['fechaFin'],
 			'publico' => $row['publico'],
+			'archivar' => $row['archivar']
 		);
 	}
 
@@ -132,14 +136,45 @@ function getCursoData($IDcurso) {
 /*
  * getListaCursos: devuelve un array con todos los cursos ordenados:
  */
-function getListaCursos() {
+function getListaCursos($anoAcademico = "") {
 	global $db;
 	
 	$listaCursos = array();
 
-	$res = $db->query('SELECT * FROM cursos ORDER BY orden, nombre');
+	$res = $db->query('SELECT * FROM cursos WHERE '.( $anoAcademico != "" ?  'archivar = 1 AND anoAcademico = "'.$anoAcademico.'"' : 'archivar = 0' ).' ORDER BY orden, nombre');
 	while ($row = $res->fetchArray()) {
 		array_push($listaCursos, array($row['IDencriptado'], $row['nombre'], $row['IDcursoMoodle']));
+	}
+
+	return $listaCursos;
+}
+
+/*
+ * getListaAnosAcademicos: devuelve un array con todos los años academicos distintos que hay:
+ */
+function getListaAnosAcademicos() {
+	global $db;
+	
+	$listaAnosAcademicos = array();
+
+	$res = $db->query('SELECT DISTINCT anoAcademico FROM cursos WHERE anoAcademico != "" ORDER BY anoAcademico');
+	while ($row = $res->fetchArray()) {
+		array_push($listaAnosAcademicos, $row['anoAcademico']);
+	}
+
+	return $listaAnosAcademicos;
+}
+/*
+ * getListaCursosArchivados: devuelve un array con todos los cursos que estan archivados ordenados:
+ */
+function getListaCursosArchivados() {
+	global $db;
+	
+	$listaCursos = array();
+
+	$res = $db->query('SELECT * FROM cursos WHERE archivar = 1 ORDER BY anoAcademico, orden, nombre');
+	while ($row = $res->fetchArray()) {
+		array_push($listaCursos, array($row['IDencriptado'], $row['nombre'], $row['IDcursoMoodle'], $row['anoAcademico']));
 	}
 
 	return $listaCursos;
@@ -161,5 +196,21 @@ function encriptarCursos($encriptarForzado = 0) {
 	}
 }
 
+/*
+ * archivarCurso: Archiva el curso dado:
+ */
+function archivarCurso($IDcurso, $anoAcademico) {
+	global $db;
+	
+	$db->exec('UPDATE cursos SET archivar = 1, anoAcademico = "'.$anoAcademico.'", IDcursoMoodle = 0 WHERE ID = '.decrypt($IDcurso));
+}
 
+/*
+ * recuperarCursoArchivado: Recupera un curso archivado:
+ */
+function recuperarCursoArchivado($IDcurso) {
+	global $db;
+	
+	$db->exec('UPDATE cursos SET archivar = 0, anoAcademico = "" WHERE ID = '.decrypt($IDcurso));
+}
 ?>

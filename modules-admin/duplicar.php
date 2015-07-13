@@ -29,7 +29,9 @@ if (!isset($_POST['IDadjunto'])) {
 				<p>Seleccione c&oacute;mo desea duplicar el contenido seleccionado.</p>
 				<div class="form-error btn btn-danger"></div>
 				<div class="modal-footer">
+					<?php if ($_POST['IDadjunto'] == '') { ?>
 					<button type="submit" name="btn-dup" value="duplicar-todo" class="btn btn-success">Duplicar con todo el contenido</button>
+					<?php } ?>
 					<button type="submit" name="btn-dup" value="duplicar-solo-reg" class="btn btn-warning">Duplicar solo registro</button>
 					<button type="submit" name="btn-dup" value="cancel" class="btn btn-cancel btn-danger">Cancelar</button>
 				</div>

@@ -24,6 +24,7 @@ if ($error == 'danger') {
 
 // Si estamos viendo un curso, mostrar sus datos:
 } else if ( ($_POST['IDcurso'] != '')&&($_POST['IDtema'] != '') ) {
+	$cursoData = getCursoData($_POST['IDcurso']);
 	$temaData = getTemaData($_POST['IDcurso'], $_POST['IDtema']);
 	$_POST['nombreTema'] = $temaData['nombre'];
 	$_POST['rutaTema'] = $temaData['ruta'];
@@ -60,7 +61,9 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/te
 		$OUT .= '<label for="descripcion">Descripción del tema:</label>';
 		$OUT .= '<textarea class="form-control" name="descripcion" rows="3">'.$_POST['descripcion'].'</textarea>';
 	$OUT .= '</div>';
-	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if ($cursoData['archivar'] == 0) {
+		$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	}
 	if ($_POST['IDtema'] != '') {
 		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
 	}

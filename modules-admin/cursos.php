@@ -26,6 +26,7 @@ if ($error == 'danger') {
 	$_POST['fechaIni'] = '';
 	$_POST['fechaFin'] = '';
 	$_POST['publico'] = '';
+	$_POST['archivar'] = '';
 
 // Si estamos viendo un curso, mostrar sus datos:
 } else if ($_POST['IDcurso'] != '') {
@@ -40,6 +41,7 @@ if ($error == 'danger') {
 	$_POST['fechaIni'] = $cursoData['fechaIni'];
 	$_POST['fechaFin'] = $cursoData['fechaFin'];
 	$_POST['publico'] = $cursoData['publico'];
+	$_POST['archivar'] = $cursoData['archivar'];
 }
 
 $_POST['orden'] = ( $_POST['orden']=='' ? getNextOrdenCurso() : $_POST['orden'] );
@@ -51,9 +53,11 @@ if ($msgError != '') {
 }
 
 $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cursos.php">';
-	$OUT .= '<div class="form-group">';
-		$OUT .= '<label>URL del curso:</label> http://'.$_SERVER['SERVER_NAME']._PORTALROOT.'?IDcurso='.$cursoData['IDcurso'];
-	$OUT .= '</div>';
+	if ($_POST['IDcurso'] != '') {
+		$OUT .= '<div class="form-group">';
+			$OUT .= '<label>URL del curso:</label> http://'.$_SERVER['SERVER_NAME']._PORTALROOT.'?IDcurso='.$cursoData['IDcurso'];
+		$OUT .= '</div>';
+	}
 	$OUT .= '<div class="form-group">';
 		$OUT .= '<label for="nombreCurso">* Nombre del curso:</label>';
 		$OUT .= '<input required type="text" name="nombreCurso" class="form-control" id="nombreCurso" placeholder="Nombre del curso" value="'.$_POST['nombreCurso'].'" />';
@@ -148,7 +152,16 @@ $OUT .= '<form role="form" method="POST" action="'._PORTALROOT.'modules-admin/cu
 		$OUT .= '</div>';
 	}
 
-	$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	if ($_POST['IDcurso'] != '') {
+		if ($_POST['archivar'] == 0) {
+			$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+			$OUT .= '<button type="button" rel="opt=cursos&IDcurso='.$_POST['IDcurso'].'" id="archivar-curso" class="btn btn-primary">Archivar</button>';
+		} else {
+			$OUT .= '<button type="submit" name="archivar-curso" value="recuperar" class="btn btn-primary">Recuperar curso archivado</button>';
+		}
+	} else {
+		$OUT .= '<button type="submit" class="btn btn-default">Guardar</button>';
+	}
 	if ($_POST['IDcurso'] != '') {
 		$OUT .= '<button type="submit" value="del" name="formDel" class="btn btn-danger">Eliminar</button>';
 	}
